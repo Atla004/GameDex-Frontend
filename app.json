@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "GameDex-Frontend",
+    "name": "GameDex",
     "slug": "GameDex-Frontend",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -22,6 +22,10 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      "expo-router"
+    ],
+    "scheme": "your-app-scheme"
   }
 }
