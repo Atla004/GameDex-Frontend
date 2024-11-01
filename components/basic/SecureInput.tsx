@@ -4,7 +4,7 @@ import { useState } from "react";
 
 interface SecureInputProps {
   placeholder?: string;
-  value:string ;
+  value:string;
   onChangeText: (value: string) => void;
 }
 

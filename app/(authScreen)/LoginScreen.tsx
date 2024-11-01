@@ -10,10 +10,9 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from "react-native";
-import { Checkbox, SecureInput } from "@/components/basic/Basics";
+import { Checkbox, SecureInput } from "@/components/basic/MyComponents";
 import { StatusBar } from "expo-status-bar";
 import { useRouter } from "expo-router";
-import BackgroundAuth from "@/components/wraper/BackgroundAuth";
 
 export const LoginScreen = () => {
   const [username, setUsername] = useState("");

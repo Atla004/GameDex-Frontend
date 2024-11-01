@@ -1,11 +1,11 @@
-import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
 import LoginScreen from '@/app/(authScreen)/LoginScreen'; // Asegúrate de que la ruta sea correcta
+import HomeScreen from '@/app/(authScreen)/HomeScreen';
 
 export default function App() {
   return (
     <View style={styles.container}>
-      <LoginScreen />
+      <HomeScreen />
     </View>
   );
 }

@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { router } from "expo-router";
-import SecureInput from "@/components/Basic/SecureInput";
+import {SecureInput} from "@/components/basic/MyComponents";
 
 const RegisterScreen = () => {
   const [username, setUsername] = useState("");
