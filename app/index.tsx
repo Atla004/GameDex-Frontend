@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native';
 import LoginScreen from '@/app/(authScreen)/LoginScreen'; // Asegúrate de que la ruta sea correcta
-import HomeScreen from '@/app/(authScreen)/HomeScreen';
+import HomeScreen from '@/app/(mainInterface)/HomeScreen';
 
 export default function App() {
   return (

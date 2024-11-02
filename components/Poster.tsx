@@ -1,64 +1,56 @@
 import React from "react";
-import { View, Text, Image, StyleSheet } from "react-native";
-import ProgressCircle from "@/components/basic/ProgressCircle";
+import { View, Image, Text, StyleSheet } from "react-native";
 
 interface PosterProps {
   imageUrl: string;
   title: string;
-  rating1: number;
-  rating2: number;
 }
 
-const Poster: React.FC<PosterProps> = ({
-  imageUrl,
-  title,
-  rating1,
-  rating2,
-}) => {
+export const Poster: React.FC<PosterProps> = ({ imageUrl, title }) => {
   return (
     <View style={styles.container}>
-      <Image source={{ uri: imageUrl }} style={styles.image} />
-      <Text style={styles.title}>{title}</Text>
-      {/*       <View style={styles.ratingsContainer}>
-        <ProgressCircle style={styles.progressCircle} progress={rating1 / 100} />
-        <ProgressCircle style={styles.progressCircle} progress={rating2 / 100} />
-      </View> */}
+      <Image
+        source={{ uri: imageUrl }}
+        style={styles.image}
+        resizeMode="cover"
+      />
+      <View style={styles.titleContainer}>
+        <Text style={styles.title} numberOfLines={2}>
+          {title}
+        </Text>
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    alignItems: "center",
-    padding: 20,
+    width: 160,
+    marginHorizontal: 8,
     backgroundColor: "#fff",
     borderRadius: 10,
+    borderWidth: 3,
+    borderColor: "#2563eb",
+    overflow: "hidden",
+    elevation: 5,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.8,
-    shadowRadius: 2,
-    elevation: 5,
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
   },
   image: {
-    width: 200,
-    height: 300,
-    borderRadius: 10,
+    width: "100%",
+    height: 200,
+    backgroundColor: "#f3f4f6",
+  },
+  titleContainer: {
+    padding: 8,
+    backgroundColor: "#3b82f6",
   },
   title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginVertical: 10,
-  },
-  ratingsContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    width: "100%",
-    marginTop: 10,
-  },
-  progressCircle: {
-    height: 50,
-    width: 50,
+    color: "#fff",
+    fontSize: 10,
+    fontFamily: "PressStart2P",
+    textAlign: "center",
   },
 });
-
-export default Poster;
