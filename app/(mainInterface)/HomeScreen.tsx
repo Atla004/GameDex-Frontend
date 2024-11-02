@@ -1,10 +1,12 @@
-
 import React from 'react';
 import { Text, StyleSheet, ScrollView, View, Image } from 'react-native';
 import { useFonts } from "expo-font";
 import { GameSection } from '@/components/GameSection';
 import { GameCard } from '@/components/GameCard';
 import {RatingGameCard} from '@/components/RatingGameCard';
+import { RotatingPokeball } from '@/components/wraper/RotatingPokeball';
+import SearchBar from '@/components/basic/SearchBar';
+
 
 const featuredGames = [
   {
@@ -35,7 +37,6 @@ const upcomingGames = [
     imageUrl: 'https://imgs.search.brave.com/GLSGvHBmPihmvZYkjykPcheADDJQhqZw8ICqn6stT7k/rs:fit:500:0:0:0/g:ce/aHR0cHM6Ly9zdGF0/aWMwLmdhbWVyYW50/aW1hZ2VzLmNvbS93/b3JkcHJlc3Mvd3At/Y29udGVudC91cGxv/YWRzLzIwMjIvMDkv/SE9MTE9XLUtOSUdI/VC1TSUxLU09ORy5q/cGc',
     title: 'sILKSONG',
   },
-  // Add more upcoming games...
 ];
 const topRatedGames = [
   {
@@ -74,39 +75,45 @@ const HomeScreen = () => {
   }
 
   return (
-    <ScrollView style={styles.container}>
-      <GameCard
-        imageUrl="https://imgs.search.brave.com/QJtBG5Bm18bBt3Wn9ozEaCHy4ORDbka_Ua0PiPwlem8/rs:fit:500:0:0:0/g:ce/aHR0cHM6Ly9pbWFn/ZXM3Lm1lbWVkcm9p/ZC5jb20vaW1hZ2Vz/L1VQTE9BREVENDkw/LzY1MTI5MDRjMGJj/Y2MuanBlZw"
-        title="Pokémon Scarlet & Violet"
-        description="Albion Online es un MMORPG no lineal en el que escribes tu propia historia sin limitarte a seguir un camino prefijado, explora un amplio mundo abierto con cinco biomas únicos, todo cuanto hagas tendrá su repercusión en el mundo, con su economía orientada al jugador de Albion los jugadores crean prácticamente todo el equipo a partir de los recursos que consiguen, el equipo que llevas define quien eres, cambia de arma y armadura para pasar de caballero a mago o juego como una mezcla de ambas clases, aventúrate en el mundo abierto y haz frente a los habitantes y las criaturas de Albion, inicia expediciones o adéntrate en mazmorras en las que encontraras enemigos aun mas difíciles, enfréntate a otros jugadores en encuentros en el mundo abierto, lucha por los territorios o por ciudades enteras en batallas tácticas, relájate en tu isla privada donde podrás construir un hogar, cultivar cosechas, criar animales, únete a un gremio, todo es mejor cuando se trabaja en grupo. Adéntrate ya en el mundo de Albion y escribe tu propia historia."
-      />
-
-      <GameSection
-        title="Featured Games"
-        games={featuredGames}
-      />
-
-      <GameSection
-        title="Upcoming Releases"
-        games={upcomingGames}
-      />
-
-      <View style={styles.topRatedSection}>
-        <View style={styles.topRatedHeader}>
-          <Image
-            source={{ uri: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/master-ball.png' }}
-            style={styles.headerPokeball}
-          />
-          <Text style={styles.topRatedTitle}>Top Rated Games</Text>
-        </View>
-        {topRatedGames.map((game) => (
-          <RatingGameCard
-            key={game.ranking}
-            {...game}
-          />
-        ))}
+    <View style={{ flex: 1 }}>
+      <View style={styles.background}>
+      <RotatingPokeball />
       </View>
-    </ScrollView>
+      <ScrollView style={styles.container}>
+        <SearchBar />
+        <GameCard
+          imageUrl="https://imgs.search.brave.com/QJtBG5Bm18bBt3Wn9ozEaCHy4ORDbka_Ua0PiPwlem8/rs:fit:500:0:0:0/g:ce/aHR0cHM6Ly9pbWFn/ZXM3Lm1lbWVkcm9p/ZC5jb20vaW1hZ2Vz/L1VQTE9BREVENDkw/LzY1MTI5MDRjMGJj/Y2MuanBlZw"
+          title="Pokémon Scarlet & Violet"
+          description="Albion Online es un MMORPG no lineal en el que escribes tu propia historia sin limitarte a seguir un camino prefijado, explora un amplio mundo abierto con cinco biomas únicos, todo cuanto hagas tendrá su repercusión en el mundo, con su economía orientada al jugador de Albion los jugadores crean prácticamente todo el equipo a partir de los recursos que consiguen, el equipo que llevas define quien eres, cambia de arma y armadura para pasar de caballero a mago o juego como una mezcla de ambas clases, aventúrate en el mundo abierto y haz frente a los habitantes y las criaturas de Albion, inicia expediciones o adéntrate en mazmorras en las que encontraras enemigos aun mas difíciles, enfréntate a otros jugadores en encuentros en el mundo abierto, lucha por los territorios o por ciudades enteras en batallas tácticas, relájate en tu isla privada donde podrás construir un hogar, cultivar cosechas, criar animales, únete a un gremio, todo es mejor cuando se trabaja en grupo. Adéntrate ya en el mundo de Albion y escribe tu propia historia."
+        />
+
+        <GameSection
+          title="Featured Games"
+          games={featuredGames}
+        />
+
+        <GameSection
+          title="Upcoming Releases"
+          games={upcomingGames}
+        />
+
+        <View style={styles.topRatedSection}>
+          <View style={styles.topRatedHeader}>
+            <Image
+              source={{ uri: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/master-ball.png' }}
+              style={styles.headerPokeball}
+            />
+            <Text style={styles.topRatedTitle}>Top Rated Games</Text>
+          </View>
+          {topRatedGames.map((game) => (
+            <RatingGameCard
+              key={game.ranking}
+              {...game}
+            />
+          ))}
+        </View>
+      </ScrollView>
+    </View>
   );
 };
 export default HomeScreen;
@@ -114,7 +121,6 @@ export default HomeScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f3f4f6',
   },
   topRatedSection: {
     marginTop: 16,
@@ -123,7 +129,7 @@ const styles = StyleSheet.create({
   topRatedHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#1d4ed8',
+    backgroundColor: 'blue',
     padding: 12,
     borderRadius: 25,
     marginHorizontal: 16,
@@ -141,5 +147,10 @@ const styles = StyleSheet.create({
     textShadowColor: 'rgba(0, 0, 0, 0.3)',
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 2,
+  },
+  background: {
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
   },
 });
