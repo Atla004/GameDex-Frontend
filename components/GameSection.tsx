@@ -1,12 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView,Image } from 'react-native';
 import { Poster } from './Poster';
-
-interface Game {
-  id: string;
-  imageUrl: string;
-  title: string;
-}
+import { Game } from '@/types/main';
 
 interface GameSectionProps {
   title: string;
