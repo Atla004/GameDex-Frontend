@@ -1,8 +1,9 @@
-import {  useFontsLoad } from '@/utils/fontsload';
+import { useFontsLoad } from '@/utils/fontsload';
 import { RotatingPokeball } from '@/components/wraper/RotatingPokeball';
 import { Tabs } from 'expo-router';
 import { StyleSheet, Text, View } from 'react-native';
 import { useEffect, useState } from 'react';
+import { StatusBar } from 'react-native';
 
 export default function Layout() {
   const loading = useFontsLoad(); 
@@ -11,8 +12,7 @@ export default function Layout() {
   }
 
   return (
-    
-
+    <View style={{ flex: 1, paddingTop: StatusBar.currentHeight }}>
       <Tabs
         screenOptions={{
           headerShown: false,
@@ -37,7 +37,7 @@ export default function Layout() {
           }}
         />
       </Tabs>
-
+    </View>
   );
 }
 
