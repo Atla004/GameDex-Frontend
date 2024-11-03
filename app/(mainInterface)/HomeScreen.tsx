@@ -1,5 +1,4 @@
-import React, { useEffect, useLayoutEffect, useState } from 'react';
-import { fontsload } from '@/utils/fontsload';
+import { useEffect, useState } from 'react';
 import { Text, StyleSheet, ScrollView, View, Image } from 'react-native';
 import { GameSection } from '@/components/GameSection';
 import { GameCard } from '@/components/GameCard';
@@ -7,12 +6,11 @@ import {RatingGameCard} from '@/components/RatingGameCard';
 import { RotatingPokeball } from '@/components/wraper/RotatingPokeball';
 import SearchBar from '@/components/basic/SearchBar';
 import { Game } from '@/types/main';
+import { StatusBar } from 'expo-status-bar';
 
 
 
 const HomeScreen = () => {
-  const fontsLoaded =  fontsload();
-
 
 
   const [featuredGames, setFeaturedGames] = useState<Game[]>([]);
@@ -20,19 +18,16 @@ const HomeScreen = () => {
 
 
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     console.log("fetching data");
     fetchFeaturedGames();
     fetchTopRatedGames();
   }, []);
 
 
-  if(fontsLoaded){
-
     return (
-      <View style={{ flex: 1 }}>
+      <View >
       <View style={styles.background}>
-      <RotatingPokeball />
       </View>
       <ScrollView style={styles.container}>
         <SearchBar />
@@ -65,9 +60,7 @@ const HomeScreen = () => {
         </View>
       </ScrollView>
     </View>
-  )}else{
-    return <Text>cargando...</Text>;
-  }
+  );
   
   
   function fetchFeaturedGames() {
@@ -85,7 +78,6 @@ const HomeScreen = () => {
   function fetchTopRatedGames() {
     fetch("http://10.195.134.120:8000/topRatedGames.json") 
       .then((response) =>{
-        console.log(response)
         return response.json()
       })
       .then((data) => {
@@ -98,7 +90,6 @@ export default HomeScreen;
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
   },
   topRatedSection: {
     marginTop: 16,

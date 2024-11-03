@@ -27,10 +27,6 @@ export default function Layout() {
           listeners={handlerChangeRoute}
         />
         <Stack.Screen
-          name="HomeScreen"
-          listeners={handlerChangeRoute}
-        />
-        <Stack.Screen
           name="RegisterScreen"
           listeners={handlerChangeRoute}
         />

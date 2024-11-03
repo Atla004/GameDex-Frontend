@@ -1,10 +1,15 @@
 import React, { useEffect } from 'react';
 import { View, StyleSheet, Animated, Easing, Dimensions } from 'react-native';
-import { Svg, Circle, Path } from "react-native-svg";
+import Svg, { Circle, Path } from 'react-native-svg';
 
+interface RotatingPokeballProps {
+  children: React.ReactNode;
+}
 
-export const RotatingPokeball = () => {
+export const RotatingPokeball = ({ children }: RotatingPokeballProps) => {
   const rotateAnim = new Animated.Value(0);
+
+  
   const size = 400;
   const radius = (size - 20) / 2;
   const strokeWidth = 2;
@@ -29,6 +34,7 @@ export const RotatingPokeball = () => {
   return (
     <View style={styles.container}>
       <View style={styles.background}>
+
         <Animated.View
           style={[
             styles.pokeball,
@@ -37,43 +43,47 @@ export const RotatingPokeball = () => {
             },
           ]}
         >
-    <View style={[styles.container, { width: size, height: size }]}>
-      <Svg
-        height={size}
-        width={size}
-        viewBox={`0 0 ${size + strokeWidth+2} ${size + strokeWidth+2}`}
-      >
-        <Path
-          transform={transform}
-          d={`M 0 ${size / 2} A ${size / 2} ${size / 2} 0 1 0 ${size} ${
-            size / 2
-          } L ${size} ${size / 2 + 1} L 0 ${size / 2 + 1} Z`}
-          fill="white"
-          stroke="black"
-          strokeWidth={strokeWidth}
-        />
-        <Path
-          transform={transform}
-          d={`M 0 ${size / 2} A ${size / 2} ${size / 2} 0 1 1 ${size} ${
-            size / 2
-          } L ${size} ${size / 2 - 1} L 0 ${size / 2 - 1} Z`}
-          fill="red"
-          stroke="black"
-          strokeWidth={strokeWidth}
-        />
+          <View style={[styles.container, { width: size, height: size }]}>
+            <Svg
+              height={size}
+              width={size}
+              viewBox={`0 0 ${size + strokeWidth+2} ${size + strokeWidth+2}`}
+            >
+              <Path
+                transform={transform}
+                d={`M 0 ${size / 2} A ${size / 2} ${size / 2} 0 1 0 ${size} ${
+                  size / 2
+                } L ${size} ${size / 2 + 1} L 0 ${size / 2 + 1} Z`}
+                fill="white"
+                stroke="black"
+                strokeWidth={strokeWidth}
+                />
+              <Path
+                transform={transform}
+                d={`M 0 ${size / 2} A ${size / 2} ${size / 2} 0 1 1 ${size} ${
+                  size / 2
+                } L ${size} ${size / 2 - 1} L 0 ${size / 2 - 1} Z`}
+                fill="red"
+                stroke="black"
+                strokeWidth={strokeWidth}
+                />
 
-        <Circle
-          cx={size / 2}
-          cy={size / 2}
-          r={size / 7}
-          fill="white"
-          stroke="black"
-          strokeWidth={strokeWidth * 2}
-        />
-      </Svg>
-    </View>
+              <Circle
+                cx={size / 2}
+                cy={size / 2}
+                r={size / 7}
+                fill="white"
+                stroke="black"
+                strokeWidth={strokeWidth * 2}
+                />
+            </Svg>
+          </View>
         </Animated.View>
       </View>
+      <View style={styles.content}>
+      {children}
+      </View>
+
     </View>
   );
 };
@@ -83,19 +93,15 @@ const POKEBALL_SIZE = width * 1.2;
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    top: 10,
+    height: "100%",
+    width: "100%",
+    position: 'relative',
   },
   background: {
+    zIndex: -1, 
     position: 'absolute',
-    width: '100%',
-    height: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   content: {
-    flex: 1,
     zIndex: 1,
   },
   pokeball: {

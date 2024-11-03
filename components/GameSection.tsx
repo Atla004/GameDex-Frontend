@@ -9,8 +9,6 @@ interface GameSectionProps {
 }
 
 export const GameSection = ({ title, games }:GameSectionProps) => {
-  console.log(JSON.stringify(games, null, 2));
-
   return (
     <View style={styles.container}>
       <View style={styles.titleContainer}>

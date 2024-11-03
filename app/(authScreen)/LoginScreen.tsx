@@ -22,7 +22,7 @@ export const LoginScreen = () => {
 
   const handleLogin = () => {
     // go to home screen
-    router.push("HomeScreen");
+    router.push("../(mainInterface)/HomeScreen");
 
   };
 

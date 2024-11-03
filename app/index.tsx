@@ -1,10 +1,12 @@
+import { Link } from 'expo-router';
+import { Text } from 'react-native';
 
-import LoginScreen from '@/app/(authScreen)/LoginScreen'; // Asegúrate de que la ruta sea correcta
-import HomeScreen from '@/app/(mainInterface)/HomeScreen';
-
-export default function App() {
+export default function Root() {
   return (
-      <HomeScreen />
+    <>
+    <Text> Hfffffffffffffffffffffffffffffffffffffffffffffffello World </Text>
+    <Link href="/LoginScreen" > Go to Auth </Link>
+    </>
   );
-}
 
+}
