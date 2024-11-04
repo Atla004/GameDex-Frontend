@@ -1,156 +1,116 @@
 import React, { useEffect } from 'react';
-import { View, StyleSheet, Animated, Easing, Dimensions } from 'react-native';
-import Svg, { Circle, Path } from 'react-native-svg';
+import { View, StyleSheet, Animated, Easing, Dimensions, Image } from 'react-native';
+
+// Import local images
+import Pikachu from '@/assets/pokemon/1.png';
+import Bulbasaur from '@/assets/pokemon/4.png';
+import Charmander from '@/assets/pokemon/7.png';
+import Squirtle from '@/assets/pokemon/25.png';
 
 interface RotatingPokeballProps {
   children: React.ReactNode;
 }
 
+const POKEMON_IMAGES = [
+  Pikachu,  // Pikachu
+  Bulbasaur,  // Bulbasaur
+  Charmander,  // Charmander
+  Squirtle,  // Squirtle
+];
+
 export const RotatingPokeball = ({ children }: RotatingPokeballProps) => {
-  const rotateAnim = new Animated.Value(0);
+  const animations = POKEMON_IMAGES.map(() => new Animated.ValueXY({ x: 0, y: 0 }));
+  const { width, height } = Dimensions.get('window');
+  const DIAGONAL_LENGTH = Math.sqrt(Math.pow(width, 2) + Math.pow(height, 2));
 
-  
-  const size = 400;
-  const radius = (size - 20) / 2;
-  const strokeWidth = 2;
-  const transform = `translate(${strokeWidth }, ${strokeWidth })`;
-  
   useEffect(() => {
-    Animated.loop(
-      Animated.timing(rotateAnim, {
-        toValue: 1,
-        duration: 10000,
-        easing: Easing.linear,
-        useNativeDriver: true,
-      })
-    ).start();
-  }, []);
+    const createAnimation = (index: number) => {
+      return Animated.loop(
+        Animated.sequence([
+          Animated.timing(animations[index], {
+            toValue: { 
+              x: -DIAGONAL_LENGTH,
+              y: DIAGONAL_LENGTH
+            },
+            duration: 14000, // Slower animation
+            easing: Easing.linear,
+            useNativeDriver: true,
+          }),
+          Animated.timing(animations[index], {
+            toValue: { x: 0, y: 0 },
+            duration: 0,
+            useNativeDriver: true,
+          }),
+        ])
+      );
+    };
 
-  const rotate = rotateAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: ['0deg', '360deg'],
-  });
+    const animationGroup = POKEMON_IMAGES.map((_, index) => createAnimation(index));
+    Animated.parallel(animationGroup).start();
+
+    return () => {
+      animationGroup.forEach(anim => anim.stop());
+    };
+  }, []);
 
   return (
     <View style={styles.container}>
       <View style={styles.background}>
+        {POKEMON_IMAGES.map((image, index) => {
+          const positionStyles = [
+            { transform: [{ translateX: animations[index].x }, { translateY: animations[index].y }] }, // Top-left
+            { transform: [{ translateX: Animated.add(animations[index].x, width - 50) }, { translateY: animations[index].y }] }, // Top-right
+            { transform: [{ translateX: animations[index].x }, { translateY: Animated.add(animations[index].y, height - 50) }] }, // Bottom-left
+            { transform: [{ translateX: Animated.add(animations[index].x, width - 50) }, { translateY: Animated.add(animations[index].y, height - 50) }] }, // Bottom-right
+          ];
 
-        <Animated.View
-          style={[
-            styles.pokeball,
-            {
-              transform: [{ rotate }],
-            },
-          ]}
-        >
-          <View style={[styles.container, { width: size, height: size }]}>
-            <Svg
-              height={size}
-              width={size}
-              viewBox={`0 0 ${size + strokeWidth+2} ${size + strokeWidth+2}`}
+          return (
+            <Animated.View
+              key={index}
+              style={[styles.imageContainer, positionStyles[index]]}
             >
-              <Path
-                transform={transform}
-                d={`M 0 ${size / 2} A ${size / 2} ${size / 2} 0 1 0 ${size} ${
-                  size / 2
-                } L ${size} ${size / 2 + 1} L 0 ${size / 2 + 1} Z`}
-                fill="white"
-                stroke="black"
-                strokeWidth={strokeWidth}
-                />
-              <Path
-                transform={transform}
-                d={`M 0 ${size / 2} A ${size / 2} ${size / 2} 0 1 1 ${size} ${
-                  size / 2
-                } L ${size} ${size / 2 - 1} L 0 ${size / 2 - 1} Z`}
-                fill="red"
-                stroke="black"
-                strokeWidth={strokeWidth}
-                />
-
-              <Circle
-                cx={size / 2}
-                cy={size / 2}
-                r={size / 7}
-                fill="white"
-                stroke="black"
-                strokeWidth={strokeWidth * 2}
-                />
-            </Svg>
-          </View>
-        </Animated.View>
+              <Image
+                source={image}
+                style={styles.pokemonImage}
+              />
+            </Animated.View>
+          );
+        })}
       </View>
       <View style={styles.content}>
-      {children}
+        {children}
       </View>
-
     </View>
   );
 };
-
-const { width } = Dimensions.get('window');
-const POKEBALL_SIZE = width * 1.2;
 
 const styles = StyleSheet.create({
   container: {
     height: "100%",
     width: "100%",
     position: 'relative',
+    backgroundColor: '#f3f4f6',
   },
   background: {
-    zIndex: -1, 
     position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: -1,
+    opacity: 1,
   },
   content: {
     zIndex: 1,
   },
-  pokeball: {
-    width: POKEBALL_SIZE,
-    height: POKEBALL_SIZE,
-    opacity: 1,
-  },
-  pokeballTop: {
+  imageContainer: {
     position: 'absolute',
+    width: 50,
+    height: 50,
+  },
+  pokemonImage: {
     width: '100%',
-    height: '50%',
-    backgroundColor: '#ef4444',
-    borderTopLeftRadius: POKEBALL_SIZE / 2,
-    borderTopRightRadius: POKEBALL_SIZE / 2,
-  },
-  pokeballBottom: {
-    position: 'absolute',
-    top: '50%',
-    width: '100%',
-    height: '50%',
-    backgroundColor: '#000',
-    borderBottomLeftRadius: POKEBALL_SIZE / 2,
-    borderBottomRightRadius: POKEBALL_SIZE / 2,
-  },
-  pokeballLine: {
-    position: 'absolute',
-    top: '50%',
-    marginTop: -POKEBALL_SIZE * 0.025,
-    width: '100%',
-    height: POKEBALL_SIZE * 0.05,
-    backgroundColor: '#000',
-  },
-  pokeballCenter: {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    width: POKEBALL_SIZE * 0.2,
-    height: POKEBALL_SIZE * 0.2,
-    marginLeft: -POKEBALL_SIZE * 0.1,
-    marginTop: -POKEBALL_SIZE * 0.1,
-    backgroundColor: '#000',
-    borderRadius: POKEBALL_SIZE * 0.1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  pokeballInnerCenter: {
-    width: POKEBALL_SIZE * 0.12,
-    height: POKEBALL_SIZE * 0.12,
-    backgroundColor: '#fff',
-    borderRadius: POKEBALL_SIZE * 0.06,
+    height: '100%',
+    resizeMode: 'contain',
   },
 });

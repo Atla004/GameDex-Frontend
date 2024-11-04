@@ -4,8 +4,8 @@ import { Text } from 'react-native';
 export default function Root() {
   return (
     <>
-    <Text> Hfffffffffffffffffffffffffffffffffffffffffffffffello World </Text>
-    <Link href="/LoginScreen" > Go to Auth </Link>
+    <Text> Hfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffello World </Text>
+    <Link href="/GameScreen" > Go to Auth </Link>
     </>
   );
 

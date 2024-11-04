@@ -24,6 +24,7 @@ const favoriteGames = [
 
 const FavoritesScreen = () => {
   return (
+    <RotatingPokeball>
       <ScrollView style={styles.container}>
         <View style={styles.header}>
           <Image 
@@ -51,6 +52,7 @@ const FavoritesScreen = () => {
           </View>
         )}
       </ScrollView>
+  </RotatingPokeball>
   );
 };
 
