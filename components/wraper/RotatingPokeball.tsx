@@ -2,23 +2,24 @@ import React, { useEffect } from 'react';
 import { View, StyleSheet, Animated, Easing, Dimensions, Image } from 'react-native';
 
 // Import local images
-import Pikachu from '@/assets/pokemon/1.png';
-import Bulbasaur from '@/assets/pokemon/4.png';
-import Charmander from '@/assets/pokemon/7.png';
-import Squirtle from '@/assets/pokemon/25.png';
+const Pikachu = require("assets/pokemon/Pikachu.png");
+const Bulbasaur = require("assets/pokemon/Bulbasaur.png");
+const Charmander = require("assets/pokemon/Charmander.png");
+const Squirtle = require("assets/pokemon/Squirtle.png");
 
 interface RotatingPokeballProps {
   children: React.ReactNode;
 }
 
 const POKEMON_IMAGES = [
-  Pikachu,  // Pikachu
-  Bulbasaur,  // Bulbasaur
-  Charmander,  // Charmander
-  Squirtle,  // Squirtle
+  Bulbasaur,
+  Charmander,
+  Squirtle,
+
 ];
 
 export const RotatingPokeball = ({ children }: RotatingPokeballProps) => {
+  console.log(Pikachu);
   const animations = POKEMON_IMAGES.map(() => new Animated.ValueXY({ x: 0, y: 0 }));
   const { width, height } = Dimensions.get('window');
   const DIAGONAL_LENGTH = Math.sqrt(Math.pow(width, 2) + Math.pow(height, 2));
@@ -32,7 +33,7 @@ export const RotatingPokeball = ({ children }: RotatingPokeballProps) => {
               x: -DIAGONAL_LENGTH,
               y: DIAGONAL_LENGTH
             },
-            duration: 14000, // Slower animation
+            duration: 2000, // Slower animation
             easing: Easing.linear,
             useNativeDriver: true,
           }),
