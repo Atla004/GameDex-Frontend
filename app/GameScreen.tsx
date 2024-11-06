@@ -9,10 +9,11 @@ import {
   Dimensions,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { GameDetail } from "../components/GameDetail";
-import { ReviewSection } from "../components/ReviewSection";
-import { PokeBallRating } from "@/components/PokeballRating";
-import { StatusBar } from "expo-status-bar";
+import { GameDetail } from "../components/GameComponents/GameDetail";
+import { ReviewSection } from "../components/GameComponents/ReviewSection";
+import { PokeBallRating } from "@/components/GameComponents/PokeballRating";
+import { StatusBar } from "react-native";
+import { router } from "expo-router";
 
 interface GameScreenProps {
   game: {
@@ -42,13 +43,14 @@ interface GameScreenProps {
       date: string;
     }>;
   };
-  onClose: () => void;
 }
 
-const GameScreen: React.FC<GameScreenProps> = ({ game, onClose }) => {
+const GameScreen: React.FC<GameScreenProps> = ({ game }) => {
+  const onClose = () => {
+    router.push("/(mainInterface)/HomeScreen");
+  };
   return (
-    <>
-      <StatusBar style="light" />
+    <View style={{ flex: 1, paddingTop: StatusBar.currentHeight }}>
       <ScrollView style={styles.container}>
         {/* Header with back button */}
         <View style={styles.header}>
@@ -126,7 +128,7 @@ const GameScreen: React.FC<GameScreenProps> = ({ game, onClose }) => {
           </View>
         </View>
       </ScrollView>
-    </>
+    </View>
   );
 };
 
@@ -174,11 +176,7 @@ const mockGame = {
 };
 
 const App = () => {
-  const handleClose = () => {
-    console.log("Game screen closed");
-  };
-
-  return <GameScreen game={mockGame} onClose={handleClose} />;
+  return <GameScreen game={mockGame} />;
 };
 
 export default App;

@@ -1,16 +1,24 @@
-import React, { useEffect } from 'react';
-import { View, StyleSheet, Animated, Easing, Dimensions, Image } from 'react-native';
+import React, { useEffect } from "react";
+import {
+  View,
+  StyleSheet,
+  Animated,
+  Easing,
+  Dimensions,
+  Image,
+} from "react-native";
 
-interface RotatingPokeballProps {
+interface BackgroundMainInterfaceProps {
   children: React.ReactNode;
 }
 
-export const RotatingPokeball = ({ children }: RotatingPokeballProps) => {
+export const BackgroundMainInterface = ({
+  children,
+}: BackgroundMainInterfaceProps) => {
   const animation = new Animated.Value(0);
-  const { width, height } = Dimensions.get('window');
-  const POKEMON_SIZE = 50;
-  const DIAGONAL = Math.sqrt(Math.pow(width, 2) + Math.pow(height, 2));
-  const PATTERN_SIZE = POKEMON_SIZE * 2; // Space between pokemon in the pattern
+  const { width, height } = Dimensions.get("window");
+  const POKEMON_SIZE = 40;
+  const PATTERN_SIZE = POKEMON_SIZE * 2; 
 
   // Calculate how many pokemon we need to fill the screen
   const ROWS = Math.ceil(height / PATTERN_SIZE) + 2;
@@ -21,12 +29,13 @@ export const RotatingPokeball = ({ children }: RotatingPokeballProps) => {
       animation.setValue(0);
       Animated.timing(animation, {
         toValue: 1,
-        duration: 10000, // 10 seconds for one complete cycle
+        duration: 5000, // 10 seconds for one complete cycle
         easing: Easing.linear,
         useNativeDriver: true,
       }).start(() => startAnimation()); // Restart animation when complete
     };
 
+    console.log("Starting animation");
     startAnimation();
   }, []);
 
@@ -59,56 +68,53 @@ export const RotatingPokeball = ({ children }: RotatingPokeballProps) => {
               {
                 left: pos.col * PATTERN_SIZE,
                 top: pos.row * PATTERN_SIZE,
-                transform: [
-                  { translateX },
-                  { translateY },
-                ],
+                transform: [{ translateX }, { translateY }],
               },
             ]}
           >
             <Image
-              source={{ uri: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/22.png' }}
+              source={{
+                uri: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/17.png",
+              }}
               style={styles.pokemonImage}
             />
           </Animated.View>
         ))}
       </View>
-      <View style={styles.content}>
-        {children}
-      </View>
+      <View style={styles.content}>{children}</View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    height: '100%',
-    width: '100%',
-    position: 'relative',
-    backgroundColor: '#f3f4f6',
+    height: "100%",
+    width: "100%",
+    position: "relative",
+    backgroundColor: "#f3f4f6",
   },
   background: {
-    position: 'absolute',
+    position: "absolute",
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
     zIndex: -1,
-    opacity: 0.1,
+    opacity: 0.8,
   },
   content: {
     zIndex: 1,
   },
   imageContainer: {
-    position: 'absolute',
+    position: "absolute",
     width: 50,
     height: 50,
   },
   pokemonImage: {
-    width: '100%',
-    height: '100%',
-    resizeMode: 'contain',
+    width: "100%",
+    height: "100%",
+    resizeMode: "contain",
   },
 });
 
-export default RotatingPokeball;
+export default BackgroundMainInterface;

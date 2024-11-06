@@ -1,76 +1,48 @@
-import React, { useState } from 'react';
-import { View, TextInput, Button, StyleSheet } from 'react-native';
-import CustomPicker from './CustomPicker';
-
+import React from "react";
+import { View, TextInput, TouchableOpacity, StyleSheet } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
 
 const SearchBar = () => {
 
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filter, setFilter] = useState('all');
-
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(e.target.value);
-  };
-
-  const handleFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setFilter(e.target.value);
-  };
-
-  const handleSearch = () => {
-    console.log(`Searching for a new life`);
+  const handlePress = () => {
+    router.push({ pathname: 'SearchScreen', params: { screen: 'SearchScreen' } });
   };
 
   return (
-    <View style={styles.searchBar}>
-      <TextInput
-        value={searchTerm}
-        onChangeText={setSearchTerm}
-        placeholder="looking for a new reason to live ..."
-        style={styles.searchInput}
-      />
-{/*       <CustomPicker
-        selectedValue={filter}
-        onValueChange={setFilter}
-        style={styles.searchFilter}
-      /> */}
-      <Button title="Search" onPress={handleSearch} color="#ff0000" />
-    </View>
+    <TouchableOpacity onPress={handlePress} style={styles.searchContainer}>
+      <View style={styles.searchBar}>
+        <Ionicons name="search" size={20} color="#6b7280" />
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Search Pokémon games..."
+          editable={false}
+        />
+      </View>
+    </TouchableOpacity>
   );
 };
 
 const styles = StyleSheet.create({
+  searchContainer: {
+    padding: 16,
+    backgroundColor: "#1d4ed8",
+  },
   searchBar: {
-    backgroundColor: '#ffffff',
-    borderWidth: 3,
-    borderColor: '#000',
-    padding: 15,
-    borderRadius: 12,
-    flexDirection: 'row',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    elevation: 4,
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#fff",
+    borderRadius: 25,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderWidth: 2,
+    borderColor: "#3b82f6",
   },
   searchInput: {
-    padding: 10,
-    borderWidth: 2,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    marginRight: 10,
-    backgroundColor: '#f2f2f2',
-    fontFamily: 'Pokémon Solid',
     flex: 1,
-  },
-  searchFilter: {
-    padding: 8,
-    borderWidth: 2,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    marginRight: 10,
-    backgroundColor: '#e6e6e6',
-    fontFamily: 'Pokémon Solid',
-    flex: 1,
+    marginLeft: 8,
+    fontSize: 16,
+    color: "#1f2937",
   },
 });
 

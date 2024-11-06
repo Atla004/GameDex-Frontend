@@ -1,104 +1,132 @@
-import { useEffect, useState } from 'react';
-import { Text, StyleSheet, ScrollView, View, Image } from 'react-native';
-import { GameSection } from '@/components/GameSection';
-import { GameCard } from '@/components/GameCard';
-import {RatingGameCard} from '@/components/RatingGameCard';
-import { RotatingPokeball } from '@/components/wraper/RotatingPokeball';
-import SearchBar from '@/components/basic/SearchBar';
-import { Game } from '@/types/main';
-import { StatusBar } from 'expo-status-bar';
+import { useEffect, useState } from "react";
+import { Text, StyleSheet, ScrollView, View, Image } from "react-native";
+import { GameSection } from "@/components/mainInterfaceComponents/GameSection";
+import { GameCard } from "@/components/mainInterfaceComponents/GameCard";
+import { RatingGameCard } from "@/components/mainInterfaceComponents/RatingGameCard";
+import SearchBar from "@/components/basic/SearchBar";
+import { Game } from "@/types/main";
+import BackgroundMainInterface from "@/components/wraper/BackgroundMainInterface";
 
-
+const backendUrl = process.env.EXPO_PUBLIC_API_URL as string;
 
 const HomeScreen = () => {
-
-
   const [featuredGames, setFeaturedGames] = useState<Game[]>([]);
   const [topRatedGames, setTopRatedGames] = useState<Game[]>([]);
-
-
+  const [cardGames, setCardGames] = useState<Game>({
+    id: "1",
+    imageUrl: "",
+    title: "",
+    description: "",
+    ranking: 1,
+    criticScore: 1,
+    userScore: 1,
+  });
 
   useEffect(() => {
     console.log("fetching data");
     fetchFeaturedGames();
     fetchTopRatedGames();
+    fetchCardGames();
   }, []);
 
-
-    return (
-      <View >
-      <View style={styles.background}>
-      </View>
+  return (
+    <BackgroundMainInterface>
       <ScrollView style={styles.container}>
         <SearchBar />
         <GameCard
-          imageUrl="https://imgs.search.brave.com/QJtBG5Bm18bBt3Wn9ozEaCHy4ORDbka_Ua0PiPwlem8/rs:fit:500:0:0:0/g:ce/aHR0cHM6Ly9pbWFn/ZXM3Lm1lbWVkcm9p/ZC5jb20vaW1hZ2Vz/L1VQTE9BREVENDkw/LzY1MTI5MDRjMGJj/Y2MuanBlZw"
-          title="Pokémon Scarlet & Violet"
-          description="Albion Online es un MMORPG no lineal en el que escribes tu propia historia sin limitarte a seguir un camino prefijado, explora un amplio mundo abierto con cinco biomas únicos, todo cuanto hagas tendrá su repercusión en el mundo, con su economía orientada al jugador de Albion los jugadores crean prácticamente todo el equipo a partir de los recursos que consiguen, el equipo que llevas define quien eres, cambia de arma y armadura para pasar de caballero a mago o juego como una mezcla de ambas clases, aventúrate en el mundo abierto y haz frente a los habitantes y las criaturas de Albion, inicia expediciones o adéntrate en mazmorras en las que encontraras enemigos aun mas difíciles, enfréntate a otros jugadores en encuentros en el mundo abierto, lucha por los territorios o por ciudades enteras en batallas tácticas, relájate en tu isla privada donde podrás construir un hogar, cultivar cosechas, criar animales, únete a un gremio, todo es mejor cuando se trabaja en grupo. Adéntrate ya en el mundo de Albion y escribe tu propia historia."
+          imageUrl={cardGames.imageUrl}
+          title={cardGames.title}
+          description={cardGames.description}
         />
 
-        <GameSection
-          title="Featured Games"
-          games={featuredGames}
-        />
-
+        <GameSection title="Featured Games" games={featuredGames} />
 
         <View style={styles.topRatedSection}>
           <View style={styles.topRatedHeader}>
             <Image
-              source={{ uri: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/master-ball.png' }}
+              source={{
+                uri: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/master-ball.png",
+              }}
               style={styles.headerPokeball}
-              />
+            />
             <Text style={styles.topRatedTitle}>Top Rated Games</Text>
           </View>
+        
           {topRatedGames.map((game) => (
-            <RatingGameCard
-            key={game.ranking}
-            {...game}
-            />
+            <RatingGameCard key={game.ranking} {...game} />
           ))}
+
+{topRatedGames.length === 0 ? (
+            <>
+            <RatingGameCard 
+              imageUrl=""
+              title=""
+              description=""
+              ranking={1}
+              criticScore={1}
+              userScore={1}
+              />
+            </>
+          ) : (
+            topRatedGames.map((game) => (
+              <RatingGameCard key={game.ranking} {...game} />
+            ))
+          )}
+
         </View>
       </ScrollView>
-    </View>
+    </BackgroundMainInterface>
   );
-  
-  
+
   function fetchFeaturedGames() {
-    fetch("http://10.195.134.120:8000/featuredGames.json") 
-    .then((response) => {
-      return response.json()
-      }
-      )
+    fetch(`${backendUrl}/featuredGames.json`)
+      .then((response) => {
+        return response.json();
+      })
       .then((data) => {
         setFeaturedGames(data.slice(0, 5));
+        console.log(data);
       })
       .catch((error) => console.error("Error fetching featured games:", error));
   }
 
   function fetchTopRatedGames() {
-    fetch("http://10.195.134.120:8000/topRatedGames.json") 
-      .then((response) =>{
-        return response.json()
+    fetch(`${backendUrl}/topRatedGames.json`)
+      .then((response) => {
+        return response.json();
       })
       .then((data) => {
         setTopRatedGames(data.slice(0, 5));
       })
-      .catch((error) => console.error("Error fetching top rated games:", error));
+      .catch((error) =>
+        console.error("Error fetching top rated games:", error)
+      );
+  }
+
+  function fetchCardGames() {
+    fetch(`${backendUrl}/cardGames.json`)
+      .then((response) => {
+        return response.json();
+      })
+      .then((data) => {
+        console.log(data);
+        setCardGames(data);
+      })
+      .catch((error) => console.error("Error fetching card games:", error));
   }
 };
 export default HomeScreen;
 
 const styles = StyleSheet.create({
-  container: {
-  },
+  container: {},
   topRatedSection: {
     marginTop: 16,
     paddingBottom: 16,
   },
   topRatedHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'blue',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "blue",
     padding: 12,
     borderRadius: 25,
     marginHorizontal: 16,
@@ -110,18 +138,11 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   topRatedTitle: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 20,
-    fontWeight: 'bold',
-    textShadowColor: 'rgba(0, 0, 0, 0.3)',
+    fontWeight: "bold",
+    textShadowColor: "rgba(0, 0, 0, 0.3)",
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 2,
   },
-  background: {
-    position: 'absolute',
-    width: '100%',
-    height: '100%',
-  },
 });
-
-

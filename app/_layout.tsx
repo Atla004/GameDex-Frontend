@@ -2,7 +2,7 @@ import { Stack } from "expo-router";
 
 export const unstable_settings = {
   // Ensure any route can link back to `/`
-  initialRouteName: "GameScreen",
+  initialRouteName: "(mainInterface)/HomeScreen",
 
   authScreen: { 
     initialRouteName: "LoginScreen", 
@@ -23,6 +23,7 @@ export default function Layout() {
         <Stack.Screen name="GameScreen"/>
         <Stack.Screen name="(authScreen)" /> 
         <Stack.Screen name="(mainInterface)"/>
+        
       </Stack>
   );
 }

@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView,Image } from 'react-native';
-import { Poster } from './Poster';
+
+import { View, Text, StyleSheet, ScrollView,Image } from 'react-native';
+import { Poster } from '@/components/mainInterfaceComponents/Poster';
 import { Game } from '@/types/main';
 
 interface GameSectionProps {
@@ -9,6 +9,7 @@ interface GameSectionProps {
 }
 
 export const GameSection = ({ title, games }:GameSectionProps) => {
+
   return (
     <View style={styles.container}>
       <View style={styles.titleContainer}>
@@ -27,13 +28,24 @@ export const GameSection = ({ title, games }:GameSectionProps) => {
           scrollEnabled={true} 
           contentContainerStyle={styles.gamesContainer}
         >
-          {games.map((game) => (
+          {games.length === 0 ? (
+            <>
             <Poster 
-              key={game.id}
-              imageUrl={game.imageUrl}
-              title={game.title}
-            />
-          ))}
+              imageUrl=""
+              title=""
+              />
+            </>
+          ) : (
+            games.map((game: Game) => (
+              <Poster 
+                key={game.id}
+                imageUrl={game.imageUrl}
+                title={game.title}
+              />
+            ))
+          )}
+
+
         </ScrollView>
 
       </View>
