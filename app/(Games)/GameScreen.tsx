@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   ScrollView,
   View,
@@ -14,41 +14,70 @@ import { ReviewSection } from "@/components/GameComponents/ReviewSection";
 import { PokeBallRating } from "@/components/GameComponents/PokeballRating";
 import { StatusBar } from "react-native";
 import { router } from "expo-router";
+const backendUrl = process.env.EXPO_PUBLIC_API_URL as string;
 
-interface GameScreenProps {
-  game: {
-    id: string;
-    title: string;
-    description: string;
-    imageUrl: string;
-    criticScore: number;
-    userScore: number;
-    genres: string[];
-    platforms: string[];
-    developer: string;
-    publisher: string;
-    releaseDate: string;
-    ageRating: string;
-    criticReviews: Array<{
-      author: string;
-      publication: string;
-      score: number;
-      content: string;
-      date: string;
-    }>;
-    userReviews: Array<{
-      username: string;
-      score: number;
-      content: string;
-      date: string;
-    }>;
-  };
+interface Review {
+  author: string;
+  publication: string;
+  score: number;
+  content: string;
+  date: string;
 }
 
-const GameScreen: React.FC<GameScreenProps> = ({ game }) => {
+interface UserReview {
+  username: string;
+  score: number;
+  content: string;
+  date: string;
+}
+
+interface GameScreenData {
+  id: string;
+  title: string;
+  description: string;
+  imageUrl: string;
+  criticScore: number;
+  userScore: number;
+  genres: string[];
+  platforms: string[];
+  developer: string;
+  publisher: string;
+  releaseDate: string;
+  ageRating: string;
+  criticReviews: Review[];
+  userReviews: UserReview[];
+}
+
+const GameScreen = () => {
+  const [gameData, setGameData] = useState<GameScreenData | undefined>();
+
+  function fetchGame(gameId: string) {
+    fetch(`${backendUrl}/getGame/${gameId}`)
+      .then((response) => {
+        return response.json();
+      })
+      .then((data) => {
+        console.log(data.imageUrl);
+        setGameData(data);
+      })
+      .catch((error) => console.error("Error fetching featured games:", error));
+  }
+
+  useEffect(() => {
+    fetchGame("1");
+  }, []);
+
   const onClose = () => {
     router.push("/(mainInterface)/HomeScreen");
   };
+
+  const onViewAllComments = () => {
+    router.push("/(Games)/CommentScreen");
+  };
+
+  if (!gameData) {
+    return <Text>Loading...</Text>;
+  }
   return (
     <View style={{ flex: 1, paddingTop: StatusBar.currentHeight }}>
       <ScrollView style={styles.container}>
@@ -61,9 +90,9 @@ const GameScreen: React.FC<GameScreenProps> = ({ game }) => {
 
         {/* Title Section */}
         <View style={styles.titleSection}>
-          <Text style={styles.title}>{game.title}</Text>
+          <Text style={styles.title}>{gameData.title}</Text>
           <View style={styles.genreContainer}>
-            {game.genres.map((genre, index) => (
+            {gameData.genres.map((genre, index) => (
               <View key={index} style={styles.genreChip}>
                 <Text style={styles.genreText}>{genre}</Text>
               </View>
@@ -81,7 +110,7 @@ const GameScreen: React.FC<GameScreenProps> = ({ game }) => {
             <View style={styles.pokeballBottom} />
           </View>
           <Image
-            source={{ uri: game.imageUrl }}
+            source={{ uri: gameData.imageUrl }}
             style={styles.coverImage}
             resizeMode="cover"
           />
@@ -89,42 +118,73 @@ const GameScreen: React.FC<GameScreenProps> = ({ game }) => {
 
         {/* Description and Ratings */}
         <View style={styles.contentSection}>
-          <Text style={styles.description}>{game.description}</Text>
+          <Text style={styles.description}>{gameData.description}</Text>
 
           <View style={styles.ratingsContainer}>
             <View style={styles.ratingBox}>
               <Text style={styles.ratingLabel}>Critic Score</Text>
               <PokeBallRating
-                score={game.criticScore}
+                score={gameData.criticScore}
                 type="critic"
                 size="large"
               />
             </View>
             <View style={styles.ratingBox}>
               <Text style={styles.ratingLabel}>User Score</Text>
-              <PokeBallRating score={game.userScore} type="user" size="large" />
+              <PokeBallRating
+                score={gameData.userScore}
+                type="user"
+                size="large"
+              />
             </View>
           </View>
 
           {/* Game Details */}
           <View style={styles.detailsContainer}>
             <Text style={styles.sectionTitle}>Game Details</Text>
-            <GameDetail label="Platforms" value={game.platforms.join(", ")} />
-            <GameDetail label="Developer" value={game.developer} />
-            <GameDetail label="Publisher" value={game.publisher} />
-            <GameDetail label="Release Date" value={game.releaseDate} />
-            <GameDetail label="Age Rating" value={game.ageRating} />
+            <GameDetail
+              label="Platforms"
+              value={gameData.platforms.join(", ")}
+            />
+            <GameDetail label="Developer" value={gameData.developer} />
+            <GameDetail label="Publisher" value={gameData.publisher} />
+            <GameDetail label="Release Date" value={gameData.releaseDate} />
+            <GameDetail label="Age Rating" value={gameData.ageRating} />
           </View>
 
           {/* Reviews */}
           <View style={styles.reviewsContainer}>
             <Text style={styles.sectionTitle}>Critic Reviews</Text>
-            <ReviewSection reviews={game.criticReviews} type="critic" />
+            <ReviewSection
+              reviews={gameData.criticReviews.slice(0, 3)}
+              type="critic"
+            />
+            {gameData.criticReviews.length > 1&& (
+              <TouchableOpacity
+                style={styles.viewAllButton}
+                onPress={onViewAllComments}
+              >
+                <Text style={styles.viewAllText}>View All Reviews</Text>
+                <Ionicons name="chevron-forward" size={20} color="#3b82f6" />
+              </TouchableOpacity>
+            )}
 
             <Text style={[styles.sectionTitle, styles.userReviewsTitle]}>
               User Reviews
             </Text>
-            <ReviewSection reviews={game.userReviews} type="user" />
+            <ReviewSection
+              reviews={gameData.userReviews.slice(0, 3)}
+              type="user"
+            />
+            {gameData.userReviews.length > 1 && (
+              <TouchableOpacity
+                style={styles.viewAllButton}
+                onPress={onViewAllComments}
+              >
+                <Text style={styles.viewAllText}>View All Reviews</Text>
+                <Ionicons name="chevron-forward" size={20} color="#3b82f6" />
+              </TouchableOpacity>
+            )}
           </View>
         </View>
       </ScrollView>
@@ -132,54 +192,7 @@ const GameScreen: React.FC<GameScreenProps> = ({ game }) => {
   );
 };
 
-const mockGame = {
-  id: "1",
-  title: "Pokémon Red",
-  description:
-    "Pokémon Red is a 1996 role-playing video game developed by Game Freak and published by Nintendo for the Game Boy.",
-  imageUrl:
-    "https://cdn.discordapp.com/attachments/750486359386357863/1219035852714545152/photo_2024-03-17_17-32-52.jpg?ex=67293d9b&is=6727ec1b&hm=3eeeceb76a7e05732fb917f1c2af01984c03f12ce891c7bf730304d409948301&",
-  criticScore: 85,
-  userScore: 90,
-  genres: ["RPG", "Adventure"],
-  platforms: ["Game Boy"],
-  developer: "Game Freak",
-  publisher: "Nintendo",
-  releaseDate: "1996-02-27",
-  ageRating: "E",
-  criticReviews: [
-    {
-      author: "CHAN...",
-      publication: "La uña negra",
-      score: 13,
-      content:
-        "Con el corazon roto... pero con la esperanza de que el proximo sea mejor",
-      date: "2005-03-01",
-    },
-    // ...more reviews
-  ],
-  userReviews: [
-    {
-      username: "TheBlackInTheBear",
-      score: 95,
-      content:
-        "Soy un tanke soy un tanke soy un tanke soy un tanke soy un tanke",
-      date: "11-09-2024",
-    },
-    {
-      username: "ElGochoComePiedras",
-      score: 69,
-      content: "para que ir por una torre si puedes ir por dos",
-      date: "11-09-2001",
-    },
-  ],
-};
-
-const App = () => {
-  return <GameScreen game={mockGame} />;
-};
-
-export default App;
+export default GameScreen;
 
 const styles = StyleSheet.create({
   container: {
@@ -306,5 +319,22 @@ const styles = StyleSheet.create({
   },
   userReviewsTitle: {
     marginTop: 24,
+  },
+  viewAllButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 12,
+    backgroundColor: "#fff",
+    borderRadius: 8,
+    borderWidth: 2,
+    borderColor: "#3b82f6",
+    marginTop: 12,
+  },
+  viewAllText: {
+    color: "#3b82f6",
+    fontSize: 16,
+    fontWeight: "600",
+    marginRight: 4,
   },
 });

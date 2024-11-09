@@ -20,10 +20,9 @@ export default function Layout() {
           headerShown: false,
         }}
       >
-        <Stack.Screen name="GameScreen"/>
+        <Stack.Screen name="(Games)"/>
         <Stack.Screen name="(authScreen)" /> 
         <Stack.Screen name="(mainInterface)"/>
-        
       </Stack>
   );
 }
