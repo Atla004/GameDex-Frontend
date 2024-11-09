@@ -9,8 +9,8 @@ import {
   Dimensions,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { GameDetail } from "../components/GameComponents/GameDetail";
-import { ReviewSection } from "../components/GameComponents/ReviewSection";
+import { GameDetail } from "@/components/GameComponents/GameDetail";
+import { ReviewSection } from "@/components/GameComponents/ReviewSection";
 import { PokeBallRating } from "@/components/GameComponents/PokeballRating";
 import { StatusBar } from "react-native";
 import { router } from "expo-router";
