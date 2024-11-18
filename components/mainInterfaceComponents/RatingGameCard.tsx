@@ -1,25 +1,24 @@
 import React, { useEffect, useState } from "react";
-import { View, Image, Text, StyleSheet, Pressable, ActivityIndicator } from "react-native";
+import {
+  View,
+  Image,
+  Text,
+  StyleSheet,
+  Pressable,
+  ActivityIndicator,
+} from "react-native";
 import { PokeBallRating } from "@/components/GameComponents/PokeballRating";
 import { router } from "expo-router";
+import { Game } from "@/types/main";
 
-interface RatingGameCardProps {
-  imageUrl: string;
-  title: string;
-  description: string;
-  criticScore: number;
-  userScore: number;
-  ranking: number;
-}
-
-export const RatingGameCard: React.FC<RatingGameCardProps> = ({
+export const RatingGameCard = ({
   imageUrl,
   title,
   description,
   criticScore,
   userScore,
   ranking,
-}) => {
+}: Game) => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -43,48 +42,48 @@ export const RatingGameCard: React.FC<RatingGameCardProps> = ({
       ]}
     >
       <View style={styles.container}>
-      {isLoading ? (
+        {isLoading ? (
           <>
-          <View style={styles.rankingContainer}>
-            <Text style={styles.rankingNumber}></Text>
-          </View>
+            <View style={styles.rankingContainer}>
+              <Text style={styles.rankingNumber}></Text>
+            </View>
             <View style={styles.titleContainer}>
-            <ActivityIndicator
-              size="large"
-              color="#2563eb"
-              style={styles.loader}
-            />
+              <ActivityIndicator
+                size="large"
+                color="#2563eb"
+                style={styles.loader}
+              />
             </View>
           </>
         ) : (
-        <>
-          <View style={styles.rankingContainer}>
-            <Text style={styles.rankingNumber}>#{ranking}</Text>
-          </View>
+          <>
+            <View style={styles.rankingContainer}>
+              <Text style={styles.rankingNumber}>#{ranking}</Text>
+            </View>
 
-          <View style={styles.contentContainer}>
-            <View style={styles.header}>
-              <Image
-                source={{ uri: imageUrl }}
-                style={styles.image}
-                resizeMode="cover"
-              />
-              <View style={styles.titleContainer}>
-                <Text style={styles.title} numberOfLines={2}>
-                  {title}
-                </Text>
-                <Text style={styles.description} numberOfLines={2}>
-                  {description}
-                </Text>
+            <View style={styles.contentContainer}>
+              <View style={styles.header}>
+                <Image
+                  source={{ uri: imageUrl }}
+                  style={styles.image}
+                  resizeMode="cover"
+                />
+                <View style={styles.titleContainer}>
+                  <Text style={styles.title} numberOfLines={2}>
+                    {title}
+                  </Text>
+                  <Text style={styles.description} numberOfLines={2}>
+                    {description}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.ratingsContainer}>
+                <PokeBallRating score={criticScore} type="critic" />
+                <PokeBallRating score={userScore} type="user" />
               </View>
             </View>
-
-            <View style={styles.ratingsContainer}>
-              <PokeBallRating score={criticScore} type="critic" />
-              <PokeBallRating score={userScore} type="user" />
-            </View>
-          </View>
-        </>
+          </>
         )}
       </View>
     </Pressable>

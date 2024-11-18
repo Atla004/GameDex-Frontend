@@ -21,11 +21,11 @@ const RestartPasswordScreen = () => {
 
   const handleRestartPassword = () => {
     // handle password restart logic
-    router.push("LoginScreen");
+    router.push("../(accountScreen)/LoginScreen");
   };
 
   const goBackToLogin = () => {
-    router.push("LoginScreen");
+    router.push("../(accountScreen)/LoginScreen");
   };
 
   return (

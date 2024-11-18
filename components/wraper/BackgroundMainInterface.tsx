@@ -91,7 +91,6 @@ const styles = StyleSheet.create({
     height: "100%",
     width: "100%",
     position: "relative",
-    backgroundColor: "#f3f4f6",
   },
   background: {
     position: "absolute",
@@ -101,6 +100,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     zIndex: -1,
     opacity: 0.8,
+    
   },
   content: {
     zIndex: 1,

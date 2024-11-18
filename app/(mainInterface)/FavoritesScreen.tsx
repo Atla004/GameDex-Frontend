@@ -1,32 +1,34 @@
 import { RatingGameCard } from "@/components/mainInterfaceComponents/RatingGameCard";
 import { BackgroundMainInterface } from "@/components/wraper/BackgroundMainInterface";
-import React from "react";
+import { Game } from "@/types/main";
+import { useCallback, useEffect, useState } from "react";
 import { ScrollView, StyleSheet, View, Text, Image } from "react-native";
+import { useFocusEffect } from "@react-navigation/native";
 
-const favoriteGames = [
-  {
-    ranking: 1,
-    imageUrl:
-      "https://assets.pokemon.com/assets/cms2/img/video-games/video-games/pokemon_legends_arceus/legends-arceus-169.jpg",
-    title: "Pokémon Legends: Arceus",
-    description:
-      "A groundbreaking new entry in the Pokémon series, featuring an open-world adventure in the ancient Hisui region.",
-    criticScore: 83,
-    userScore: 88,
-  },
-  {
-    ranking: 2,
-    imageUrl:
-      "https://assets.pokemon.com/assets/cms2/img/video-games/video-games/pokemon_scarlet_violet/scarlet-violet-169.jpg",
-    title: "Pokémon Scarlet & Violet",
-    description:
-      "The first open-world RPG in the main Pokémon series, featuring three grand stories.",
-    criticScore: 72,
-    userScore: 78,
-  },
-];
+const backendUrl = process.env.EXPO_PUBLIC_API_URL as string;
 
 const FavoritesScreen = () => {
+  const [favoriteGames, setFavoriteGames] = useState<Game[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useFocusEffect(
+    useCallback(() => {
+      const fetchFavoriteGames = async () => {
+        try {
+          const response = await fetch(`${backendUrl}/Favorites.json`);
+          const data = await response.json();
+          setFavoriteGames(data);
+        } catch (error) {
+          console.error("Error fetching favorite games:", error);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      fetchFavoriteGames();
+    }, [])
+  );
+
   return (
     <BackgroundMainInterface>
       <ScrollView style={styles.container}>
@@ -40,23 +42,31 @@ const FavoritesScreen = () => {
           <Text style={styles.headerTitle}>Your Favorite Games</Text>
         </View>
 
-        {favoriteGames.map((game, index) => (
-          <RatingGameCard key={index} {...game} />
-        ))}
-
-        {favoriteGames.length === 0 && (
-          <View style={styles.emptyState}>
-            <Image
-              source={{
-                uri: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png",
-              }}
-              style={styles.emptyStateIcon}
-            />
-            <Text style={styles.emptyStateText}>No favorite games yet!</Text>
-            <Text style={styles.emptyStateSubtext}>
-              Start adding games to your favorites
-            </Text>
+        {loading ? (
+          <View style={styles.loadingContainer}>
+            <Text style={styles.loadingText}>Loading...</Text>
           </View>
+        ) : (
+          <>
+            {favoriteGames.map((game, index) => (
+              <RatingGameCard key={index} {...game} />
+            ))}
+
+            {favoriteGames.length === 0 && (
+              <View style={styles.emptyState}>
+                <Image
+                  source={{
+                    uri: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png",
+                  }}
+                  style={styles.emptyStateIcon}
+                />
+                <Text style={styles.emptyStateText}>No favorite games yet!</Text>
+                <Text style={styles.emptyStateSubtext}>
+                  Start adding games to your favorites
+                </Text>
+              </View>
+            )}
+          </>
         )}
       </ScrollView>
     </BackgroundMainInterface>
@@ -105,5 +115,16 @@ const styles = StyleSheet.create({
   emptyStateSubtext: {
     fontSize: 14,
     color: "#6b7280",
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 32,
+  },
+  loadingText: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#4b5563",
   },
 });

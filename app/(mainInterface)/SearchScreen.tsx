@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
   ScrollView,
   StyleSheet,
@@ -7,7 +7,6 @@ import {
   TextInput,
   TouchableOpacity,
   Image,
-  Modal,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { GameCard } from "@/components/mainInterfaceComponents/GameCard";
@@ -18,32 +17,9 @@ import { useLocalSearchParams } from "expo-router";
 import FilterModal from "@/components/mainInterfaceComponents/SearchScreenComponents/FilterModal";
 import BackgroundMainInterface from "@/components/wraper/BackgroundMainInterface";
 
-// Mock data - in a real app this would come from an API
-const allSearchResults:Game[] = Array(25)
-  .fill(null)
-  .map((_, index) => ({
-    id: index.toString(),
-    imageUrl:
-      index % 2 === 0
-        ? "https://imgs.search.brave.com/GVcDP9cX1YLhjAXS0-gIVZzpPpmCYLlsOHfwIOt7VfU/rs:fit:500:0:0:0/g:ce/aHR0cHM6Ly9idXJz/dC5zaG9waWZ5Y2Ru/LmNvbS9waG90b3Mv/dHdvLXRvbmUtaW5r/LWNsb3VkLmpwZz93/aWR0aD0xMDAwJmZv/cm1hdD1wanBnJmV4/aWY9MCZpcHRjPTA"
-        : "https://imgs.search.brave.com/GVcDP9cX1YLhjAXS0-gIVZzpPpmCYLlsOHfwIOt7VfU/rs:fit:500:0:0:0/g:ce/aHR0cHM6Ly9idXJz/dC5zaG9waWZ5Y2Ru/LmNvbS9waG90b3Mv/dHdvLXRvbmUtaW5r/LWNsb3VkLmpwZz93/aWR0aD0xMDAwJmZv/cm1hdD1wanBnJmV4/aWY9MCZpcHRjPTA",
-    title:
-      index % 2 === 0 ? "Pokémon Scarlet & Violet" : "Pokémon Legends: Arceus",
-    description:
-      index % 2 === 0
-        ? "Embark on an open-world adventure in the Paldea region. Discover new Pokémon, explore vast landscapes, and uncover the mysteries of Terastallization."
-        : "Travel to the ancient Hisui region and discover the origins of the Pokémon world in this groundbreaking adventure.",
-    releaseDate: index % 2 === 0 ? "2022-11-18" : "2022-01-28",
-    platform: "Nintendo Switch",
-    developer: "Game Freak",
-    publisher: "Nintendo",
-    genre: index % 2 === 0 ? "RPG" : "Action RPG",
-    criticScore: index % 2 === 0 ? 85 : 90,
-    userScore: index % 2 === 0 ? 8.5 : 9.0,
-    ranking: index + 1,
-  }));
+const backendUrl = process.env.EXPO_PUBLIC_API_URL as string;
 
-const ITEMS_PER_PAGE = 5;
+const ITEMS_PER_PAGE = 10;
 
 const filterOptions = {
   releaseDate: ["2023", "2022", "2021", "2020", "Older"],
@@ -53,12 +29,25 @@ const filterOptions = {
   genre: ["RPG", "Action RPG", "Strategy", "Puzzle", "Adventure"],
 };
 
+interface response {
+  page: number;
+  total_pages: number;
+  result_count: number;
+}
 
 const SearchScreen = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearching, setIsSearching] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const isSearchingRef = useRef(false);
+
+  const [response, setResponse] = useState<response>({
+    page: 1,
+    total_pages: 1,
+    result_count: 0,
+  });
   const [activeFilters, setActiveFilters] = useState<activeFilters>({
     releaseDate: [],
     platform: [],
@@ -66,17 +55,61 @@ const SearchScreen = () => {
     publisher: [],
     genre: [],
   });
+  const [searchResults, setSearchResults] = useState<Game[]>([]);
+
+
 
   const searchInputRef = useRef<TextInput>(null);
 
-  const totalPages = Math.ceil(allSearchResults.length / ITEMS_PER_PAGE);
+
+
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const currentResults = allSearchResults.slice(
-    startIndex,
-    startIndex + ITEMS_PER_PAGE
-  );
+
+
+
 
   const data = useLocalSearchParams();
+
+
+
+
+
+
+  const handleSearch = () => {
+    isSearchingRef.current = true;
+    setCurrentPage(1);
+    console.log("handleSearch to currentpage 1"); // no es
+  };
+
+  const getSearchedGames = useCallback(() => {
+    if (!isSearchingRef.current) {
+      console.log("not searching isSearching:", isSearchingRef.current);
+      return;
+    }
+    console.log("fetching data");
+    setLoading(true);
+    const url = `${backendUrl}/pagination/pag_${currentPage}.json`;
+    console.log(url);
+    fetch(url)
+      .then((response) => response.json())
+      .then((data) => {
+        setSearchResults(data.results);
+        setResponse(data);
+        setLoading(false);
+      })
+      .catch((error) => console.error("Error fetching data:", error));
+  }, [currentPage]);
+
+
+
+  useEffect(() => {
+    console.log("useEffect currentPage", currentPage);
+    getSearchedGames();
+  }, [currentPage]);
+
+  useEffect(() => {
+    console.log("currentPage se esta cambiando", currentPage);
+  }, [currentPage]);
 
   useEffect(() => {
     if (data) {
@@ -84,13 +117,8 @@ const SearchScreen = () => {
     }
   }, [data]);
 
-  const handleSearch = () => {
-    setIsSearching(true);
-    setCurrentPage(1);
-    // Implement search logic here with filters
-  };
-
   const handleClearFilters = () => {
+    console.log("handleClearFilters to curentPage 1");
     setCurrentPage(1);
     setActiveFilters({
       releaseDate: [],
@@ -116,11 +144,14 @@ const SearchScreen = () => {
               onChangeText={setSearchQuery}
               onSubmitEditing={handleSearch}
             />
+
             {searchQuery.length > 0 && (
               <TouchableOpacity onPress={() => setSearchQuery("")}>
                 <Ionicons name="close-circle" size={20} color="#6b7280" />
               </TouchableOpacity>
             )}
+
+
             <TouchableOpacity
               style={styles.filterButton}
               onPress={() => setShowFilters(true)}
@@ -130,25 +161,34 @@ const SearchScreen = () => {
           </View>
         </View>
 
-        {isSearching && currentResults.length > 0 && (
+        
+          {/*pantalla de juegos*/}
+        {loading && (
+          <View style={styles.loadingContainer}>
+            <Text style={styles.loadingText}>Loading...</Text>
+          </View>
+        )}
+
+        {!loading && isSearchingRef.current && searchResults.length > 0 && (
           <View>
 
-            {currentResults.map((game, index) => (
+            {searchResults.map((game, index) => (
               <GameCard key={`${currentPage}-${index}`} {...game} />
             ))}
 
             <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
+              currentPage={response.page}
+              totalPages={response.total_pages}
               setCurrentPage={setCurrentPage}
               startIndex={startIndex}
               ITEMS_PER_PAGE={ITEMS_PER_PAGE}
-              allSearchResults={allSearchResults}
+              result_count={response.result_count}
             />
           </View>
         )}
 
-        {isSearching && currentResults.length === 0 && (
+        {/* NO se encontraron juegos */}
+        {!loading && isSearchingRef.current && searchResults.length === 0 && (
           <View style={styles.emptyState}>
             <Image
               source={{
@@ -354,6 +394,17 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: "#6b7280",
     marginTop: 2,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 32,
+  },
+  loadingText: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#4b5563",
   },
 });
 

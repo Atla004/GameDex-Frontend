@@ -13,7 +13,7 @@ const HomeScreen = () => {
   const [featuredGames, setFeaturedGames] = useState<Game[]>([]);
   const [topRatedGames, setTopRatedGames] = useState<Game[]>([]);
   const [cardGames, setCardGames] = useState<Game>({
-    id: "1",
+    id: "12",
     imageUrl: "",
     title: "",
     description: "",
@@ -52,13 +52,12 @@ const HomeScreen = () => {
             <Text style={styles.topRatedTitle}>Top Rated Games</Text>
           </View>
         
-          {topRatedGames.map((game) => (
-            <RatingGameCard key={game.ranking} {...game} />
-          ))}
 
-{topRatedGames.length === 0 ? (
+
+          {topRatedGames.length === 0 ? (
             <>
             <RatingGameCard 
+              id=""
               imageUrl=""
               title=""
               description=""
@@ -85,7 +84,6 @@ const HomeScreen = () => {
       })
       .then((data) => {
         setFeaturedGames(data.slice(0, 5));
-        console.log(data);
       })
       .catch((error) => console.error("Error fetching featured games:", error));
   }
@@ -96,7 +94,7 @@ const HomeScreen = () => {
         return response.json();
       })
       .then((data) => {
-        setTopRatedGames(data.slice(0, 5));
+        setTopRatedGames(data.slice(0, 2));
       })
       .catch((error) =>
         console.error("Error fetching top rated games:", error)
@@ -109,7 +107,6 @@ const HomeScreen = () => {
         return response.json();
       })
       .then((data) => {
-        console.log(data);
         setCardGames(data);
       })
       .catch((error) => console.error("Error fetching card games:", error));

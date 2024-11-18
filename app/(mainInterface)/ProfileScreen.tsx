@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   ScrollView,
   View,
@@ -15,9 +15,21 @@ import PasswordChangeModal from "@/components/mainInterfaceComponents/ProfileScr
 import EmailChangeModal from "@/components/mainInterfaceComponents/ProfileScreenComponents/EmailChangeModal";
 import UsernameChangeModal from "@/components/mainInterfaceComponents/ProfileScreenComponents/UsernameChangeModal";
 import DeleteAccountModal from "@/components/mainInterfaceComponents/ProfileScreenComponents/DeleteAccountModal";
+import { router } from "expo-router";
 
+const backendUrl = process.env.EXPO_PUBLIC_API_URL as string;
+
+interface ProfileData {
+  profileImageUri: string;
+  username: string;
+  userLevel: string;
+  reviews: number;
+  favorites: number;
+  email: string;
+}
 
 const ProfileScreen = () => {
+  const [mockData, setMockData] = useState<ProfileData>();
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [showUsernameModal, setShowUsernameModal] = useState(false);
@@ -28,6 +40,24 @@ const ProfileScreen = () => {
   const [newEmail, setNewEmail] = useState("");
   const [newUsername, setNewUsername] = useState("");
   const [deleteConfirmation, setDeleteConfirmation] = useState("");
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch(`${backendUrl}/Profile.json`);
+        const data = await response.json();
+        setMockData(data);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  if (!mockData) {
+    return <Text>Loading...</Text>;
+  }
 
   const handlePasswordChange = () => {
     if (newPassword !== confirmPassword) {
@@ -47,6 +77,16 @@ const ProfileScreen = () => {
     setShowUsernameModal(false);
     setNewUsername("");
   };
+
+  const handleLogout = () => {
+    Alert.alert("Goodbye, Trainer!", "You have been logged out.", [
+      { text: "OK", onPress: () => {
+
+        router.dismissAll();
+        router.replace("/(authScreen)/LoginScreen");
+      } },
+    ]);
+  }
 
   const handleDeleteAccount = () => {
     if (deleteConfirmation.toLowerCase() !== "delete") {
@@ -73,26 +113,24 @@ const ProfileScreen = () => {
         <View style={styles.header}>
           <View style={styles.profileImageContainer}>
             <Image
-              source={{
-                uri: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png",
-              }}
+              source={{ uri: mockData.profileImageUri }}
               style={styles.profileImage}
             />
             <TouchableOpacity style={styles.editImageButton}>
               <Ionicons name="camera" size={20} color="#fff" />
             </TouchableOpacity>
           </View>
-          <Text style={styles.username}>Ash Ketchum</Text>
-          <Text style={styles.userLevel}>Level 42 Trainer</Text>
+          <Text style={styles.username}>{mockData.username}</Text>
+          <Text style={styles.userLevel}>{mockData.userLevel}</Text>
 
           {/* Stats */}
           <View style={styles.statsContainer}>
             <View style={styles.statItem}>
-              <Text style={styles.statValue}>128</Text>
+              <Text style={styles.statValue}>{mockData.reviews}</Text>
               <Text style={styles.statLabel}>Reviews</Text>
             </View>
             <View style={styles.statItem}>
-              <Text style={styles.statValue}>64</Text>
+              <Text style={styles.statValue}>{mockData.favorites}</Text>
               <Text style={styles.statLabel}>Favorites</Text>
             </View>
           </View>
@@ -104,13 +142,13 @@ const ProfileScreen = () => {
           <SettingOption
             icon="master-ball"
             title="Change Username"
-            subtitle="Ash Ketchum"
+            subtitle={mockData.username}
             onPress={() => setShowUsernameModal(true)}
           />
           <SettingOption
             icon="quick-ball"
             title="Change Email"
-            subtitle="ash.ketchum@pokemon.com"
+            subtitle={mockData.email}
             onPress={() => setShowEmailModal(true)}
           />
           <SettingOption
@@ -140,7 +178,10 @@ const ProfileScreen = () => {
 
         {/* Account Management */}
         <View style={styles.accountManagement}>
-          <TouchableOpacity style={styles.logoutButton}>
+          <TouchableOpacity 
+            style={styles.logoutButton}
+            onPress={handleLogout}   
+          >
             <Text style={styles.logoutText}>Log Out</Text>
           </TouchableOpacity>
 

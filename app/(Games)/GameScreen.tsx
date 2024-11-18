@@ -14,22 +14,10 @@ import { ReviewSection } from "@/components/GameComponents/ReviewSection";
 import { PokeBallRating } from "@/components/GameComponents/PokeballRating";
 import { StatusBar } from "react-native";
 import { router } from "expo-router";
+import { CommentInputFooter } from "@/components/GameComponents/CommentsInputFooter";
+import { Review } from "@/types/main";
+
 const backendUrl = process.env.EXPO_PUBLIC_API_URL as string;
-
-interface Review {
-  author: string;
-  publication: string;
-  score: number;
-  content: string;
-  date: string;
-}
-
-interface UserReview {
-  username: string;
-  score: number;
-  content: string;
-  date: string;
-}
 
 interface GameScreenData {
   id: string;
@@ -45,22 +33,37 @@ interface GameScreenData {
   releaseDate: string;
   ageRating: string;
   criticReviews: Review[];
-  userReviews: UserReview[];
+  userReviews: Review[];
 }
 
 const GameScreen = () => {
-  const [gameData, setGameData] = useState<GameScreenData | undefined>();
+  const [gameData, setGameData] = useState<GameScreenData>({
+    id: "",
+    title: "",
+    description: "",
+    imageUrl: "",
+    criticScore: 0,
+    userScore: 0,
+    genres: [],
+    platforms: [],
+    developer: "",
+    publisher: "",
+    releaseDate: "",
+    ageRating: "",
+    criticReviews: [],
+    userReviews: [],
+  });
 
   function fetchGame(gameId: string) {
-    fetch(`${backendUrl}/getGame/${gameId}`)
+    fetch(`${backendUrl}/getGame/${gameId}.json`)
       .then((response) => {
         return response.json();
       })
       .then((data) => {
-        console.log(data.imageUrl);
+        console.log(data.criticReviews);
         setGameData(data);
       })
-      .catch((error) => console.error("Error fetching featured games:", error));
+      .catch((error) => console.error("Error fetching featured games"));
   }
 
   useEffect(() => {
@@ -72,14 +75,72 @@ const GameScreen = () => {
   };
 
   const onViewAllComments = () => {
-    router.push("/(Games)/CommentScreen");
+    router.push("/(games)/CommentScreen");
   };
+
+  const handleAddComment = (content: string) => {
+    const newReview = {
+      id: Date.now().toString(),
+      username: "You",
+      score: 85, // You might want to add a score input in the real app
+      content,
+      date: new Date().toLocaleDateString(),
+      isOwnReview: true,
+    };
+
+    if (!gameData.userReviews) {
+      setGameData({
+        ...gameData,
+        userReviews: [newReview],
+      });
+      return;
+    }
+
+
+    setGameData({
+      ...gameData,
+      userReviews: [...gameData.userReviews,newReview],
+    });
+
+  
+  };
+
+  const handleDeleteReview = (reviewId: string) => {
+    
+    if(!gameData.userReviews){
+      return;
+    }
+
+
+    setGameData({
+      ...gameData,
+      userReviews: [...gameData.userReviews.filter((review) => review.id !== reviewId)],
+    });
+    
+  };
+
+  const [renderViewAllButtonBoolean, setRenderViewAllButtonBoolean] = useState(false);
+
+  useEffect(() => {
+    console.log("gameData", gameData);
+    if (gameData.userReviews.length > 3 || gameData.criticReviews.length > 3
+    ) {
+      console.log("review true");
+      setRenderViewAllButtonBoolean(true);
+      
+    }else{
+      console.log("review false");
+      setRenderViewAllButtonBoolean(false);
+    }
+  }, [gameData]);
 
   if (!gameData) {
     return <Text>Loading...</Text>;
-  }
+  }else
+  console.log("gameData", gameData);
+  
   return (
-    <View style={{ flex: 1, paddingTop: StatusBar.currentHeight }}>
+    <>
       <ScrollView style={styles.container}>
         {/* Header with back button */}
         <View style={styles.header}>
@@ -109,11 +170,18 @@ const GameScreen = () => {
             </View>
             <View style={styles.pokeballBottom} />
           </View>
-          <Image
+          { gameData.imageUrl?(
+
+            
+            <Image
             source={{ uri: gameData.imageUrl }}
             style={styles.coverImage}
             resizeMode="cover"
-          />
+            />
+          ):(
+            null
+          )
+          }
         </View>
 
         {/* Description and Ratings */}
@@ -159,7 +227,7 @@ const GameScreen = () => {
               reviews={gameData.criticReviews.slice(0, 3)}
               type="critic"
             />
-            {gameData.criticReviews.length > 1&& (
+            {gameData.criticReviews.length > 1 && (
               <TouchableOpacity
                 style={styles.viewAllButton}
                 onPress={onViewAllComments}
@@ -173,10 +241,11 @@ const GameScreen = () => {
               User Reviews
             </Text>
             <ReviewSection
-              reviews={gameData.userReviews.slice(0, 3)}
+              reviews={gameData.userReviews}
               type="user"
+              onDeleteReview={handleDeleteReview}
             />
-            {gameData.userReviews.length > 1 && (
+            { renderViewAllButtonBoolean && (
               <TouchableOpacity
                 style={styles.viewAllButton}
                 onPress={onViewAllComments}
@@ -188,7 +257,8 @@ const GameScreen = () => {
           </View>
         </View>
       </ScrollView>
-    </View>
+      <CommentInputFooter onSubmit={handleAddComment} />
+    </>
   );
 };
 

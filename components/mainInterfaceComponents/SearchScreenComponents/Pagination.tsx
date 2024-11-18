@@ -9,11 +9,12 @@ interface PaginationProps {
   setCurrentPage: React.Dispatch<React.SetStateAction<number>>;
   startIndex: number;
   ITEMS_PER_PAGE: number;
-  allSearchResults: Game[];
+  result_count: number;
 }
 
 
-const Pagination = ({ currentPage, totalPages, setCurrentPage, startIndex, ITEMS_PER_PAGE, allSearchResults }: PaginationProps) => {
+const Pagination = ({ currentPage, totalPages, setCurrentPage, startIndex, ITEMS_PER_PAGE, result_count }: PaginationProps) => {
+  console.log(currentPage, "currentPage in Pagination.tsx");
   return(
   <View style={styles.paginationContainer}>
     <TouchableOpacity
@@ -37,8 +38,8 @@ const Pagination = ({ currentPage, totalPages, setCurrentPage, startIndex, ITEMS
       </Text>
       <Text style={styles.paginationSubtext}>
         Showing {startIndex + 1}-
-        {Math.min(startIndex + ITEMS_PER_PAGE, allSearchResults.length)} of{" "}
-        {allSearchResults.length}
+        {Math.min(startIndex + ITEMS_PER_PAGE, result_count)} of{" "}
+        {result_count}
       </Text>
     </View>
 

@@ -1,28 +1,30 @@
 import { Stack } from "expo-router";
 
 export const unstable_settings = {
-  // Ensure any route can link back to `/`
-  initialRouteName: "(mainInterface)/HomeScreen",
-
-  authScreen: { 
-    initialRouteName: "LoginScreen", 
+  games: {
+    initialRouteName: "GameScreen",
   },
-  mainInterface: { 
-    initialRouteName: "HomeScreen", 
+  authScreen: {
+    initialRouteName: "LoginScreen",
   },
-
+  mainInterface: {
+    initialRouteName: "HomeScreen",
+  },
 };
 
 export default function Layout() {
+  console.log("layout");
   return (
-      <Stack
-        screenOptions={{
-          headerShown: false,
-        }}
-      >
-        <Stack.Screen name="(Games)"/>
-        <Stack.Screen name="(authScreen)" /> 
-        <Stack.Screen name="(mainInterface)"/>
-      </Stack>
+    <Stack
+      screenOptions={{
+        headerShown: false,
+      }}
+      initialRouteName="(mainInterface)"
+    >
+      <Stack.Screen name="(mainInterface)" />
+      <Stack.Screen name="(authScreen)" />
+      <Stack.Screen name="(games)" />
+      <Stack.Screen name="index" />
+    </Stack>
   );
 }

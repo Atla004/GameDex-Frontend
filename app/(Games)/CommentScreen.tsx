@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
   View,
   Text,
@@ -9,76 +9,61 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { ReviewSection } from "@/components/GameComponents/ReviewSection";
+import { Review } from "@/types/main";
+import { router } from "expo-router";
+import Pagination from "@/components/mainInterfaceComponents/SearchScreenComponents/Pagination";
 
-interface CommentsScreenProps {
-  game: {
-    title: string;
-    criticReviews: Array<{
-      author: string;
-      publication: string;
-      score: number;
-      content: string;
-      date: string;
-    }>;
-    userReviews: Array<{
-      username: string;
-      score: number;
-      content: string;
-      date: string;
-    }>;
-  };
-  onClose: () => void;
-}
+const backendUrl = process.env.EXPO_PUBLIC_API_URL as string;
 
-const ITEMS_PER_PAGE = 5;
+const ITEMS_PER_PAGE = 10;
 
-const mockGame = {
-  title: "Mock Game Title",
-  criticReviews: [
-    {
-      author: "Critic Author 1",
-      publication: "Publication 1",
-      score: 85,
-      content: "This is a great game!",
-      date: "2023-01-01",
-    },
-    {
-      author: "Critic Author 2",
-      publication: "Publication 2",
-      score: 90,
-      content: "Amazing gameplay and story.",
-      date: "2023-02-01",
-    },
-    // ...more mock critic reviews...
-  ],
-  userReviews: [
-    {
-      username: "User1",
-      score: 80,
-      content: "Really enjoyed this game.",
-      date: "2023-03-01",
-    },
-    {
-      username: "User2",
-      score: 75,
-      content: "Good game but has some bugs.",
-      date: "2023-04-01",
-    },
-    // ...more mock user reviews...
-  ],
-};
-
-const CommentsScreen = ({ game = mockGame, onClose }: CommentsScreenProps) => {
+const CommentsScreen = () => {
+  const [comments, setComments] = useState<Review[]>([]);
   const [activeTab, setActiveTab] = useState<"critic" | "user">("critic");
   const [currentPage, setCurrentPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const isSearchingRef = useRef(false);
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [totalPages, setTotalPages] = useState(1);
+  const [resultCount, setResultCount] = useState(0);
 
-  const reviews =
-    activeTab === "critic" ? game.criticReviews : game.userReviews;
-  const totalPages = Math.ceil(reviews.length / ITEMS_PER_PAGE);
-  const currentReviews = reviews.slice(
-    (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
-  );
+  const onClose = () => {
+    console.log("onClose");
+    router.back();
+  };
+
+  const getReviews = useCallback(async () => {
+    if (!isSearchingRef.current) {
+      console.log("not searching isSearching:", isSearchingRef.current);
+      return;
+    }
+    console.log("fetching data");
+    setLoading(true);
+    try {
+      const url = `${backendUrl}/commentspages/${activeTab}/pag_${currentPage}.json`;
+      const response = await fetch(url);
+      console.log("response", response);
+      const data = await response.json();
+      console.log("data", data);
+      setReviews(data.comments);
+      setTotalPages(data.total_pages);
+      setResultCount(data.result_count);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, [activeTab, currentPage]);
+
+  useEffect(() => {
+    console.log("useEffect currentPage", currentPage);
+    getReviews();
+  }, [currentPage, activeTab]);
+
+  useEffect(() => {
+    isSearchingRef.current = true;
+    getReviews();
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -86,7 +71,6 @@ const CommentsScreen = ({ game = mockGame, onClose }: CommentsScreenProps) => {
         <TouchableOpacity onPress={onClose} style={styles.backButton}>
           <Ionicons name="chevron-back" size={28} color="#fff" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>{game.title}</Text>
       </View>
 
       <View style={styles.tabContainer}>
@@ -137,53 +121,38 @@ const CommentsScreen = ({ game = mockGame, onClose }: CommentsScreenProps) => {
       </View>
 
       <ScrollView style={styles.content}>
-        <ReviewSection reviews={currentReviews} type={activeTab} />
+        {loading && (
+          <View style={styles.loadingContainer}>
+            <Text style={styles.loadingText}>Loading...</Text>
+          </View>
+        )}
+
+        {!loading && isSearchingRef.current && reviews.length > 0 && (
+          <ReviewSection reviews={reviews} type={activeTab}  maxNumberOfReviews={10}/>
+        )}
+
+        {!loading && isSearchingRef.current && reviews.length === 0 && (
+          <View style={styles.emptyState}>
+            <Image
+              source={{
+                uri: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png",
+              }}
+              style={styles.emptyStateIcon}
+            />
+            <Text style={styles.emptyStateText}>No reviews found</Text>
+            <Text style={styles.emptyStateSubtext}>Try different keywords</Text>
+          </View>
+        )}
       </ScrollView>
 
-      <View style={styles.pagination}>
-        <TouchableOpacity
-          style={[
-            styles.pageButton,
-            currentPage === 1 && styles.pageButtonDisabled,
-          ]}
-          onPress={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
-          disabled={currentPage === 1}
-        >
-          <Ionicons
-            name="chevron-back"
-            size={24}
-            color={currentPage === 1 ? "#9ca3af" : "#3b82f6"}
-          />
-        </TouchableOpacity>
-
-        <View style={styles.pageInfo}>
-          <Text style={styles.pageText}>
-            Page {currentPage} of {totalPages}
-          </Text>
-          <Text style={styles.pageSubtext}>
-            Showing {(currentPage - 1) * ITEMS_PER_PAGE + 1}-
-            {Math.min(currentPage * ITEMS_PER_PAGE, reviews.length)} of{" "}
-            {reviews.length}
-          </Text>
-        </View>
-
-        <TouchableOpacity
-          style={[
-            styles.pageButton,
-            currentPage === totalPages && styles.pageButtonDisabled,
-          ]}
-          onPress={() =>
-            setCurrentPage((prev) => Math.min(totalPages, prev + 1))
-          }
-          disabled={currentPage === totalPages}
-        >
-          <Ionicons
-            name="chevron-forward"
-            size={24}
-            color={currentPage === totalPages ? "#9ca3af" : "#3b82f6"}
-          />
-        </TouchableOpacity>
-      </View>
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        setCurrentPage={setCurrentPage}
+        startIndex={0}
+        ITEMS_PER_PAGE={ITEMS_PER_PAGE}
+        result_count={resultCount}
+      />
     </View>
   );
 };
@@ -276,6 +245,36 @@ const styles = StyleSheet.create({
   },
   pageSubtext: {
     fontSize: 12,
+    color: "#6b7280",
+    marginTop: 4,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  loadingText: {
+    fontSize: 16,
+    color: "#6b7280",
+  },
+  emptyState: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 16,
+  },
+  emptyStateIcon: {
+    width: 40,
+    height: 40,
+    marginBottom: 16,
+  },
+  emptyStateText: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#374151",
+  },
+  emptyStateSubtext: {
+    fontSize: 14,
     color: "#6b7280",
     marginTop: 4,
   },

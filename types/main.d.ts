@@ -1,3 +1,5 @@
+import { GameCard } from "@/components/mainInterfaceComponents/GameCard";
+
 export interface Game {
   id: string;
   imageUrl: string;
@@ -7,3 +9,14 @@ export interface Game {
   criticScore: number;
   userScore: number;
 }
+
+export interface Review {
+  id: string;
+  publication?: string;
+  username?: string;
+  score: number;
+  content: string;
+  date: string;
+  isOwnReview?: boolean;
+}
+
