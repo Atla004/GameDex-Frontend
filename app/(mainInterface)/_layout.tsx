@@ -2,6 +2,7 @@ import { useFontsLoad } from "@/utils/fontsload";
 import { Tabs } from "expo-router";
 import { StyleSheet, Text, View } from "react-native";
 import { Ionicons } from '@expo/vector-icons';
+import { StatusBar } from "react-native";
 
 export default function Layout() {
   const loading = useFontsLoad();
@@ -9,8 +10,10 @@ export default function Layout() {
     return <Text> Loading... </Text>;
   }
 
+
+
   return (
-    <View style={{ flex: 1}}>
+    <View style={{ flex: 1, paddingTop: StatusBar.currentHeight }}>
       <Tabs
         screenOptions={({ route }) => ({
           headerShown: false,

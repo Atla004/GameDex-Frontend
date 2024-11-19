@@ -1,6 +1,8 @@
 import { Stack } from "expo-router";
+import { useEffect } from "react";
 
 export default function Layout() {
+
   return (
       <Stack
         screenOptions={{
@@ -8,10 +10,10 @@ export default function Layout() {
         }}
       >
         <Stack.Screen
-          name="(authScreen)"
+          name="(accountScreen)"
         />
         <Stack.Screen
-          name="(accountScreen)"
+          name="(recoverScreen)"
         />
       </Stack>
   );

@@ -1,6 +1,6 @@
 import { Stack } from "expo-router";
 import PokedexFrame from "@/components/wraper/PokedexFrame";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function Layout() {
   const [isTransitioning, setIsTransitioning] = useState(false);
@@ -14,7 +14,7 @@ export default function Layout() {
     },
   }
 
-  console.log("Layout -> isTransitioning", isTransitioning)
+
   return (
     <PokedexFrame isTransitioning={isTransitioning}>
       <Stack

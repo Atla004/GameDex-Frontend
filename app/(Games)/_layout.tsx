@@ -1,12 +1,13 @@
 import { Stack } from "expo-router";
+import { useEffect } from "react";
 import { StatusBar } from "react-native";
 
 import { View } from "react-native";
 
 export default function Layout() {
-  console.log("layoutsss");
+
   return (
-    <View style={{ flex: 1}}>
+    <View style={{ flex: 1, paddingTop: StatusBar.currentHeight }}>
       <Stack
         screenOptions={{
           headerShown: false,
