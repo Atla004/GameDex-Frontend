@@ -76,7 +76,7 @@ export const BackgroundMainInterface = ({
               source={{
                 uri: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/17.png",
               }}
-              style={styles.pokemonImage}
+            style={styles.pokemonImage}
             />
           </Animated.View>
         ))}
@@ -91,9 +91,11 @@ const styles = StyleSheet.create({
     height: "100%",
     width: "100%",
     position: "relative",
+
   },
   background: {
     position: "absolute",
+    backgroundColor: "#3886d0",
     top: 0,
     left: 0,
     right: 0,

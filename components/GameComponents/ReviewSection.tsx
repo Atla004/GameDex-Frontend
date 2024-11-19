@@ -9,7 +9,6 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { PokeBallRating } from "./PokeballRating";
-import { number } from "zod";
 
 interface Review {
   id: string;
@@ -80,10 +79,10 @@ export const ReviewSection = ({
                   }}
                   style={styles.reviewerIcon}
                 />
-                <Text style={styles.reviewerName}>{review.username}</Text>
-              </View>
-              {type === "critic" && review.publication && (
                 <Text style={styles.publication}>{review.publication}</Text>
+              </View>
+              {review.publication && (
+                <Text style={styles.reviewerName}>{review.username}</Text>
               )}
             </View>
             <View style={styles.rightHeader}>
@@ -146,12 +145,12 @@ const styles = StyleSheet.create({
     height: 20,
     marginRight: 8,
   },
-  reviewerName: {
+  publication: {
     fontSize: 16,
     fontWeight: "bold",
     color: "#991b1b",
   },
-  publication: {
+  reviewerName: {
     fontSize: 14,
     color: "#6b7280",
     marginLeft: 28,

@@ -1,4 +1,5 @@
 import { Stack } from "expo-router";
+import { useEffect } from "react";
 
 export const unstable_settings = {
   games: {
@@ -13,7 +14,6 @@ export const unstable_settings = {
 };
 
 export default function Layout() {
-  console.log("layout");
   return (
     <Stack
       screenOptions={{

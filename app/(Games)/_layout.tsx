@@ -6,7 +6,7 @@ import { View } from "react-native";
 export default function Layout() {
   console.log("layoutsss");
   return (
-    <View style={{ flex: 1, paddingTop: StatusBar.currentHeight }}>
+    <View style={{ flex: 1}}>
       <Stack
         screenOptions={{
           headerShown: false,

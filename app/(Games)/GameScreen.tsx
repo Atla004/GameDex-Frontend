@@ -27,9 +27,9 @@ interface GameScreenData {
   criticScore: number;
   userScore: number;
   genres: string[];
-  platforms: string[];
-  developer: string;
-  publisher: string;
+  platform: string[];
+  developer: string[];
+  publisher: string[];
   releaseDate: string;
   ageRating: string;
   criticReviews: Review[];
@@ -45,9 +45,9 @@ const GameScreen = () => {
     criticScore: 0,
     userScore: 0,
     genres: [],
-    platforms: [],
-    developer: "",
-    publisher: "",
+    platform: [],
+    developer: [],
+    publisher: [],
     releaseDate: "",
     ageRating: "",
     criticReviews: [],
@@ -212,10 +212,16 @@ const GameScreen = () => {
             <Text style={styles.sectionTitle}>Game Details</Text>
             <GameDetail
               label="Platforms"
-              value={gameData.platforms.join(", ")}
+              value={gameData.platform ? gameData.platform.join(", ") : ""}
             />
-            <GameDetail label="Developer" value={gameData.developer} />
-            <GameDetail label="Publisher" value={gameData.publisher} />
+            <GameDetail
+              label="Developer"
+              value={gameData.developer ? gameData.developer.join(", ") : ""}
+            />
+            <GameDetail
+              label="Publisher"
+              value={gameData.publisher ? gameData.publisher.join(", ") : ""}
+            />
             <GameDetail label="Release Date" value={gameData.releaseDate} />
             <GameDetail label="Age Rating" value={gameData.ageRating} />
           </View>

@@ -1,8 +1,7 @@
 import { useFontsLoad } from "@/utils/fontsload";
 import { Tabs } from "expo-router";
 import { StyleSheet, Text, View } from "react-native";
-
-import { StatusBar } from "react-native";
+import { Ionicons } from '@expo/vector-icons';
 
 export default function Layout() {
   const loading = useFontsLoad();
@@ -11,11 +10,24 @@ export default function Layout() {
   }
 
   return (
-    <View style={{ flex: 1, paddingTop: StatusBar.currentHeight }}>
+    <View style={{ flex: 1}}>
       <Tabs
-        screenOptions={{
+        screenOptions={({ route }) => ({
           headerShown: false,
-        }}
+          tabBarIcon: ({ color, size }) => {
+            let iconName: keyof typeof Ionicons.glyphMap = 'home';
+            if (route.name === 'HomeScreen') {
+              iconName = 'home';
+            } else if (route.name === 'SearchScreen') {
+              iconName = 'search';
+            } else if (route.name === 'FavoritesScreen') {
+              iconName = 'heart';
+            } else if (route.name === 'ProfileScreen') {
+              iconName = 'person';
+            }
+            return <Ionicons name={iconName} size={size} color={color} />;
+          },
+        })}
       >
         <Tabs.Screen
           name="HomeScreen"
