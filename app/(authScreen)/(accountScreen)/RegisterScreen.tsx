@@ -13,25 +13,28 @@ import {
 import { StatusBar } from "expo-status-bar";
 import { router } from "expo-router";
 import {SecureInput} from "@/components/basic/MyComponents";
+import BackgroundMainInterface from "@/components/wraper/BackgroundMainInterface";
 
 const RegisterScreen = () => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [isTransitioning, setIsTransitioning] = useState(false);
-
+  
   const handleRegister = () => {
-    router.push("LoginScreen");
+    setTimeout(() => {
+      router.push("LoginScreen");
+    }, 120);
   };
 
   const goBackToLogin = () => {
-    router.push("LoginScreen");
+    setTimeout(() => {
+      router.push("LoginScreen");
+    }, 120);
   };
 
   return (
-    <>
-      <StatusBar style="light" />
+    <BackgroundMainInterface>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.keyboardAvoid}
@@ -83,7 +86,7 @@ const RegisterScreen = () => {
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
-    </>
+    </BackgroundMainInterface>
   );
 };
 

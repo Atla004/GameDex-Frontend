@@ -13,6 +13,7 @@ import {
 import { StatusBar } from "expo-status-bar";
 import { useRouter } from "expo-router";
 import {SecureInput} from "@/components/basic/MyComponents";
+import BackgroundMainInterface from "@/components/wraper/BackgroundMainInterface";
 
 const RestartPasswordScreen = () => {
   const [newPassword, setNewPassword] = useState("");
@@ -29,7 +30,7 @@ const RestartPasswordScreen = () => {
   };
 
   return (
-    <>
+    <BackgroundMainInterface>
       <StatusBar style="light" />
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -70,7 +71,7 @@ const RestartPasswordScreen = () => {
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
-    </>
+    </BackgroundMainInterface>
   );
 };
 

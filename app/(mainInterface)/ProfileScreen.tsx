@@ -15,7 +15,9 @@ import PasswordChangeModal from "@/components/mainInterfaceComponents/ProfileScr
 import EmailChangeModal from "@/components/mainInterfaceComponents/ProfileScreenComponents/EmailChangeModal";
 import UsernameChangeModal from "@/components/mainInterfaceComponents/ProfileScreenComponents/UsernameChangeModal";
 import DeleteAccountModal from "@/components/mainInterfaceComponents/ProfileScreenComponents/DeleteAccountModal";
+
 import { router } from "expo-router";
+import { ProfileImageSelectorModal } from "@/components/mainInterfaceComponents/ProfileScreenComponents/ProfileImageSelectorModal";
 
 const backendUrl = process.env.EXPO_PUBLIC_API_URL as string;
 
@@ -34,6 +36,7 @@ const ProfileScreen = () => {
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [showUsernameModal, setShowUsernameModal] = useState(false);
   const [showDeleteAccountModal, setShowDeleteAccountModal] = useState(false);
+  const [showImageSelectorModal, setShowImageSelectorModal] = useState(false);
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -54,10 +57,6 @@ const ProfileScreen = () => {
 
     fetchData();
   }, []);
-
-  if (!mockData) {
-    return <Text>Loading...</Text>;
-  }
 
   const handlePasswordChange = () => {
     if (newPassword !== confirmPassword) {
@@ -81,12 +80,11 @@ const ProfileScreen = () => {
   const handleLogout = () => {
     Alert.alert("Goodbye, Trainer!", "You have been logged out.", [
       { text: "OK", onPress: () => {
-
         router.dismissAll();
         router.replace("/(authScreen)/LoginScreen");
       } },
     ]);
-  }
+  };
 
   const handleDeleteAccount = () => {
     if (deleteConfirmation.toLowerCase() !== "delete") {
@@ -106,6 +104,15 @@ const ProfileScreen = () => {
     setConfirmPassword("");
   };
 
+  const handleChangeProfileImage = () => {
+    setShowImageSelectorModal(true);
+  };
+
+  const handleSelectProfileImage = (imageUri: string) => {
+    setMockData(prev => prev ? { ...prev, profileImageUri: imageUri } : prev);
+    // Here you would typically make an API call to update the profile image
+  };
+
   return (
     <BackgroundMainInterface>
       <ScrollView style={styles.container}>
@@ -113,24 +120,27 @@ const ProfileScreen = () => {
         <View style={styles.header}>
           <View style={styles.profileImageContainer}>
             <Image
-              source={{ uri: mockData.profileImageUri }}
+              source={{ uri: mockData?.profileImageUri }}
               style={styles.profileImage}
             />
-            <TouchableOpacity style={styles.editImageButton}>
+            <TouchableOpacity 
+              onPress={handleChangeProfileImage}
+              style={styles.editImageButton}
+            >
               <Ionicons name="camera" size={20} color="#fff" />
             </TouchableOpacity>
           </View>
-          <Text style={styles.username}>{mockData.username}</Text>
-          <Text style={styles.userLevel}>{mockData.userLevel}</Text>
+          <Text style={styles.username}>{mockData?.username}</Text>
+          <Text style={styles.userLevel}>{mockData?.userLevel}</Text>
 
           {/* Stats */}
           <View style={styles.statsContainer}>
             <View style={styles.statItem}>
-              <Text style={styles.statValue}>{mockData.reviews}</Text>
+              <Text style={styles.statValue}>{mockData?.reviews}</Text>
               <Text style={styles.statLabel}>Reviews</Text>
             </View>
             <View style={styles.statItem}>
-              <Text style={styles.statValue}>{mockData.favorites}</Text>
+              <Text style={styles.statValue}>{mockData?.favorites}</Text>
               <Text style={styles.statLabel}>Favorites</Text>
             </View>
           </View>
@@ -142,13 +152,13 @@ const ProfileScreen = () => {
           <SettingOption
             icon="master-ball"
             title="Change Username"
-            subtitle={mockData.username}
+            subtitle={mockData?.username}
             onPress={() => setShowUsernameModal(true)}
           />
           <SettingOption
             icon="quick-ball"
             title="Change Email"
-            subtitle={mockData.email}
+            subtitle={mockData?.email}
             onPress={() => setShowEmailModal(true)}
           />
           <SettingOption
@@ -237,6 +247,11 @@ const ProfileScreen = () => {
           deleteConfirmation={deleteConfirmation}
           setDeleteConfirmation={setDeleteConfirmation}
           onDelete={handleDeleteAccount}
+        />
+        <ProfileImageSelectorModal
+          visible={showImageSelectorModal}
+          onClose={() => setShowImageSelectorModal(false)}
+          onSelectImage={handleSelectProfileImage}
         />
       </ScrollView>
     </BackgroundMainInterface>

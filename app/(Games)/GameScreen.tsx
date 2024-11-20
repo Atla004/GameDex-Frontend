@@ -16,6 +16,7 @@ import { StatusBar } from "react-native";
 import { router } from "expo-router";
 import { CommentInputFooter } from "@/components/GameComponents/CommentsInputFooter";
 import { Review } from "@/types/main";
+import { LoadingScreen } from "@/components/wraper/LoadingScreen";
 
 const backendUrl = process.env.EXPO_PUBLIC_API_URL as string;
 
@@ -60,7 +61,6 @@ const GameScreen = () => {
         return response.json();
       })
       .then((data) => {
-        console.log(data.criticReviews);
         setGameData(data);
       })
       .catch((error) => console.error("Error fetching featured games"));
@@ -71,18 +71,20 @@ const GameScreen = () => {
   }, []);
 
   const onClose = () => {
-    router.push("/(mainInterface)/HomeScreen");
+    router.replace("/(mainInterface)/HomeScreen");
   };
 
   const onViewAllComments = () => {
-    router.push("/(games)/CommentScreen");
+    router.replace("/(games)/CommentScreen");
   };
 
-  const handleAddComment = (content: string) => {
-    const newReview = {
+  const handleAddComment = ({content,publication,score}:{content: string,publication:string,score:number}) => {
+    console.log("Adding comment", content,publication,score);
+    const newReview:Review = {
+      publication,
       id: Date.now().toString(),
       username: "You",
-      score: 85, // You might want to add a score input in the real app
+      score, // You might want to add a score input in the real app
       content,
       date: new Date().toLocaleDateString(),
       isOwnReview: true,
@@ -122,7 +124,7 @@ const GameScreen = () => {
   const [renderViewAllButtonBoolean, setRenderViewAllButtonBoolean] = useState(false);
 
   useEffect(() => {
-    console.log("gameData", gameData);
+
     if (gameData.userReviews.length > 3 || gameData.criticReviews.length > 3
     ) {
       console.log("review true");
@@ -134,13 +136,14 @@ const GameScreen = () => {
     }
   }, [gameData]);
 
-  if (!gameData) {
-    return <Text>Loading...</Text>;
-  }else
-  console.log("gameData", gameData);
-  
+
+console.log("gameData",gameData.id);
+console.log("gameDatdddda",gameData.id==="null");
   return (
-    <>
+
+    <LoadingScreen isLoading={gameData.id===""}>
+  {/* Your app content */}
+
       <ScrollView style={styles.container}>
         {/* Header with back button */}
         <View style={styles.header}>
@@ -171,7 +174,7 @@ const GameScreen = () => {
             <View style={styles.pokeballBottom} />
           </View>
           { gameData.imageUrl?(
-
+            
             
             <Image
             source={{ uri: gameData.imageUrl }}
@@ -195,7 +198,7 @@ const GameScreen = () => {
                 score={gameData.criticScore}
                 type="critic"
                 size="large"
-              />
+                />
             </View>
             <View style={styles.ratingBox}>
               <Text style={styles.ratingLabel}>User Score</Text>
@@ -203,7 +206,7 @@ const GameScreen = () => {
                 score={gameData.userScore}
                 type="user"
                 size="large"
-              />
+                />
             </View>
           </View>
 
@@ -213,15 +216,15 @@ const GameScreen = () => {
             <GameDetail
               label="Platforms"
               value={gameData.platform ? gameData.platform.join(", ") : ""}
-            />
+              />
             <GameDetail
               label="Developer"
               value={gameData.developer ? gameData.developer.join(", ") : ""}
-            />
+              />
             <GameDetail
               label="Publisher"
               value={gameData.publisher ? gameData.publisher.join(", ") : ""}
-            />
+              />
             <GameDetail label="Release Date" value={gameData.releaseDate} />
             <GameDetail label="Age Rating" value={gameData.ageRating} />
           </View>
@@ -232,11 +235,11 @@ const GameScreen = () => {
             <ReviewSection
               reviews={gameData.criticReviews.slice(0, 3)}
               type="critic"
-            />
+              />
             {gameData.criticReviews.length > 1 && (
               <TouchableOpacity
-                style={styles.viewAllButton}
-                onPress={onViewAllComments}
+              style={styles.viewAllButton}
+              onPress={onViewAllComments}
               >
                 <Text style={styles.viewAllText}>View All Reviews</Text>
                 <Ionicons name="chevron-forward" size={20} color="#3b82f6" />
@@ -250,11 +253,11 @@ const GameScreen = () => {
               reviews={gameData.userReviews}
               type="user"
               onDeleteReview={handleDeleteReview}
-            />
+              />
             { renderViewAllButtonBoolean && (
               <TouchableOpacity
-                style={styles.viewAllButton}
-                onPress={onViewAllComments}
+              style={styles.viewAllButton}
+              onPress={onViewAllComments}
               >
                 <Text style={styles.viewAllText}>View All Reviews</Text>
                 <Ionicons name="chevron-forward" size={20} color="#3b82f6" />
@@ -264,7 +267,8 @@ const GameScreen = () => {
         </View>
       </ScrollView>
       <CommentInputFooter onSubmit={handleAddComment} />
-    </>
+
+      </LoadingScreen>
   );
 };
 

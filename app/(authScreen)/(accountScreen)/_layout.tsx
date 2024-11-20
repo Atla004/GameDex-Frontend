@@ -1,6 +1,7 @@
 import { Stack } from "expo-router";
 import PokedexFrame from "@/components/wraper/PokedexFrame";
 import { useEffect, useState } from "react";
+import BackgroundMainInterface from "@/components/wraper/BackgroundMainInterface";
 
 export default function Layout() {
   const [isTransitioning, setIsTransitioning] = useState(false);
@@ -16,6 +17,7 @@ export default function Layout() {
 
 
   return (
+    
     <PokedexFrame isTransitioning={isTransitioning}>
       <Stack
         screenOptions={{
@@ -25,11 +27,11 @@ export default function Layout() {
         <Stack.Screen
           name="LoginScreen"
           listeners={handlerChangeRoute}
-        />
+          />
         <Stack.Screen
           name="RegisterScreen"
           listeners={handlerChangeRoute}
-        />
+          />
       </Stack>
     </PokedexFrame>
   );

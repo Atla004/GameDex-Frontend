@@ -6,6 +6,49 @@ interface PokedexFrameProps {
   isTransitioning?: boolean;
 }
 
+const TopBorder = () => {
+  return (
+    <>
+      <View style={styles.topContent}>
+        <View style={styles.mainLight}>
+          <View style={styles.mainLightOuter}>
+            <View style={styles.mainLightInner} />
+            <View style={styles.mainLightReflection} />
+          </View>
+        </View>
+        <View style={styles.indicatorLights}>
+          <View style={[styles.smallLight, styles.redLight]} />
+          <View style={[styles.smallLight, styles.yellowLight]} />
+          <View style={[styles.smallLight, styles.greenLight]} />
+        </View>
+      </View>
+      <View style={styles.topLines}>
+        <View style={styles.line} />
+        <View style={styles.line} />
+        <View style={styles.line} />
+      </View>
+    </>
+  );
+};
+
+const BottomBorder = () => {
+  return (
+    <>
+      <View style={styles.bottomContent}>
+        <View style={styles.dPad}>
+          <View style={styles.dPadVertical} />
+          <View style={styles.dPadHorizontal} />
+          <View style={styles.dPadCenter} />
+        </View>
+        <View style={styles.actionButtons}>
+          <View style={[styles.actionButton, styles.actionButtonRed]} />
+          <View style={[styles.actionButton, styles.actionButtonBlue]} />
+        </View>
+      </View>
+    </>
+  );
+};
+
 const PokedexFrame = ({ children, isTransitioning }: PokedexFrameProps) => {
   const topHeight = useRef(new Animated.Value(80)).current;
   const bottomHeight = useRef(new Animated.Value(80)).current;
@@ -15,13 +58,13 @@ const PokedexFrame = ({ children, isTransitioning }: PokedexFrameProps) => {
       // Close animation
       Animated.parallel([
         Animated.timing(topHeight, {
-          toValue: Dimensions.get("window").height / 2,
-          duration: 300,
+          toValue: (Dimensions.get("window").height / 2)+15,
+          duration: 200,
           useNativeDriver: false,
         }),
         Animated.timing(bottomHeight, {
-          toValue: Dimensions.get("window").height / 2,
-          duration: 300,
+          toValue:( Dimensions.get("window").height / 2)+15,
+          duration: 200,
           useNativeDriver: false,
         }),
       ]).start(() => {
@@ -50,29 +93,12 @@ const PokedexFrame = ({ children, isTransitioning }: PokedexFrameProps) => {
       <Animated.View
         style={[styles.border, styles.topBorder, { height: topHeight }]}
       >
-        <View style={styles.topContent}>
-          <View style={styles.mainLight}>
-            <View style={styles.mainLightOuter}>
-              <View style={styles.mainLightInner} />
-              <View style={styles.mainLightReflection} />
-            </View>
-          </View>
-          <View style={styles.indicatorLights}>
-            <View style={[styles.smallLight, styles.redLight]} />
-            <View style={[styles.smallLight, styles.yellowLight]} />
-            <View style={[styles.smallLight, styles.greenLight]} />
-          </View>
-        </View>
-        <View style={styles.topLines}>
-          <View style={styles.line} />
-          <View style={styles.line} />
-          <View style={styles.line} />
-        </View>
       </Animated.View>
 
       {/* Main Content */}
       <View style={styles.content}>{children}</View>
-      <View style={{ justifyContent: "center", alignItems: "center" }}>
+      
+      <View style={{ alignItems: "center" }}>
         <Text>Powered by RAWG</Text>
       </View>
 
@@ -80,17 +106,8 @@ const PokedexFrame = ({ children, isTransitioning }: PokedexFrameProps) => {
       <Animated.View
         style={[styles.border, styles.bottomBorder, { height: bottomHeight }]}
       >
-        <View style={styles.bottomContent}>
-          <View style={styles.dPad}>
-            <View style={styles.dPadVertical} />
-            <View style={styles.dPadHorizontal} />
-            <View style={styles.dPadCenter} />
-          </View>
-          <View style={styles.actionButtons}>
-            <View style={[styles.actionButton, styles.actionButtonRed]} />
-            <View style={[styles.actionButton, styles.actionButtonBlue]} />
-          </View>
-        </View>
+
+
       </Animated.View>
     </View>
   );

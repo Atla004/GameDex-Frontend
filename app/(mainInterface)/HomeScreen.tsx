@@ -30,6 +30,7 @@ const HomeScreen = () => {
   }, []);
 
   return (
+    
     <BackgroundMainInterface>
       <ScrollView style={styles.container}>
         <SearchBar />

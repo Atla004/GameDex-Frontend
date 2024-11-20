@@ -13,6 +13,7 @@ import {
 import { Checkbox, SecureInput } from "@/components/basic/MyComponents";
 import { StatusBar } from "expo-status-bar";
 import { useRouter } from "expo-router";
+import BackgroundMainInterface from "@/components/wraper/BackgroundMainInterface";
 
 export const LoginScreen = () => {
   const [username, setUsername] = useState("");
@@ -38,8 +39,10 @@ export const LoginScreen = () => {
   };
 
   return (
-    <>
-      <StatusBar style="light" />
+    <BackgroundMainInterface>
+
+    
+
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.keyboardAvoid}
@@ -86,7 +89,10 @@ export const LoginScreen = () => {
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
-    </>
+
+
+
+    </BackgroundMainInterface>
   );
 };
 

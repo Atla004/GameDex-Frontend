@@ -1,7 +1,7 @@
 import Toast from '@/components/basic/Toast';
 import { Link } from 'expo-router';
 import { useState } from 'react';
-import { Button } from 'react-native';
+import { Button, Text } from 'react-native';
 
 export default function index() {
 
@@ -14,7 +14,9 @@ export default function index() {
 
 return(
 <>
-    <Link href="LoginScreen" > Go to Auth </Link>;
+    <Link href="LoginScreen" > 
+    <Text>Go to Auth</Text>
+    </Link>
     <Button title="Show Toast" onPress={showToast} />
       <Toast
         message="This is a toast message"
@@ -22,6 +24,9 @@ return(
         setToast={setToastVisible}
         duration={4000}
       />
+
+
+
       
 
 </>

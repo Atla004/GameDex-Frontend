@@ -53,18 +53,12 @@ export const ReviewSection = ({
 
   const reviewsToRender = reviews.slice(0, maxNumberOfReviews);
 
-
-
-
-
   return (
     <View style={styles.container}>
       {reviewsToRender.length === 0 ? 
       (
           <Text style={styles.content}>No reviews yet</Text>
         ) : (
-
-      
       reviewsToRender.map((review) => (
         <View key={review.id} style={styles.reviewCard}>
           <View style={styles.reviewHeader}>
@@ -97,17 +91,12 @@ export const ReviewSection = ({
               )}
             </View>
           </View>
-
           <Text style={styles.content}>{review.content}</Text>
-
           <Text style={styles.date}>{review.date}</Text>
         </View>
       ))
     )
-
     }
-
-
     </View>
   );
 };

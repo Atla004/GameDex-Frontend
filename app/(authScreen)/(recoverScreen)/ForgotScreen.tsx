@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { useRouter } from "expo-router";
+import BackgroundMainInterface from "@/components/wraper/BackgroundMainInterface";
 
 const ForgotScreen = () => {
   const [email_or_username, setUsernameOrEmail] = useState("");
@@ -29,7 +30,7 @@ const ForgotScreen = () => {
   };
 
   return (
-    <>
+    <BackgroundMainInterface>
       <StatusBar style="light" />
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -69,7 +70,7 @@ const ForgotScreen = () => {
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
-    </>
+    </BackgroundMainInterface>
   );
 };
 

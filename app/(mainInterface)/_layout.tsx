@@ -7,10 +7,11 @@ import { StatusBar } from "react-native";
 export default function Layout() {
   const loading = useFontsLoad();
   if (!loading) {
-    return <Text> Loading... </Text>;
+    return (
+      <View style={styles.loadingContainer}>
+      </View>
+    );
   }
-
-
 
   return (
     <View style={{ flex: 1, paddingTop: StatusBar.currentHeight }}>
@@ -67,5 +68,14 @@ const styles = StyleSheet.create({
     position: "absolute",
     alignItems: "center",
     justifyContent: "center",
+  },
+  loadingContainer: {
+    flex: 1,
+    backgroundColor: 'black',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  loadingText: {
+    color: 'white',
   },
 });
