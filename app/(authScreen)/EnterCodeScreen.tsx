@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { router } from 'expo-router';
-import BackgroundMainInterface from '@/components/wraper/BackgroundMainInterface';
+
 
 const EnterCodeScreen = () => {
   const [code, setCode] = useState(['', '', '', '', '', '']);
@@ -56,7 +56,7 @@ const EnterCodeScreen = () => {
   };
 
   return (
-    <BackgroundMainInterface>
+    <>
       <StatusBar style="light" />
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -113,7 +113,7 @@ const EnterCodeScreen = () => {
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
-    </BackgroundMainInterface>
+    </>
   );
 };
 

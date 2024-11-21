@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { View, StyleSheet, Animated, Dimensions, Text } from "react-native";
+import { usePokedex } from '../../app/(authScreen)/_layout';
 
 interface PokedexFrameProps {
   children: React.ReactNode;
@@ -22,11 +23,7 @@ const TopBorder = () => {
           <View style={[styles.smallLight, styles.greenLight]} />
         </View>
       </View>
-      <View style={styles.topLines}>
-        <View style={styles.line} />
-        <View style={styles.line} />
-        <View style={styles.line} />
-      </View>
+
     </>
   );
 };
@@ -52,6 +49,7 @@ const BottomBorder = () => {
 const PokedexFrame = ({ children, isTransitioning }: PokedexFrameProps) => {
   const topHeight = useRef(new Animated.Value(80)).current;
   const bottomHeight = useRef(new Animated.Value(80)).current;
+  const { openPokedex, closePokedex } = usePokedex();
 
   useEffect(() => {
     if (isTransitioning) {
@@ -93,6 +91,7 @@ const PokedexFrame = ({ children, isTransitioning }: PokedexFrameProps) => {
       <Animated.View
         style={[styles.border, styles.topBorder, { height: topHeight }]}
       >
+        <TopBorder />
       </Animated.View>
 
       {/* Main Content */}
@@ -106,8 +105,7 @@ const PokedexFrame = ({ children, isTransitioning }: PokedexFrameProps) => {
       <Animated.View
         style={[styles.border, styles.bottomBorder, { height: bottomHeight }]}
       >
-
-
+        <BottomBorder />
       </Animated.View>
     </View>
   );
@@ -116,7 +114,6 @@ const PokedexFrame = ({ children, isTransitioning }: PokedexFrameProps) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#ef4444",
   },
   border: {
     backgroundColor: "#dc2626",
@@ -133,7 +130,6 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    backgroundColor: "#ef4444",
   },
   topContent: {
     flexDirection: "row",

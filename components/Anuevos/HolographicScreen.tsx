@@ -1,25 +1,25 @@
-import React, { useEffect, useMemo, useRef, useCallback } from "react";
+import React, { useCallback, useEffect, useMemo, useRef } from "react";
 import {
   View,
   StyleSheet,
   Animated,
-  Easing,
   Dimensions,
-  Image,
+  ImageBackground,
 } from "react-native";
-import { LinearGradient } from 'expo-linear-gradient';
+import { LinearGradient } from "expo-linear-gradient";
+import { Easing } from "react-native-reanimated";
 
-interface BackgroundMainInterfaceProps {
+interface HolographicScreenProps {
   children: React.ReactNode;
 }
 
-export const BackgroundMainInterface = ({
-  children,
-}: BackgroundMainInterfaceProps) => {
+const HolographicScreen: React.FC<HolographicScreenProps> = ({ children }) => {
+  const scanLinePosition = new Animated.Value(0);
+
   const animation = useRef(new Animated.Value(0)).current;
   const { width, height } = Dimensions.get("window");
-  const POKEMON_SIZE = 40;
-  const PATTERN_SIZE = POKEMON_SIZE * 2; 
+  const POKEMON_SIZE = 60;
+  const PATTERN_SIZE = POKEMON_SIZE * 2;
 
   const ROWS = Math.ceil(height / PATTERN_SIZE) + 2;
   const COLS = Math.ceil(width / PATTERN_SIZE) + 2;
@@ -59,14 +59,50 @@ export const BackgroundMainInterface = ({
     outputRange: [0, -PATTERN_SIZE],
   });
 
+  React.useEffect(() => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(scanLinePosition, {
+          toValue: 1,
+          duration: 7000,
+          useNativeDriver: true,
+        }),
+        Animated.timing(scanLinePosition, {
+          toValue: 0,
+          duration: 7000,
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
+  }, []);
+
   return (
     <View style={styles.container}>
       <LinearGradient
-        colors={['#4c669f', '#3b5998', '#192f6a']}
-        style={styles.background}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
+        colors={[
+          "rgba(0, 191, 255, 0.8)",
+          "rgba(0, 122, 204, 0.8)",
+          "rgba(0, 51, 153, 0.8)",
+        ]}
+        style={styles.gradient}
       >
+        {/* Holographic scan line */}
+        <Animated.View
+          style={[
+            styles.scanLine,
+            {
+              transform: [
+                {
+                  translateY: scanLinePosition.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [0, 750],
+                  }),
+                },
+              ],
+            },
+          ]}
+        />
+
         {pattern.map((pos, index) => (
           <Animated.View
             key={index}
@@ -79,22 +115,33 @@ export const BackgroundMainInterface = ({
               },
             ]}
           >
-            <Image
-              source={{
-                uri: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/17.png",
-              }}
-            style={styles.pokemonImage}
+            <ImageBackground
+              source={require("@/assets/background/pokeballBackground.png")}
+              style={styles.pokemonImage}
             />
           </Animated.View>
         ))}
+
+        {/* Content */}
+        <View style={styles.content}>{children}</View>
       </LinearGradient>
-      
-      <View style={styles.content}>{children}</View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
+  gradient: {
+    flex: 1,
+    padding: 16,
+  },
+  scanLine: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    height: 2,
+    backgroundColor: "rgba(255, 255, 255, 0.3)",
+  },
+
   container: {
     ...StyleSheet.absoluteFillObject, // Ensures the container covers the entire screen without affecting other components
   },
@@ -104,13 +151,18 @@ const styles = StyleSheet.create({
     opacity: 0.8,
   },
   content: {
-    flex: 1,
-    zIndex: 1,
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    zIndex: 0,
   },
   imageContainer: {
     position: "absolute",
     width: 50,
     height: 50,
+    zIndex: 0,
   },
   pokemonImage: {
     width: "100%",
@@ -119,4 +171,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default BackgroundMainInterface;
+export default HolographicScreen;

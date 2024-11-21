@@ -6,35 +6,32 @@ import {
   TextInput,
   TouchableOpacity,
   Image,
+  ScrollView,
   KeyboardAvoidingView,
   Platform,
-  ScrollView,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
-import { router } from "expo-router";
+import { useRouter } from "expo-router";
 import {SecureInput} from "@/components/basic/MyComponents";
-import BackgroundMainInterface from "@/components/wraper/BackgroundMainInterface";
 
-const RegisterScreen = () => {
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+
+const RestartPasswordScreen = () => {
+  const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  
-  const handleRegister = () => {
-    setTimeout(() => {
-      router.push("LoginScreen");
-    }, 120);
+  const router = useRouter();
+
+  const handleRestartPassword = () => {
+    // handle password restart logic
+    router.push("../(accountScreen)/LoginScreen");
   };
 
   const goBackToLogin = () => {
-    setTimeout(() => {
-      router.push("LoginScreen");
-    }, 120);
+    router.push("../(accountScreen)/LoginScreen");
   };
 
   return (
-    <BackgroundMainInterface>
+    <>
+      <StatusBar style="light" />
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.keyboardAvoid}
@@ -43,41 +40,29 @@ const RegisterScreen = () => {
           <View style={styles.card}>
             <Image
               source={{
-                uri: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/premier-ball.png",
+                uri: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png",
               }}
               style={styles.logo}
               resizeMode="contain"
             />
 
-            <Text style={styles.title}>New Trainer Registration</Text>
+            <Text style={styles.title}>Restart Password</Text>
 
-            <TextInput
-              style={styles.input}
-              placeholder="Trainer Name"
-              value={username}
-              onChangeText={setUsername}
-              autoCapitalize="none"
-            />
-
-            <TextInput
-              style={styles.input}
-              placeholder="Email"
-              value={email}
-              onChangeText={setEmail}
-              keyboardType="email-address"
-              autoCapitalize="none"
+            <SecureInput
+              value={newPassword}
+              onChangeText={setNewPassword}
             />
 
             <SecureInput
-              value={password}
-              onChangeText={setPassword}
+              value={confirmPassword}
+              onChangeText={setConfirmPassword}
             />
 
             <TouchableOpacity
-              style={styles.registerButton}
-              onPress={handleRegister}
+              style={styles.restartButton}
+              onPress={handleRestartPassword}
             >
-              <Text style={styles.registerButtonText}>Start Your Journey</Text>
+              <Text style={styles.restartButtonText}>Restart Password</Text>
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.backButton} onPress={goBackToLogin}>
@@ -86,11 +71,11 @@ const RegisterScreen = () => {
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
-    </BackgroundMainInterface>
+    </>
   );
 };
 
-export default RegisterScreen;
+export default RestartPasswordScreen;
 
 const styles = StyleSheet.create({
   keyboardAvoid: {
@@ -129,16 +114,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
     textAlign: "center",
   },
-  input: {
-    width: "100%",
-    borderWidth: 2,
-    borderColor: "#e5e7eb",
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 16,
-    fontSize: 16,
-  },
-  registerButton: {
+  restartButton: {
     backgroundColor: "#ef4444",
     paddingVertical: 12,
     paddingHorizontal: 24,
@@ -146,7 +122,7 @@ const styles = StyleSheet.create({
     width: "100%",
     marginBottom: 16,
   },
-  registerButtonText: {
+  restartButtonText: {
     color: "white",
     fontSize: 18,
     fontWeight: "bold",

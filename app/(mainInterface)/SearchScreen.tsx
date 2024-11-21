@@ -15,7 +15,7 @@ import Pagination from "@/components/mainInterfaceComponents/SearchScreenCompone
 import { Game } from "@/types/main";
 import { useLocalSearchParams } from "expo-router";
 import FilterModal from "@/components/mainInterfaceComponents/SearchScreenComponents/FilterModal";
-import BackgroundMainInterface from "@/components/wraper/BackgroundMainInterface";
+
 
 const backendUrl = process.env.EXPO_PUBLIC_API_URL as string;
 
@@ -131,7 +131,7 @@ const SearchScreen = () => {
 
   return (
 
-    <BackgroundMainInterface>
+    <>
       <ScrollView >
         <View style={styles.searchContainer}>
           <View style={styles.searchBar}>
@@ -214,7 +214,7 @@ const SearchScreen = () => {
           setShowFilters(false);
         }}
       />
-    </BackgroundMainInterface>
+    </>
   );
 };
 

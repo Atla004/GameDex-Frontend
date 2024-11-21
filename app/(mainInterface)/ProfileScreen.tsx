@@ -9,7 +9,7 @@ import {
   Alert,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { BackgroundMainInterface } from "@/components/wraper/BackgroundMainInterface";
+ 
 import { SettingOption } from "@/components/ProfileComponents/SettingOption";
 import PasswordChangeModal from "@/components/mainInterfaceComponents/ProfileScreenComponents/PasswordChangeModal";
 import EmailChangeModal from "@/components/mainInterfaceComponents/ProfileScreenComponents/EmailChangeModal";
@@ -114,7 +114,7 @@ const ProfileScreen = () => {
   };
 
   return (
-    <BackgroundMainInterface>
+    <>
       <ScrollView style={styles.container}>
         {/* Profile Header */}
         <View style={styles.header}>
@@ -254,7 +254,7 @@ const ProfileScreen = () => {
           onSelectImage={handleSelectProfileImage}
         />
       </ScrollView>
-    </BackgroundMainInterface>
+    </>
   );
 };
 

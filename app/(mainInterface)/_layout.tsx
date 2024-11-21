@@ -3,6 +3,7 @@ import { Tabs } from "expo-router";
 import { StyleSheet, Text, View } from "react-native";
 import { Ionicons } from '@expo/vector-icons';
 import { StatusBar } from "react-native";
+import HolographicScreen from "@/components/Anuevos/HolographicScreen";
 
 export default function Layout() {
   const loading = useFontsLoad();
@@ -14,7 +15,7 @@ export default function Layout() {
   }
 
   return (
-    <View style={{ flex: 1, paddingTop: StatusBar.currentHeight }}>
+    <View style={[styles.tabsContainer,{paddingTop: StatusBar.currentHeight }]}>
       <Tabs
         screenOptions={({ route }) => ({
           headerShown: false,
@@ -63,11 +64,15 @@ export default function Layout() {
 }
 
 const styles = StyleSheet.create({
+  tabsContainer: {
+    flex: 1,
+  },
   container: {
     flex: 1,
     position: "absolute",
     alignItems: "center",
     justifyContent: "center",
+
   },
   loadingContainer: {
     flex: 1,

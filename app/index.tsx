@@ -1,34 +1,34 @@
-import Toast from '@/components/basic/Toast';
-import { Link } from 'expo-router';
-import { useState } from 'react';
-import { Button, Text } from 'react-native';
+import React, { useState } from 'react';
+import { View, StyleSheet, TouchableOpacity, Dimensions,Text } from 'react-native';
+import { router } from 'expo-router';
+import HolographicScreen from '@/components/Anuevos/HolographicScreen';
 
-export default function index() {
 
-  const [toastVisible, setToastVisible] = useState(false);
+export default function Index() {
 
-  const showToast = () => {
-    setToastVisible(true);
+
+  const handlePress = () => {
+
+    setTimeout(() => {
+      console.log('handlePress');
+      router.push('/LoginScreen');
+    }, 600);
   };
 
-
-return(
-<>
-    <Link href="LoginScreen" > 
-    <Text>Go to Auth</Text>
-    </Link>
-    <Button title="Show Toast" onPress={showToast} />
-      <Toast
-        message="This is a toast message"
-        visible={toastVisible}
-        setToast={setToastVisible}
-        duration={4000}
-      />
-
-
-
-      
-
-</>
-  ) 
+  return (
+    <TouchableOpacity 
+      style={styles.container} 
+      onPress={handlePress}
+    >
+        <Text>Press mffffffffffffffffffffffdasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasasfffffffffffffffffffffffffe</Text>
+    </TouchableOpacity>
+  );
 }
+
+const styles = StyleSheet.create({
+  container: {
+  },
+  content: {
+    flex: 1,
+  },
+});

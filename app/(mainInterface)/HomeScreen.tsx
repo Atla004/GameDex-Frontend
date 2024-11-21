@@ -5,7 +5,6 @@ import { GameCard } from "@/components/mainInterfaceComponents/GameCard";
 import { RatingGameCard } from "@/components/mainInterfaceComponents/RatingGameCard";
 import SearchBar from "@/components/basic/SearchBar";
 import { Game } from "@/types/main";
-import BackgroundMainInterface from "@/components/wraper/BackgroundMainInterface";
 
 const backendUrl = process.env.EXPO_PUBLIC_API_URL as string;
 
@@ -30,9 +29,8 @@ const HomeScreen = () => {
   }, []);
 
   return (
-    
-    <BackgroundMainInterface>
-      <ScrollView style={styles.container}>
+    <View style={styles.container}>
+      <ScrollView>
         <SearchBar />
         <GameCard
           imageUrl={cardGames.imageUrl}
@@ -75,7 +73,7 @@ const HomeScreen = () => {
 
         </View>
       </ScrollView>
-    </BackgroundMainInterface>
+    </View>
   );
 
   function fetchFeaturedGames() {
@@ -116,7 +114,8 @@ const HomeScreen = () => {
 export default HomeScreen;
 
 const styles = StyleSheet.create({
-  container: {},
+  container: {
+  },
   topRatedSection: {
     marginTop: 16,
     paddingBottom: 16,

@@ -10,44 +10,33 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from "react-native";
-import { Checkbox, SecureInput } from "@/components/basic/MyComponents";
 import { StatusBar } from "expo-status-bar";
 import { useRouter } from "expo-router";
-import BackgroundMainInterface from "@/components/wraper/BackgroundMainInterface";
 
-export const LoginScreen = () => {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [staySignedIn, setStaySignedIn] = useState(false);
+
+const ForgotScreen = () => {
+  const [email_or_username, setUsernameOrEmail] = useState("");
   const router = useRouter();
 
-  const handleLogin = () => {
-    // go to home screen
-    router.push("../../(mainInterface)/HomeScreen");
+  const handleResetPassword = () => {
+    console.log("Reset password");
+    router.push("EnterCodeScreen");
+
 
   };
 
-  const handleRegister = () => {
-    // go to register screen
-    router.push("RegisterScreen");
-
-  };
-
-  const handleForgot = () => {
-    // go to forgot password screen
-    router.push("../(recoverScreen)/ForgotScreen");
+  const goBackToLogin = () => {
+    router.push("/LoginScreen");
   };
 
   return (
-    <BackgroundMainInterface>
-
-    
-
+    <>
+      <StatusBar style="light" />
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.keyboardAvoid}
       >
-        <ScrollView>
+        <ScrollView contentContainerStyle={styles.scrollContent}>
           <View style={styles.card}>
             <Image
               source={{
@@ -57,54 +46,47 @@ export const LoginScreen = () => {
               resizeMode="contain"
             />
 
+            <Text style={styles.title}>Reset Password</Text>
+
             <TextInput
               style={styles.input}
-              placeholder="Username"
-              value={username}
-              onChangeText={setUsername}
+              placeholder="Email or username"
+              value={email_or_username}
+              onChangeText={setUsernameOrEmail}
+              keyboardType="email-address"
               autoCapitalize="none"
             />
 
-            <SecureInput value={password} onChangeText={setPassword} />
-
-            <View style={styles.checkboxContainer}>
-              <Checkbox value={staySignedIn} setValue={setStaySignedIn} />
-              <Text style={styles.checkboxLabel}>Stay signed in</Text>
-            </View>
-
-            <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-              <Text style={styles.loginButtonText}>Login</Text>
-            </TouchableOpacity>
-
             <TouchableOpacity
-              style={styles.linkButton}
-              onPress={handleRegister}
+              style={styles.resetButton}
+              onPress={handleResetPassword}
             >
-              <Text style={styles.linkText}>Register as New Trainer</Text>
+              <Text style={styles.resetButtonText}>Reset Password</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.linkButton} onPress={handleForgot}>
-              <Text style={styles.linkText}>Forgot Password?</Text>
+            <TouchableOpacity style={styles.backButton} onPress={goBackToLogin}>
+              <Text style={styles.backButtonText}>Back to Login</Text>
             </TouchableOpacity>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
-
-
-
-    </BackgroundMainInterface>
+    </>
   );
 };
 
-export default LoginScreen;
+export default ForgotScreen;
 
 const styles = StyleSheet.create({
   keyboardAvoid: {
     flex: 1,
   },
+  scrollContent: {
+    flexGrow: 1,
+    justifyContent: "center",
+    padding: 16,
+  },
   card: {
     backgroundColor: "white",
-    marginTop: 24,
     borderRadius: 12,
     padding: 24,
     marginHorizontal: 16,
@@ -123,7 +105,13 @@ const styles = StyleSheet.create({
   logo: {
     width: 100,
     height: 100,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#1f2937",
     marginBottom: 24,
+    textAlign: "center",
   },
   input: {
     width: "100%",
@@ -134,16 +122,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     fontSize: 16,
   },
-  checkboxContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 24,
-  },
-  checkboxLabel: {
-    fontSize: 16,
-    color: "#4b5563",
-  },
-  loginButton: {
+  resetButton: {
     backgroundColor: "#ef4444",
     paddingVertical: 12,
     paddingHorizontal: 24,
@@ -151,16 +130,16 @@ const styles = StyleSheet.create({
     width: "100%",
     marginBottom: 16,
   },
-  loginButtonText: {
+  resetButtonText: {
     color: "white",
     fontSize: 18,
     fontWeight: "bold",
     textAlign: "center",
   },
-  linkButton: {
-    marginVertical: 4,
+  backButton: {
+    marginTop: 8,
   },
-  linkText: {
+  backButtonText: {
     color: "#3b82f6",
     fontSize: 16,
     textAlign: "center",

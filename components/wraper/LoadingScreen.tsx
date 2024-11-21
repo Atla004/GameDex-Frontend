@@ -3,9 +3,7 @@ import {
   View,
   Text,
   StyleSheet,
-  Dimensions,
-  Animated,
-  Easing,
+  Image,
 } from 'react-native';
 import Reanimated, {
   useAnimatedStyle,
@@ -71,14 +69,8 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({ isLoading, childre
     <View style={styles.container}>
       <Reanimated.View style={[styles.overlay, overlayStyle]}>
         <View style={styles.content}>
-          <Reanimated.View style={[styles.pokeballContainer, rotationStyle]}>
-            <View style={styles.pokeball}>
-              <View style={styles.pokeballTop} />
-              <View style={styles.pokeballMiddle}>
-                <View style={styles.pokeballDot} />
-              </View>
-              <View style={styles.pokeballBottom} />
-            </View>
+          <Reanimated.View style={[styles.imageContainer, rotationStyle]}>
+            <Image source={require('@/assets/background/pokeballLoading.png')} style={styles.loadingImage} />
           </Reanimated.View>
           <Reanimated.Text style={[styles.loadingText, textStyle]}>
             Loading...
@@ -106,51 +98,13 @@ const styles = StyleSheet.create({
   content: {
     alignItems: 'center',
   },
-  pokeballContainer: {
+  imageContainer: {
     width: 100,
     height: 100,
   },
-  pokeball: {
+  loadingImage: {
     width: '100%',
     height: '100%',
-  },
-  pokeballTop: {
-    position: 'absolute',
-    top: 0,
-    width: '100%',
-    height: '50%',
-    backgroundColor: '#ff1f1f',
-    borderTopLeftRadius: 50,
-    borderTopRightRadius: 50,
-  },
-  pokeballMiddle: {
-    position: 'absolute',
-    top: '45%',
-    width: '100%',
-    height: 10,
-    backgroundColor: '#000',
-    zIndex: 2,
-  },
-  pokeballDot: {
-    position: 'absolute',
-    top: -5,
-    left: '40%',
-    width: 20,
-    height: 20,
-    backgroundColor: 'white',
-    borderRadius: 10,
-    borderWidth: 4,
-    borderColor: '#000',
-    zIndex: 3,
-  },
-  pokeballBottom: {
-    position: 'absolute',
-    bottom: 0,
-    width: '100%',
-    height: '50%',
-    backgroundColor: 'white',
-    borderBottomLeftRadius: 50,
-    borderBottomRightRadius: 50,
   },
   loadingText: {
     color: 'white',

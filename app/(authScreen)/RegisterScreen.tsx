@@ -6,32 +6,35 @@ import {
   TextInput,
   TouchableOpacity,
   Image,
-  ScrollView,
   KeyboardAvoidingView,
   Platform,
+  ScrollView,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
-import { useRouter } from "expo-router";
-import BackgroundMainInterface from "@/components/wraper/BackgroundMainInterface";
+import { router } from "expo-router";
+import {SecureInput} from "@/components/basic/MyComponents";
+ 
 
-const ForgotScreen = () => {
-  const [email_or_username, setUsernameOrEmail] = useState("");
-  const router = useRouter();
-
-  const handleResetPassword = () => {
-    console.log("Reset password");
-    router.push("EnterCodeScreen");
-
-
+const RegisterScreen = () => {
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  
+  const handleRegister = () => {
+    setTimeout(() => {
+      router.push("LoginScreen");
+    }, 120);
   };
 
   const goBackToLogin = () => {
-    router.push("../(accountScreen)/LoginScreen");
+    setTimeout(() => {
+      router.push("LoginScreen");
+    }, 120);
   };
 
   return (
-    <BackgroundMainInterface>
-      <StatusBar style="light" />
+    <>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.keyboardAvoid}
@@ -40,28 +43,41 @@ const ForgotScreen = () => {
           <View style={styles.card}>
             <Image
               source={{
-                uri: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png",
+                uri: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/premier-ball.png",
               }}
               style={styles.logo}
               resizeMode="contain"
             />
 
-            <Text style={styles.title}>Reset Password</Text>
+            <Text style={styles.title}>New Trainer Registration</Text>
 
             <TextInput
               style={styles.input}
-              placeholder="Email or username"
-              value={email_or_username}
-              onChangeText={setUsernameOrEmail}
+              placeholder="Trainer Name"
+              value={username}
+              onChangeText={setUsername}
+              autoCapitalize="none"
+            />
+
+            <TextInput
+              style={styles.input}
+              placeholder="Email"
+              value={email}
+              onChangeText={setEmail}
               keyboardType="email-address"
               autoCapitalize="none"
             />
 
+            <SecureInput
+              value={password}
+              onChangeText={setPassword}
+            />
+
             <TouchableOpacity
-              style={styles.resetButton}
-              onPress={handleResetPassword}
+              style={styles.registerButton}
+              onPress={handleRegister}
             >
-              <Text style={styles.resetButtonText}>Reset Password</Text>
+              <Text style={styles.registerButtonText}>Start Your Journey</Text>
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.backButton} onPress={goBackToLogin}>
@@ -70,11 +86,11 @@ const ForgotScreen = () => {
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
-    </BackgroundMainInterface>
+    </>
   );
 };
 
-export default ForgotScreen;
+export default RegisterScreen;
 
 const styles = StyleSheet.create({
   keyboardAvoid: {
@@ -122,7 +138,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     fontSize: 16,
   },
-  resetButton: {
+  registerButton: {
     backgroundColor: "#ef4444",
     paddingVertical: 12,
     paddingHorizontal: 24,
@@ -130,7 +146,7 @@ const styles = StyleSheet.create({
     width: "100%",
     marginBottom: 16,
   },
-  resetButtonText: {
+  registerButtonText: {
     color: "white",
     fontSize: 18,
     fontWeight: "bold",

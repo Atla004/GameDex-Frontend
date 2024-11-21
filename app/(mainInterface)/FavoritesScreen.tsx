@@ -1,5 +1,5 @@
 import { RatingGameCard } from "@/components/mainInterfaceComponents/RatingGameCard";
-import { BackgroundMainInterface } from "@/components/wraper/BackgroundMainInterface";
+ 
 import { Game } from "@/types/main";
 import { useCallback, useEffect, useState } from "react";
 import { ScrollView, StyleSheet, View, Text, Image } from "react-native";
@@ -30,7 +30,7 @@ const FavoritesScreen = () => {
   );
 
   return (
-    <BackgroundMainInterface>
+    <>
       <ScrollView style={styles.container}>
         <View style={styles.header}>
           <Image
@@ -69,14 +69,16 @@ const FavoritesScreen = () => {
           </>
         )}
       </ScrollView>
-    </BackgroundMainInterface>
+    </>
   );
 };
 
 export default FavoritesScreen;
 
 const styles = StyleSheet.create({
-  container: {},
+  container: {
+    
+  },
   header: {
     flexDirection: "row",
     alignItems: "center",

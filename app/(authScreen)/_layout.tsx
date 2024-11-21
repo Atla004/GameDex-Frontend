@@ -1,20 +1,28 @@
-import { Stack } from "expo-router";
-import { useEffect } from "react";
+import React, { createContext, useState, useContext } from 'react';
+import { Slot } from 'expo-router';
+import PokedexFrame from '../../components/wraper/PokedexFrame';
 
-export default function Layout() {
+const PokedexContext = createContext({
+  isTransitioning: false,
+  openPokedex: () => {},
+  closePokedex: () => {}
+});
+
+export const usePokedex = () => useContext(PokedexContext);
+
+const Layout = () => {
+  const [isTransitioning, setIsTransitioning] = useState(false);
+
+  const openPokedex = () => setIsTransitioning(true);
+  const closePokedex = () => setIsTransitioning(false);
 
   return (
-      <Stack
-        screenOptions={{
-          headerShown: false,
-        }}
-      >
-        <Stack.Screen
-          name="(accountScreen)"
-        />
-        <Stack.Screen
-          name="(recoverScreen)"
-        />
-      </Stack>
+    <PokedexContext.Provider value={{ isTransitioning, openPokedex, closePokedex }}>
+      <PokedexFrame isTransitioning={isTransitioning}>
+        <Slot />
+      </PokedexFrame>
+    </PokedexContext.Provider>
   );
-}
+};
+
+export default Layout;
