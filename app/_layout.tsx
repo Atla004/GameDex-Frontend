@@ -4,12 +4,14 @@ import { Slot } from "expo-router";
 import { createContext, useContext, useState } from "react";
 import { useFontsLoad } from "@/utils/fontsload";
 import { StyleSheet, View } from "react-native";
+import { red } from "react-native-reanimated/lib/typescript/Colors";
 
 
 const ToastContext = createContext({
   message: '',
   visible: false,
   duration: 3000,
+  color: 'red',
   setToast: (message: string, visible: boolean, duration?: number) => {}
 });
 
@@ -17,13 +19,13 @@ export const useToast = () => useContext(ToastContext);
 
 
 export default function Layout() {
-  const [toast, setToastState] = useState({ message: '', visible: false, duration: 3000 });
+  const [toast, setToastState] = useState({ message: '', visible: false, duration: 3000, color: 'red' });
 
 
 
 
-  const setToast = (message: string, visible: boolean, duration: number = 3000) => {
-    setToastState({ message, visible, duration });
+  const setToast = (message: string, visible: boolean, duration: number = 3000,color: string= "red") => {
+    setToastState({ message, visible, duration,color });
   };
 
 
@@ -42,7 +44,7 @@ export default function Layout() {
         headerShown: false,
       }}
       />
-          <Toast message={toast.message} visible={toast.visible} duration={toast.duration} setToast={() => setToast('', false)} />
+          <Toast message={toast.message} visible={toast.visible} duration={toast.duration} color={toast.color} setToast={() => setToast('', false)} />
             
       </ToastContext.Provider>
     </HolographicScreen>

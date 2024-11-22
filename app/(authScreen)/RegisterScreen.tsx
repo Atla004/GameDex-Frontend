@@ -15,6 +15,7 @@ import { router } from "expo-router";
 import {SecureInput} from "@/components/basic/MyComponents";
 import { usePokedex } from "./_layout";
 import { z } from "zod";
+import { useToast } from "../_layout";
 
 // Define validation schema using Zod
 const schema = z.object({
@@ -32,6 +33,7 @@ interface Errors {
 }
 
 const RegisterScreen = () => {
+  const { setToast } = useToast();
   const { isTransitioning, closePokedex, openPokedex } = usePokedex();
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -49,6 +51,7 @@ const RegisterScreen = () => {
     closePokedex();
     setTimeout(() => {
       router.push("LoginScreen");
+      setToast("Registration successful!", true,3000, "green");
     }, 600);
   };
 

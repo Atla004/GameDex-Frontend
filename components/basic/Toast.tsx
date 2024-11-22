@@ -6,9 +6,10 @@ interface ToastProps {
   visible: boolean;
   duration?: number;
   setToast: (visible: boolean) => void;
+  color?: string;
 }
 
-const Toast: React.FC<ToastProps> = ({ message, visible, duration = 3000, setToast }) => {
+const Toast: React.FC<ToastProps> = ({ message, visible, duration = 3000, setToast , color="red"}) => {
   const opacity = new Animated.Value(0);
 
   useEffect(() => {
@@ -34,7 +35,7 @@ const Toast: React.FC<ToastProps> = ({ message, visible, duration = 3000, setToa
   }
 
   return (
-    <Animated.View style={[styles.toast, { opacity }]}>
+    <Animated.View style={[styles.toast, { opacity },{backgroundColor: color,}]}>
       <Text style={styles.message}>{message}</Text>
     </Animated.View>
   );
@@ -46,7 +47,6 @@ const styles = StyleSheet.create({
     bottom: 50,
     left: 20,
     right: 20,
-    backgroundColor: 'black',
     padding: 10,
     borderRadius: 5,
     alignItems: 'center',
