@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   StyleSheet,
   View,
@@ -12,23 +12,50 @@ import {
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { useRouter } from "expo-router";
-
+import { usePokedex } from "./_layout";
+import { z } from "zod";
 
 const ForgotScreen = () => {
+  const { isTransitioning, closePokedex, openPokedex } = usePokedex();
   const [email_or_username, setUsernameOrEmail] = useState("");
+  const [error, setError] = useState("");
   const router = useRouter();
 
   const handleResetPassword = () => {
+    const emailSchema = z.string().email("Invalid email format");
+    const usernameSchema = z.string().min(1, "Username is required");
+
+    const isEmail = emailSchema.safeParse(email_or_username).success;
+    const isUsername = usernameSchema.safeParse(email_or_username).success;
+
+    if (!isEmail && !isUsername) {
+      setError("Please enter a valid email or username");
+      return;
+    }
+
+    setError("");
     console.log("Reset password");
-    router.push("EnterCodeScreen");
 
-
+    closePokedex();
+    setTimeout(() => {
+      router.push("EnterCodeScreen");
+    }, 600);
   };
 
   const goBackToLogin = () => {
+    closePokedex();
+    setTimeout(() => {
     router.push("/LoginScreen");
+  }, 600);
   };
 
+
+  useEffect(() => {
+    if (isTransitioning) {
+      // Close animation
+      openPokedex();
+    }
+  }, []);
   return (
     <>
       <StatusBar style="light" />
@@ -56,6 +83,7 @@ const ForgotScreen = () => {
               keyboardType="email-address"
               autoCapitalize="none"
             />
+            {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
             <TouchableOpacity
               style={styles.resetButton}
@@ -143,5 +171,9 @@ const styles = StyleSheet.create({
     color: "#3b82f6",
     fontSize: 16,
     textAlign: "center",
+  },
+  errorText: {
+    color: "red",
+    marginBottom: 16,
   },
 });

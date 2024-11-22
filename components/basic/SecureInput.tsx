@@ -34,7 +34,7 @@ const styles = StyleSheet.create({
   passwordContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 16,
+    marginVertical: 5,
   },
   showPasswordButton: {
     position: 'absolute',

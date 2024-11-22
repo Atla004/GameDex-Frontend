@@ -12,6 +12,7 @@ import { ReviewSection } from "@/components/GameComponents/ReviewSection";
 import { Review } from "@/types/main";
 import { router } from "expo-router";
 import Pagination from "@/components/mainInterfaceComponents/SearchScreenComponents/Pagination";
+import { useToast } from "../_layout";
 
 const backendUrl = process.env.EXPO_PUBLIC_API_URL as string;
 
@@ -26,6 +27,7 @@ const CommentsScreen = () => {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [totalPages, setTotalPages] = useState(1);
   const [resultCount, setResultCount] = useState(0);
+  const { setToast } = useToast();
 
   const onClose = () => {
     console.log("onClose");
@@ -49,7 +51,7 @@ const CommentsScreen = () => {
       setTotalPages(data.total_pages);
       setResultCount(data.result_count);
     } catch (error) {
-      console.error("Error fetching data:", error);
+      setToast("Error fetching data", true, 3000);
     } finally {
       setLoading(false);
     }

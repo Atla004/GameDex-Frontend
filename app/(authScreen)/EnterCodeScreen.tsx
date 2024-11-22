@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   StyleSheet,
   View,
@@ -12,11 +12,12 @@ import {
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { router } from 'expo-router';
+import { usePokedex } from './_layout';
 
 
 const EnterCodeScreen = () => {
+  const { isTransitioning, closePokedex, openPokedex } = usePokedex();
   const [code, setCode] = useState(['', '', '', '', '', '']);
-  const [isTransitioning, setIsTransitioning] = useState(false);
   const inputRefs = useRef<Array<TextInput | null>>([]);
 
   const handleCodeChange = (text: string, index: number) => {
@@ -46,14 +47,28 @@ const EnterCodeScreen = () => {
   const handleSubmit = () => {
     const fullCode = code.join('');
     if (fullCode.length === 6) {
+
+
+      closePokedex();
+      setTimeout(() => {
       router.push('/RestartPasswordScreen');
+    }, 600);
     }
   };
 
   const handleBack = () => {
-    setIsTransitioning(true);
+    closePokedex();
+    setTimeout(() => {
     router.push('/LoginScreen');
+  }, 600);
   };
+
+  useEffect(() => {
+    if (isTransitioning) {
+      // Close animation
+      openPokedex();
+    }
+  }, []);
 
   return (
     <>

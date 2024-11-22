@@ -12,11 +12,12 @@ import { Ionicons } from "@expo/vector-icons";
 import { GameDetail } from "@/components/GameComponents/GameDetail";
 import { ReviewSection } from "@/components/GameComponents/ReviewSection";
 import { PokeBallRating } from "@/components/GameComponents/PokeballRating";
-import { StatusBar } from "react-native";
 import { router } from "expo-router";
 import { CommentInputFooter } from "@/components/GameComponents/CommentsInputFooter";
 import { Review } from "@/types/main";
 import { LoadingScreen } from "@/components/wraper/LoadingScreen";
+import { useToast } from "../_layout";
+import { set } from "zod";
 
 const backendUrl = process.env.EXPO_PUBLIC_API_URL as string;
 
@@ -33,8 +34,12 @@ interface GameScreenData {
   publisher: string[];
   releaseDate: string;
   ageRating: string;
-  criticReviews: Review[];
-  userReviews: Review[];
+}
+
+interface newComment {
+  content: string;
+  publication: string;
+  score: number;
 }
 
 const GameScreen = () => {
@@ -51,23 +56,58 @@ const GameScreen = () => {
     publisher: [],
     releaseDate: "",
     ageRating: "",
-    criticReviews: [],
-    userReviews: [],
   });
 
-  function fetchGame(gameId: string) {
-    fetch(`${backendUrl}/getGame/${gameId}.json`)
-      .then((response) => {
-        return response.json();
-      })
-      .then((data) => {
-        setGameData(data);
-      })
-      .catch((error) => console.error("Error fetching featured games"));
+  const [reviewUserData, setReviewUserData] = useState<Review[]>([]);
+  const [reviewCriticData, setReviewCriticData] = useState<Review[]>([]);
+
+  const { setToast } = useToast();
+
+  async function fetchGame(gameId: string) {
+    try {
+      const response = await fetch(`${backendUrl}/getGame/${gameId}.json`);
+      const data = await response.json();
+      setGameData(data);
+    } catch (error) {
+      throw new Error("Error fetching game data");
+    }
+  }
+
+  async function fetchUserComments(gameId: string) {
+    try {
+      const response = await fetch(`${backendUrl}/Comments/${gameId}.json`);
+      const data = await response.json();
+      setReviewUserData(data);
+    } catch (error) {
+      throw new Error("Error fetching comments");
+    }
+  }
+
+  async function fetchCriticComments(gameId: string) {
+    try {
+      const response = await fetch(`${backendUrl}/Comments/${gameId}.json`);
+      const data = await response.json();
+      setReviewCriticData(data);
+    } catch (error) {
+      throw new Error("Error fetching comments");
+    }
   }
 
   useEffect(() => {
-    fetchGame("1");
+    async function fetchAllGames() {
+      try {
+        const gameId = "1";
+        await Promise.all([
+          fetchGame(gameId),
+          fetchUserComments(gameId),
+          fetchCriticComments(gameId),
+        ]);
+      } catch (error) {
+        setToast("Error fetching game data", true, 3000);
+      }
+    }
+
+    fetchAllGames();
   }, []);
 
   const onClose = () => {
@@ -78,9 +118,9 @@ const GameScreen = () => {
     router.replace("/(games)/CommentScreen");
   };
 
-  const handleAddComment = ({content,publication,score}:{content: string,publication:string,score:number}) => {
-    console.log("Adding comment", content,publication,score);
-    const newReview:Review = {
+  const handleAddComment = ({ content, publication, score }: newComment) => {
+    console.log("Adding comment", content, publication, score);
+    const newReview: Review = {
       publication,
       id: Date.now().toString(),
       username: "You",
@@ -90,59 +130,44 @@ const GameScreen = () => {
       isOwnReview: true,
     };
 
-    if (!gameData.userReviews) {
-      setGameData({
-        ...gameData,
-        userReviews: [newReview],
-      });
+
+
+    if (!reviewUserData) {
+      setReviewUserData([newReview]);
       return;
     }
 
-
-    setGameData({
-      ...gameData,
-      userReviews: [...gameData.userReviews,newReview],
-    });
-
-  
+    setReviewUserData([...reviewUserData, newReview]);
   };
 
   const handleDeleteReview = (reviewId: string) => {
-    
-    if(!gameData.userReviews){
+    if (reviewUserData.length === 0) {
       return;
     }
 
-
-    setGameData({
-      ...gameData,
-      userReviews: [...gameData.userReviews.filter((review) => review.id !== reviewId)],
-    });
-    
+    setReviewUserData([
+      ...reviewUserData.filter((review) => review.id !== reviewId),
+    ]);
   };
 
-  const [renderViewAllButtonBoolean, setRenderViewAllButtonBoolean] = useState(false);
+  const [renderViewAllButtonBoolean, setRenderViewAllButtonBoolean] =
+    useState(false);
 
   useEffect(() => {
-
-    if (gameData.userReviews.length > 3 || gameData.criticReviews.length > 3
-    ) {
+    if (reviewUserData.length > 3 || reviewCriticData.length > 3) {
       console.log("review true");
       setRenderViewAllButtonBoolean(true);
-      
-    }else{
+    } else {
       console.log("review false");
       setRenderViewAllButtonBoolean(false);
     }
   }, [gameData]);
 
-
-console.log("gameData",gameData.id);
-console.log("gameDatdddda",gameData.id==="null");
+  console.log("gameData", gameData.id);
+  console.log("gameDatdddda", gameData.id === "null");
   return (
-
-    <LoadingScreen isLoading={gameData.id===""}>
-  {/* Your app content */}
+    <LoadingScreen isLoading={gameData.id === ""}>
+      {/* Your app content */}
 
       <ScrollView style={styles.container}>
         {/* Header with back button */}
@@ -173,18 +198,13 @@ console.log("gameDatdddda",gameData.id==="null");
             </View>
             <View style={styles.pokeballBottom} />
           </View>
-          { gameData.imageUrl?(
-            
-            
+          {gameData.imageUrl ? (
             <Image
-            source={{ uri: gameData.imageUrl }}
-            style={styles.coverImage}
-            resizeMode="cover"
+              source={{ uri: gameData.imageUrl }}
+              style={styles.coverImage}
+              resizeMode="cover"
             />
-          ):(
-            null
-          )
-          }
+          ) : null}
         </View>
 
         {/* Description and Ratings */}
@@ -198,7 +218,7 @@ console.log("gameDatdddda",gameData.id==="null");
                 score={gameData.criticScore}
                 type="critic"
                 size="large"
-                />
+              />
             </View>
             <View style={styles.ratingBox}>
               <Text style={styles.ratingLabel}>User Score</Text>
@@ -206,7 +226,7 @@ console.log("gameDatdddda",gameData.id==="null");
                 score={gameData.userScore}
                 type="user"
                 size="large"
-                />
+              />
             </View>
           </View>
 
@@ -216,15 +236,15 @@ console.log("gameDatdddda",gameData.id==="null");
             <GameDetail
               label="Platforms"
               value={gameData.platform ? gameData.platform.join(", ") : ""}
-              />
+            />
             <GameDetail
               label="Developer"
               value={gameData.developer ? gameData.developer.join(", ") : ""}
-              />
+            />
             <GameDetail
               label="Publisher"
               value={gameData.publisher ? gameData.publisher.join(", ") : ""}
-              />
+            />
             <GameDetail label="Release Date" value={gameData.releaseDate} />
             <GameDetail label="Age Rating" value={gameData.ageRating} />
           </View>
@@ -233,13 +253,13 @@ console.log("gameDatdddda",gameData.id==="null");
           <View style={styles.reviewsContainer}>
             <Text style={styles.sectionTitle}>Critic Reviews</Text>
             <ReviewSection
-              reviews={gameData.criticReviews.slice(0, 3)}
+              reviews={reviewCriticData.slice(0, 3)}
               type="critic"
-              />
-            {gameData.criticReviews.length > 1 && (
+            />
+            {reviewCriticData.length > 1 && (
               <TouchableOpacity
-              style={styles.viewAllButton}
-              onPress={onViewAllComments}
+                style={styles.viewAllButton}
+                onPress={onViewAllComments}
               >
                 <Text style={styles.viewAllText}>View All Reviews</Text>
                 <Ionicons name="chevron-forward" size={20} color="#3b82f6" />
@@ -250,14 +270,14 @@ console.log("gameDatdddda",gameData.id==="null");
               User Reviews
             </Text>
             <ReviewSection
-              reviews={gameData.userReviews}
+              reviews={reviewUserData}
               type="user"
               onDeleteReview={handleDeleteReview}
-              />
-            { renderViewAllButtonBoolean && (
+            />
+            {renderViewAllButtonBoolean && (
               <TouchableOpacity
-              style={styles.viewAllButton}
-              onPress={onViewAllComments}
+                style={styles.viewAllButton}
+                onPress={onViewAllComments}
               >
                 <Text style={styles.viewAllText}>View All Reviews</Text>
                 <Ionicons name="chevron-forward" size={20} color="#3b82f6" />
@@ -267,8 +287,7 @@ console.log("gameDatdddda",gameData.id==="null");
         </View>
       </ScrollView>
       <CommentInputFooter onSubmit={handleAddComment} />
-
-      </LoadingScreen>
+    </LoadingScreen>
   );
 };
 
@@ -277,7 +296,6 @@ export default GameScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f3f4f6",
   },
   header: {
     height: 60,

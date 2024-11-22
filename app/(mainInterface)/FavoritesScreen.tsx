@@ -4,10 +4,12 @@ import { Game } from "@/types/main";
 import { useCallback, useEffect, useState } from "react";
 import { ScrollView, StyleSheet, View, Text, Image } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
+import { useToast } from "../_layout";
 
 const backendUrl = process.env.EXPO_PUBLIC_API_URL as string;
 
 const FavoritesScreen = () => {
+  const { setToast } = useToast();
   const [favoriteGames, setFavoriteGames] = useState<Game[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -19,7 +21,7 @@ const FavoritesScreen = () => {
           const data = await response.json();
           setFavoriteGames(data);
         } catch (error) {
-          console.error("Error fetching favorite games:", error);
+          setToast("Error getting user favorites", true, 3000);
         } finally {
           setLoading(false);
         }

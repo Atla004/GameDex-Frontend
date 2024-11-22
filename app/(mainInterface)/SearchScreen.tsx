@@ -15,6 +15,8 @@ import Pagination from "@/components/mainInterfaceComponents/SearchScreenCompone
 import { Game } from "@/types/main";
 import { useLocalSearchParams } from "expo-router";
 import FilterModal from "@/components/mainInterfaceComponents/SearchScreenComponents/FilterModal";
+import { useToast } from "../_layout";
+import {OrderingDropdown} from "@/components/mainInterfaceComponents/SearchScreenComponents/Dropdown";
 
 
 const backendUrl = process.env.EXPO_PUBLIC_API_URL as string;
@@ -36,8 +38,8 @@ interface response {
 }
 
 const SearchScreen = () => {
+  const { setToast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
-  const [isSearching, setIsSearching] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -57,23 +59,11 @@ const SearchScreen = () => {
   });
   const [searchResults, setSearchResults] = useState<Game[]>([]);
 
-
-
   const searchInputRef = useRef<TextInput>(null);
-
-
 
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
 
-
-
-
   const data = useLocalSearchParams();
-
-
-
-
-
 
   const handleSearch = () => {
     isSearchingRef.current = true;
@@ -97,10 +87,11 @@ const SearchScreen = () => {
         setResponse(data);
         setLoading(false);
       })
-      .catch((error) => console.error("Error fetching data:", error));
+      .catch((error) => {
+        setToast("Error searching games", true, 3000);
+        setLoading(false);
+      });
   }, [currentPage]);
-
-
 
   useEffect(() => {
     console.log("useEffect currentPage", currentPage);
@@ -128,11 +119,11 @@ const SearchScreen = () => {
       genre: [],
     });
   };
+  const [selected, setSelected] = useState("Release Date");
 
   return (
-
     <>
-      <ScrollView >
+      <ScrollView>
         <View style={styles.searchContainer}>
           <View style={styles.searchBar}>
             <Ionicons name="search" size={20} color="#6b7280" />
@@ -151,7 +142,6 @@ const SearchScreen = () => {
               </TouchableOpacity>
             )}
 
-
             <TouchableOpacity
               style={styles.filterButton}
               onPress={() => setShowFilters(true)}
@@ -161,8 +151,14 @@ const SearchScreen = () => {
           </View>
         </View>
 
-        
-          {/*pantalla de juegos*/}
+<View style={styles.orderingDropdown}>
+          <OrderingDropdown
+            options={["Release Date", "Name", "Rating"]}
+            selected={selected}
+            setSelected={setSelected}
+          />
+        </View>
+        {/*pantalla de juegos*/}
         {loading && (
           <View style={styles.loadingContainer}>
             <Text style={styles.loadingText}>Loading...</Text>
@@ -171,7 +167,6 @@ const SearchScreen = () => {
 
         {!loading && isSearchingRef.current && searchResults.length > 0 && (
           <View>
-
             {searchResults.map((game, index) => (
               <GameCard key={`${currentPage}-${index}`} {...game} />
             ))}
@@ -242,6 +237,9 @@ const styles = StyleSheet.create({
   filterButton: {
     marginLeft: 8,
     padding: 4,
+  },
+  orderingDropdown: {
+
   },
   emptyState: {
     alignItems: "center",

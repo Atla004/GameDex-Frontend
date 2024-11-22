@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   StyleSheet,
   View,
@@ -13,25 +13,58 @@ import {
 import { StatusBar } from "expo-status-bar";
 import { router } from "expo-router";
 import {SecureInput} from "@/components/basic/MyComponents";
- 
+import { usePokedex } from "./_layout";
+import { z } from "zod";
+
+// Define validation schema using Zod
+const schema = z.object({
+  username: z.string().min(1, "Trainer Name is required"),
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+  confirmPassword: z.string().min(6, "Confirm Password must be at least 6 characters"),
+});
+
+interface Errors {
+  username?: { _errors: string[] };
+  email?: { _errors: string[] };
+  password?: { _errors: string[] };
+  confirmPassword?: { _errors: string[] };
+}
 
 const RegisterScreen = () => {
+  const { isTransitioning, closePokedex, openPokedex } = usePokedex();
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [errors, setErrors] = useState<Errors>({});
   
   const handleRegister = () => {
+    const result = schema.safeParse({ username, email, password, confirmPassword });
+    if (!result.success) {
+      const formattedErrors = result.error.format();
+      setErrors(formattedErrors);
+      return;
+    }
+    closePokedex();
     setTimeout(() => {
       router.push("LoginScreen");
-    }, 120);
+    }, 600);
   };
 
   const goBackToLogin = () => {
+    closePokedex();
     setTimeout(() => {
       router.push("LoginScreen");
-    }, 120);
+    }, 600);
   };
+
+  useEffect(() => {
+    if (isTransitioning) {
+      // Close animation
+      openPokedex();
+    }
+  }, []);
 
   return (
     <>
@@ -58,6 +91,7 @@ const RegisterScreen = () => {
               onChangeText={setUsername}
               autoCapitalize="none"
             />
+            {errors.username && <Text style={styles.errorText}>{errors.username._errors[0]}</Text>}
 
             <TextInput
               style={styles.input}
@@ -67,11 +101,22 @@ const RegisterScreen = () => {
               keyboardType="email-address"
               autoCapitalize="none"
             />
+            {errors.email && <Text style={styles.errorText}>{errors.email._errors[0]}</Text>}
 
             <SecureInput
               value={password}
               onChangeText={setPassword}
             />
+            {errors.password && <Text style={styles.errorText}>{errors.password._errors[0]}</Text>}
+
+            <TextInput
+              style={styles.input}
+              placeholder="Confirm Password"
+              value={confirmPassword}
+              onChangeText={setConfirmPassword}
+              secureTextEntry
+            />
+            {errors.confirmPassword && <Text style={styles.errorText}>{errors.confirmPassword._errors[0]}</Text>}
 
             <TouchableOpacity
               style={styles.registerButton}
@@ -135,7 +180,7 @@ const styles = StyleSheet.create({
     borderColor: "#e5e7eb",
     borderRadius: 8,
     padding: 12,
-    marginBottom: 16,
+    marginVertical: 5,
     fontSize: 16,
   },
   registerButton: {
@@ -159,5 +204,9 @@ const styles = StyleSheet.create({
     color: "#3b82f6",
     fontSize: 16,
     textAlign: "center",
+  },
+  errorText: {
+    color: "red",
+    fontSize: 12
   },
 });

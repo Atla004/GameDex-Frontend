@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { View, StyleSheet, Animated, Dimensions, Text } from "react-native";
-import { usePokedex } from '../../app/(authScreen)/_layout';
+import { usePokedex } from "../../app/(authScreen)/_layout";
 
 interface PokedexFrameProps {
   children: React.ReactNode;
@@ -23,7 +23,6 @@ const TopBorder = () => {
           <View style={[styles.smallLight, styles.greenLight]} />
         </View>
       </View>
-
     </>
   );
 };
@@ -49,39 +48,36 @@ const BottomBorder = () => {
 const PokedexFrame = ({ children, isTransitioning }: PokedexFrameProps) => {
   const topHeight = useRef(new Animated.Value(80)).current;
   const bottomHeight = useRef(new Animated.Value(80)).current;
-  const { openPokedex, closePokedex } = usePokedex();
 
   useEffect(() => {
     if (isTransitioning) {
       // Close animation
       Animated.parallel([
         Animated.timing(topHeight, {
-          toValue: (Dimensions.get("window").height / 2)+15,
+          toValue: Dimensions.get("window").height / 2 + 15,
           duration: 200,
           useNativeDriver: false,
         }),
         Animated.timing(bottomHeight, {
-          toValue:( Dimensions.get("window").height / 2)+15,
+          toValue: Dimensions.get("window").height / 2 + 15,
           duration: 200,
           useNativeDriver: false,
         }),
-      ]).start(() => {
-        // Reopen animation after a short delay
-        setTimeout(() => {
-          Animated.parallel([
-            Animated.timing(topHeight, {
-              toValue: 80,
-              duration: 300,
-              useNativeDriver: false,
-            }),
-            Animated.timing(bottomHeight, {
-              toValue: 80,
-              duration: 300,
-              useNativeDriver: false,
-            }),
-          ]).start();
-        }, 400); // Adjust the delay as needed
-      });
+      ]).start();
+    } else {
+      // Open animation
+      Animated.parallel([
+        Animated.timing(topHeight, {
+          toValue: 80,
+          duration: 300,
+          useNativeDriver: false,
+        }),
+        Animated.timing(bottomHeight, {
+          toValue: 80,
+          duration: 300,
+          useNativeDriver: false,
+        }),
+      ]).start();
     }
   }, [isTransitioning]);
 
@@ -96,15 +92,14 @@ const PokedexFrame = ({ children, isTransitioning }: PokedexFrameProps) => {
 
       {/* Main Content */}
       <View style={styles.content}>{children}</View>
-      
-      <View style={{ alignItems: "center" }}>
-        <Text>Powered by RAWG</Text>
-      </View>
 
       {/* Bottom Border */}
       <Animated.View
         style={[styles.border, styles.bottomBorder, { height: bottomHeight }]}
       >
+        <View style={styles.textContainer}>
+          <Text>Powered by RAWG</Text>
+        </View>
         <BottomBorder />
       </Animated.View>
     </View>
@@ -252,6 +247,12 @@ const styles = StyleSheet.create({
   actionButtonBlue: {
     backgroundColor: "#3b82f6",
     borderColor: "#1d4ed8",
+  },
+  textContainer: {
+    position: "absolute",
+    top: 10,
+    alignItems: "center",
+    width: "100%",
   },
 });
 

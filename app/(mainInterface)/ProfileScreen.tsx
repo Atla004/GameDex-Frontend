@@ -18,6 +18,7 @@ import DeleteAccountModal from "@/components/mainInterfaceComponents/ProfileScre
 
 import { router } from "expo-router";
 import { ProfileImageSelectorModal } from "@/components/mainInterfaceComponents/ProfileScreenComponents/ProfileImageSelectorModal";
+import { useToast } from "../_layout";
 
 const backendUrl = process.env.EXPO_PUBLIC_API_URL as string;
 
@@ -31,6 +32,7 @@ interface ProfileData {
 }
 
 const ProfileScreen = () => {
+  const { setToast } = useToast();
   const [mockData, setMockData] = useState<ProfileData>();
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [showEmailModal, setShowEmailModal] = useState(false);
@@ -51,7 +53,7 @@ const ProfileScreen = () => {
         const data = await response.json();
         setMockData(data);
       } catch (error) {
-        console.error("Error fetching data:", error);
+        setToast("Error getting profile data", true, 3000);
       }
     };
 

@@ -5,10 +5,12 @@ import { GameCard } from "@/components/mainInterfaceComponents/GameCard";
 import { RatingGameCard } from "@/components/mainInterfaceComponents/RatingGameCard";
 import SearchBar from "@/components/basic/SearchBar";
 import { Game } from "@/types/main";
+import { useToast } from "../_layout";
 
 const backendUrl = process.env.EXPO_PUBLIC_API_URL as string;
 
 const HomeScreen = () => {
+  const { setToast } = useToast();
   const [featuredGames, setFeaturedGames] = useState<Game[]>([]);
   const [topRatedGames, setTopRatedGames] = useState<Game[]>([]);
   const [cardGames, setCardGames] = useState<Game>({
@@ -22,10 +24,21 @@ const HomeScreen = () => {
   });
 
   useEffect(() => {
-    console.log("fetching data");
-    fetchFeaturedGames();
-    fetchTopRatedGames();
-    fetchCardGames();
+    const fetchData = async () => {
+      try {
+        console.log("fetching data");
+        await Promise.all([
+          fetchFeaturedGames(),
+          fetchTopRatedGames(),
+          fetchCardGames(),
+        ]);
+        console.log("Data fetched");
+      } catch (error) {
+        setToast("Error fetching data", true, 3000);
+      }
+    };
+
+    fetchData();
   }, []);
 
   return (
@@ -50,19 +63,17 @@ const HomeScreen = () => {
             />
             <Text style={styles.topRatedTitle}>Top Rated Games</Text>
           </View>
-        
-
 
           {topRatedGames.length === 0 ? (
             <>
-            <RatingGameCard 
-              id=""
-              imageUrl=""
-              title=""
-              description=""
-              ranking={1}
-              criticScore={1}
-              userScore={1}
+              <RatingGameCard
+                id=""
+                imageUrl=""
+                title=""
+                description=""
+                ranking={1}
+                criticScore={1}
+                userScore={1}
               />
             </>
           ) : (
@@ -70,52 +81,45 @@ const HomeScreen = () => {
               <RatingGameCard key={game.ranking} {...game} />
             ))
           )}
-
         </View>
       </ScrollView>
     </View>
   );
 
-  function fetchFeaturedGames() {
-    fetch(`${backendUrl}/featuredGames.json`)
-      .then((response) => {
-        return response.json();
-      })
-      .then((data) => {
-        setFeaturedGames(data.slice(0, 5));
-      })
-      .catch((error) => console.error("Error fetching featured games:", error));
+  async function fetchFeaturedGames() {
+    try {
+      const response = await fetch(`${backendUrl}/featuredGames.json`);
+      const data = await response.json();
+      setFeaturedGames(data.slice(0, 5));
+    } catch (error) {
+      throw new Error("Error fetching featured games");
+    }
   }
 
-  function fetchTopRatedGames() {
-    fetch(`${backendUrl}/topRatedGames.json`)
-      .then((response) => {
-        return response.json();
-      })
-      .then((data) => {
-        setTopRatedGames(data.slice(0, 2));
-      })
-      .catch((error) =>
-        console.error("Error fetching top rated games:", error)
-      );
+  async function fetchTopRatedGames() {
+    try {
+      const response = await fetch(`${backendUrl}/topRatedGames.json`);
+      const data = await response.json();
+      setTopRatedGames(data.slice(0, 2));
+    } catch (error) {
+      throw new Error("Error fetching top rated games");
+    }
   }
 
-  function fetchCardGames() {
-    fetch(`${backendUrl}/cardGames.json`)
-      .then((response) => {
-        return response.json();
-      })
-      .then((data) => {
-        setCardGames(data);
-      })
-      .catch((error) => console.error("Error fetching card games:", error));
+  async function fetchCardGames() {
+    try {
+      const response = await fetch(`${backendUrl}/cardGames.json`);
+      const data = await response.json();
+      setCardGames(data);
+    } catch (error) {
+      throw new Error("Error fetching card games ");
+    }
   }
 };
 export default HomeScreen;
 
 const styles = StyleSheet.create({
-  container: {
-  },
+  container: {},
   topRatedSection: {
     marginTop: 16,
     paddingBottom: 16,

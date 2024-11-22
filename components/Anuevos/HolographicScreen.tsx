@@ -147,7 +147,7 @@ const styles = StyleSheet.create({
   },
   background: {
     ...StyleSheet.absoluteFillObject, // Ensures the background covers the entire screen without affecting other components
-    zIndex: -1,
+    zIndex: 1,
     opacity: 0.8,
   },
   content: {

@@ -35,11 +35,6 @@ const Pagination = ({ currentPage, totalPages, setCurrentPage, startIndex, ITEMS
       <Text style={styles.paginationText}>
         Page {currentPage} of {totalPages}
       </Text>
-      <Text style={styles.paginationSubtext}>
-        Showing {startIndex + 1}-
-        {Math.min(startIndex + ITEMS_PER_PAGE, result_count)} of{" "}
-        {result_count}
-      </Text>
     </View>
 
     <TouchableOpacity

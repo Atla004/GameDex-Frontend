@@ -1,61 +1,66 @@
-import { useFontsLoad } from "@/utils/fontsload";
+
 import { Tabs } from "expo-router";
-import { StyleSheet, Text, View } from "react-native";
-import { Ionicons } from '@expo/vector-icons';
-import { StatusBar } from "react-native";
-import HolographicScreen from "@/components/Anuevos/HolographicScreen";
+import { StyleSheet, Text, View, Image } from "react-native";
 
 export default function Layout() {
-  const loading = useFontsLoad();
-  if (!loading) {
-    return (
-      <View style={styles.loadingContainer}>
-      </View>
-    );
-  }
+
 
   return (
-    <View style={[styles.tabsContainer,{paddingTop: StatusBar.currentHeight }]}>
+    <View
+      style={styles.tabsContainer}
+    >
       <Tabs
         screenOptions={({ route }) => ({
+          sceneStyle: { backgroundColor: "transparent" },
           headerShown: false,
-          tabBarIcon: ({ color, size }) => {
-            let iconName: keyof typeof Ionicons.glyphMap = 'home';
-            if (route.name === 'HomeScreen') {
-              iconName = 'home';
-            } else if (route.name === 'SearchScreen') {
-              iconName = 'search';
-            } else if (route.name === 'FavoritesScreen') {
-              iconName = 'heart';
-            } else if (route.name === 'ProfileScreen') {
-              iconName = 'person';
-            }
-            return <Ionicons name={iconName} size={size} color={color} />;
-          },
         })}
       >
         <Tabs.Screen
           name="HomeScreen"
           options={{
             title: "Home",
+            tabBarIcon: ({ focused }) => (
+              <Image
+                source={require('@/assets/tabsIcon/home.png')}
+                style={{ width: 24, height: 24}}
+              />
+            ),
           }}
         />
         <Tabs.Screen
           name="SearchScreen"
           options={{
             title: "Search",
+            tabBarIcon: ({ focused }) => (
+              <Image
+                source={require('@/assets/tabsIcon/search.png')}
+                style={{ width: 24, height: 24}}
+              />
+            ),
           }}
         />
         <Tabs.Screen
           name="FavoritesScreen"
           options={{
             title: "Favorites",
+            tabBarIcon: ({ focused }) => (
+              <Image
+                source={require('@/assets/tabsIcon/favorites.png')}
+                style={{ width: 24, height: 24}}
+              />
+            ),
           }}
         />
         <Tabs.Screen
           name="ProfileScreen"
           options={{
             title: "Profile",
+            tabBarIcon: ({ focused }) => (
+              <Image
+                source={require('@/assets/tabsIcon/profile.png')}
+                style={{ width: 24, height: 24}}
+              />
+            ),
           }}
         />
       </Tabs>
@@ -72,15 +77,6 @@ const styles = StyleSheet.create({
     position: "absolute",
     alignItems: "center",
     justifyContent: "center",
+  },
 
-  },
-  loadingContainer: {
-    flex: 1,
-    backgroundColor: 'black',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  loadingText: {
-    color: 'white',
-  },
 });

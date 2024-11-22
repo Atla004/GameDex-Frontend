@@ -11,10 +11,19 @@ const PokedexContext = createContext({
 export const usePokedex = () => useContext(PokedexContext);
 
 const Layout = () => {
-  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(true);
 
-  const openPokedex = () => setIsTransitioning(true);
-  const closePokedex = () => setIsTransitioning(false);
+  const openPokedex = () =>{
+    console.log("openPokedex");
+    setIsTransitioning(false);
+
+  } 
+  const closePokedex = () => 
+    {
+      console.log("closePokedex");
+      setIsTransitioning(true);
+    }
+    
 
   return (
     <PokedexContext.Provider value={{ isTransitioning, openPokedex, closePokedex }}>
