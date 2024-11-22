@@ -77,7 +77,12 @@ const GameScreen = () => {
     try {
       const response = await fetch(`${backendUrl}/Comments/${gameId}.json`);
       const data = await response.json();
-      setReviewUserData(data);
+      if (Array.isArray(data)) {
+        setReviewUserData(data);
+      } else {
+        setReviewUserData([]);
+      }
+
     } catch (error) {
       throw new Error("Error fetching comments");
     }
@@ -87,7 +92,11 @@ const GameScreen = () => {
     try {
       const response = await fetch(`${backendUrl}/Comments/${gameId}.json`);
       const data = await response.json();
-      setReviewCriticData(data);
+      if (Array.isArray(data)) {
+        setReviewCriticData(data);
+      } else {
+        setReviewCriticData([]);
+      }
     } catch (error) {
       throw new Error("Error fetching comments");
     }
@@ -253,7 +262,7 @@ const GameScreen = () => {
           <View style={styles.reviewsContainer}>
             <Text style={styles.sectionTitle}>Critic Reviews</Text>
             <ReviewSection
-              reviews={reviewCriticData.slice(0, 3)}
+              reviews={reviewCriticData}
               type="critic"
             />
             {reviewCriticData.length > 1 && (
