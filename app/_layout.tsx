@@ -5,7 +5,7 @@ import { createContext, useContext, useState } from "react";
 import { useFontsLoad } from "@/utils/fontsload";
 import { StyleSheet, View } from "react-native";
 import { red } from "react-native-reanimated/lib/typescript/Colors";
-import { LoadingScreen } from "@/components/wraper/LoadingScreen";
+import { LoadingScreen } from "@/components/wrapper/LoadingScreen";
 import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
 
 const ToastContext = createContext({

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, TouchableOpacity, Text, Animated } from 'react-native';
 import { router } from 'expo-router';
-import PokedexFrame from '@/components/wraper/PokedexFrame';
+import PokedexFrame from '@/components/wrapper/PokedexFrame';
 
 export default function Index() {
   const [isOpen, setIsOpen] = useState(true);

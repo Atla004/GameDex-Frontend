@@ -1,6 +1,6 @@
 import React, { createContext, useState, useContext } from 'react';
 import { Slot } from 'expo-router';
-import PokedexFrame from '../../components/wraper/PokedexFrame';
+import PokedexFrame from '../../components/wrapper/PokedexFrame';
 
 const PokedexContext = createContext({
   isTransitioning: false,

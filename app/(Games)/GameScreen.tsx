@@ -15,10 +15,7 @@ import { PokeBallRating } from "@/components/GameComponents/PokeballRating";
 import { router } from "expo-router";
 import { CommentInputFooter } from "@/components/GameComponents/CommentsInputFooter";
 import { Review } from "@/types/main";
-import { LoadingScreen } from "@/components/wraper/LoadingScreen";
 import { useLoadingScreen, useToast } from "../_layout";
-import { set } from "zod";
-
 const backendUrl = process.env.EXPO_PUBLIC_API_URL as string;
 
 interface GameScreenData {
