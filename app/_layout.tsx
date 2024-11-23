@@ -62,10 +62,11 @@ export default function Layout() {
   const [LoadingScreenBool, setLoadingScreen] = useState(false);
 
   const [userData, setUserData] = useState<User>({
-    username: null,
-    _id: null,
-    email: null,
-    token: null,
+    username: "atlas",
+    _id: "67414526b8c6c983203a2e46",
+    email: "andrese.g.v.13579@gmail.com",
+    token:
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NzQxNDUyNmI4YzZjOTgzMjAzYTJlNDYiLCJ1c2VybmFtZSI6ImF0bGFzIiwiZW1haWwiOiJhbmRyZXNlLmcudi4xMzU3OUBnbWFpbC5jb20iLCJpYXQiOjE3MzIzNDEyNTcsImV4cCI6MTczMjc3MzI1N30.ASG3IH3am1swUmM01K_twU12_DT9Qsv0uUfEBvjYjmM",
   });
 
   const setUser = ({ username, _id, email, token }: User) => {
@@ -88,7 +89,6 @@ export default function Layout() {
   useEffect(() => {
     console.log("userData se cambio", userData);
   }, [userData]);
-
 
   const loading = useFontsLoad();
   if (!loading) {

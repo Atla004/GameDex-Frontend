@@ -5,13 +5,14 @@ import { GameCard } from "@/components/mainInterfaceComponents/GameCard";
 import { RatingGameCard } from "@/components/mainInterfaceComponents/RatingGameCard";
 import SearchBar from "@/components/basic/SearchBar";
 import { Game } from "@/types/main";
-import { useLoadingScreen, useToast } from "../_layout";
+import { useLoadingScreen, useToast, useUserData } from "../_layout";
 
 const backendUrl = process.env.EXPO_PUBLIC_API_URL as string;
 
 const HomeScreen = () => {
+  const { token } = useUserData();
   const { setToast } = useToast();
-  const { setLoading,isLoading } = useLoadingScreen();
+  const { setLoading, isLoading } = useLoadingScreen();
   const [featuredGames, setFeaturedGames] = useState<Game[]>([]);
   const [topRatedGames, setTopRatedGames] = useState<Game[]>([]);
   const [cardGames, setCardGames] = useState<Game>({
@@ -25,14 +26,13 @@ const HomeScreen = () => {
   });
 
   useEffect(() => {
-
     const fetchData = async () => {
       try {
         console.log("fetching data");
         await Promise.all([
           //fetchFeaturedGames(),
           //fetchTopRatedGames(),
-          //fetchCardGames(),
+          fetchCardGames(),
         ]);
         console.log("Data fetched");
         if (isLoading) {
@@ -114,9 +114,21 @@ const HomeScreen = () => {
 
   async function fetchCardGames() {
     try {
-      const response = await fetch(`${backendUrl}/cardGames.json`);
+      const response = await fetch(`${backendUrl}/api/game/home`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        method: "GET",
+      });
+
       const data = await response.json();
-      setCardGames(data);
+
+      console.log(data.data.cardGames[0]);
+
+      setCardGames(data.data.cardGames[0]);
+      setFeaturedGames(data.data.featured);
+      setTopRatedGames(data.data.topRated);
     } catch (error) {
       throw new Error("Error fetching card games ");
     }
