@@ -103,6 +103,7 @@ const SearchScreen = () => {
   const [loading, setLoading] = useState(false);
   const [genresArray, setGenresArray] = useState<string[]>([]);
   const [platformsArray, setPlatformsArray] = useState<string[]>([]);
+  const firstRender = useRef(true);
 
   const isSearchingRef = useRef(false);
 
@@ -130,7 +131,6 @@ const SearchScreen = () => {
     isSearchingRef.current = true;
     console.log("handleSearch to currentpage 1");
     setCurrentPage(1);
-    getSearchedGames();
   };
 
   const getSearchedGames = () => {
@@ -162,6 +162,7 @@ const SearchScreen = () => {
     })
       .then((response) => response.json())
       .then((res) => {
+        console.log("derpertandop",res);
 
 
         const toResults = res.data.results.map((game: any) => {
@@ -193,9 +194,13 @@ const SearchScreen = () => {
 
   useEffect(() => {
     console.log("useEffect currentPage", currentPage);
-    if (currentPage > 1) {
-      getSearchedGames();
+    if (firstRender.current) {
+      firstRender.current = false;
+      return;
     }
+
+    getSearchedGames();
+
   }, [currentPage]);
 
   useEffect(() => {
@@ -226,7 +231,6 @@ const SearchScreen = () => {
         },
         method: "GET",
       });
-
       const data = await response.json();
       console.log(data);
     } catch (error) {

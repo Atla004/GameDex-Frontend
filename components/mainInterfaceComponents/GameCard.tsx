@@ -15,7 +15,7 @@ export const GameCard: React.FC<GameCardProps> = ({ imageUrl, title, description
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (imageUrl && title && description) {
+    if (imageUrl && title) {
       setIsLoading(false);
     }
   }, [imageUrl, title, description]);
@@ -28,6 +28,7 @@ export const GameCard: React.FC<GameCardProps> = ({ imageUrl, title, description
     }, 600);
     
   };
+
 
   return (
     <Pressable 
