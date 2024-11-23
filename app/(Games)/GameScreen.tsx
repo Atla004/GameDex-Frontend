@@ -141,12 +141,12 @@ const GameScreen = () => {
   const onClose = () => {
     setLoading(true);
     setTimeout(() => {
-      router.replace("/(mainInterface)/HomeScreen");
+      router.replace("/HomeScreen");
     }, 600);
   };
 
   const onViewAllComments = () => {
-    router.push("/(games)/CommentScreen");
+    router.push("/CommentScreen");
   };
 
   const handleFavoritePress = () => {
