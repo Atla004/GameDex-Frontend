@@ -8,7 +8,7 @@ const usernameSchema = z.string()
 const passwordSchema = z.string()
   .min(8, { message: "Password must be at least 8 characters long" })
   .max(100, { message: "Password must be at most 100 characters long" })
-  .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/, { message: "Password must contain at least one uppercase letter, one lowercase letter, and one number" });
+  .regex(/^\S*$/, { message: "Password cannot contain spaces" });
 
 
 
