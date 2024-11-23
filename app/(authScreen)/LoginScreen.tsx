@@ -55,16 +55,18 @@ export const LoginScreen = () => {
       body: JSON.stringify({ username, password }),
     })
       .then((response) => {
+        console.log(response.ok);
         if (!response.ok) {
           console.log(JSON.stringify(response, null, 4));
 
           setErrors({ username: "Invalid username or password", password: "" });
-          return;
         }
         return response.json();
       })
       .then((response) => {
-        console.log("Logged in successfully");
+        if (response.error) {
+          return;
+        }
         console.log(JSON.stringify(response, null, 4));
         setUser({
           username: response.data.user.username,
@@ -72,10 +74,13 @@ export const LoginScreen = () => {
           email: response.data.user.email,
           token: response.data.token,
         });
-        if (staySignedIn)
-          AsyncStorage.setItem('token', response.data.token)
-          .then((tok) => console.log(`Token ${tok} saved in localStorage`))
-        
+
+        if (staySignedIn) {
+          AsyncStorage.setItem("user", JSON.stringify(response.data))
+            .then(() => console.log("User data saved in localStorage"))
+            .catch((error) => console.log("Error saving user data", error));
+        }
+
         closePokedex();
         setTimeout(() => {
           router.push("/HomeScreen");
@@ -88,7 +93,6 @@ export const LoginScreen = () => {
   };
 
   const handleRegister = () => {
-    // go to register screen
     closePokedex();
     setTimeout(() => {
       router.push("RegisterScreen");
@@ -103,11 +107,44 @@ export const LoginScreen = () => {
   };
 
   useEffect(() => {
+    validateAutoLogin();
     if (isTransitioning) {
       // Close animation
       openPokedex();
     }
   }, []);
+
+  const validateAutoLogin = async () => {
+    AsyncStorage.getItem("user").then(async(tok) => {
+      if (tok) {
+        const parsedUser = JSON.parse(tok);
+        console.log("User data retrieved from localStorage", parsedUser.user._id);
+
+        const response = await fetch(`${backendUrl}/api/user/${parsedUser.user._id}`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${parsedUser.token}`,
+          },
+        });
+        const data = await response.json();
+        console.log("Refresh token response", data.data.username);
+        if (data.error) {
+          return;
+        }
+        setUser({
+          username: data.data.username,
+          _id: parsedUser.user._id,
+          email: data.data.email,
+          token: parsedUser.token,
+        });
+        closePokedex();
+        setTimeout(() => {
+          router.push("/HomeScreen");
+        }, 600);
+
+      }
+    });
+  };
 
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
