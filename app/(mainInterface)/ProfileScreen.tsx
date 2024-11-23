@@ -19,7 +19,7 @@ import DeleteAccountModal from "@/components/mainInterfaceComponents/ProfileScre
 
 import { router } from "expo-router";
 import { ProfileImageSelectorModal } from "@/components/mainInterfaceComponents/ProfileScreenComponents/ProfileImageSelectorModal";
-import { useToast } from "../_layout";
+import { useToast, useUserData } from "../_layout";
 import { validateEmail, validatePassword, validateUsername } from "@/utils/validation";
 
 const backendUrl = process.env.EXPO_PUBLIC_API_URL as string;
@@ -53,7 +53,8 @@ const ProfileScreen = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`${backendUrl}/Profile.json`);
+        const { _id } = useUserData()
+        const response = await fetch(`${backendUrl}/api/user/${_id}`);
         const data = await response.json();
         setMockData(data);
       } catch (error) {

@@ -13,6 +13,8 @@ import { useRouter } from "expo-router";
 import { usePokedex } from "./_layout";
 import { validatePassword, validateUsername } from "@/utils/validation";
 import { useUserData } from "../_layout";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+// import { AsyncStorage } from 'react-native'
 
 const backendUrl = process.env.EXPO_PUBLIC_API_URL as string;
 
@@ -70,6 +72,10 @@ export const LoginScreen = () => {
           email: response.data.user.email,
           token: response.data.token,
         });
+        if (staySignedIn)
+          AsyncStorage.setItem('token', response.data.token)
+          .then((tok) => console.log(`Token ${tok} saved in localStorage`))
+        
         closePokedex();
         setTimeout(() => {
           router.push("/HomeScreen");
