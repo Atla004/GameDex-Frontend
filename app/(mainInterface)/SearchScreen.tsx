@@ -17,8 +17,7 @@ import { useLocalSearchParams } from "expo-router";
 import FilterModal from "@/components/mainInterfaceComponents/SearchScreenComponents/FilterModal";
 import { useToast, useUserData } from "../_layout";
 import { OrderingDropdown } from "@/components/mainInterfaceComponents/SearchScreenComponents/Dropdown";
-import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
-import { set, z } from "zod";
+
 
 const backendUrl = process.env.EXPO_PUBLIC_API_URL as string;
 
@@ -131,6 +130,9 @@ const SearchScreen = () => {
     isSearchingRef.current = true;
     console.log("handleSearch to currentpage 1");
     setCurrentPage(1);
+    if (currentPage === 1) { 
+      getSearchedGames();
+    }
   };
 
   const getSearchedGames = () => {
@@ -194,10 +196,6 @@ const SearchScreen = () => {
 
   useEffect(() => {
     console.log("useEffect currentPage", currentPage);
-    if (firstRender.current) {
-      firstRender.current = false;
-      return;
-    }
 
     getSearchedGames();
 
@@ -265,9 +263,10 @@ const SearchScreen = () => {
         setToast("Error fetching data", true, 3000);
       }
     };
-
     fetchData();
   }, []);
+
+
 
   return (
     <>
