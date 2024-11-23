@@ -29,8 +29,8 @@ interface GameScreenData {
   userScore: number;
   genres: string[];
   platform: string[];
-  developer: string[];
-  publisher: string[];
+  developers: string[];
+  publishers: string[];
   releaseDate: string;
   ageRating: string;
   favorite: boolean;
@@ -52,17 +52,17 @@ const GameScreen = () => {
     userScore: 0,
     genres: [],
     platform: [],
-    developer: [],
-    publisher: [],
+    developers: [],
+    publishers: [],
     releaseDate: "",
     ageRating: "",
     favorite: false,
   });
 
-  const { _id,token } = useUserData()
+  const { _id, token, username } = useUserData();
 
   const { setLoading } = useLoadingScreen();
-  const { id, } = useLocalSearchParams();
+  const { id } = useLocalSearchParams();
 
   const [reviewUserData, setReviewUserData] = useState<Review[]>([]);
   const [reviewCriticData, setReviewCriticData] = useState<Review[]>([]);
@@ -77,32 +77,37 @@ const GameScreen = () => {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
-        }
+        },
       });
 
       const data = await response.json();
       if (!response.ok) {
-        console.log('not ok')
+        console.log("not ok");
         throw new Error("Game not found");
       }
+      console.log(JSON.stringify(data, null, 4));
       setGameData(data.data);
     } catch (error) {
-      console.log(error)
+      console.log(error);
       throw new Error("Error fetching game data");
     }
   }
 
   async function fetchUserComments(gameId: string) {
     try {
-      const response = await fetch(`${backendUrl}/review/${_id}/${gameId}/player/1`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
+      const response = await fetch(
+        `${backendUrl}/api/review/${_id}/${gameId}/player/1`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
         }
-      });
+      );
       const data = await response.json();
-      if (Array.isArray(data)) {
-        setReviewUserData(data);
+
+      if (Array.isArray(data.data.comments)) {
+        setReviewUserData(data.data.comments);
       } else {
         setReviewUserData([]);
       }
@@ -113,13 +118,70 @@ const GameScreen = () => {
 
   async function fetchCriticComments(gameId: string) {
     try {
-      const response = await fetch(`${backendUrl}/review/${_id}/${gameId}/critic/1`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
+      const response = await fetch(
+        `${backendUrl}/api/review/${_id}/${gameId}/critic/1`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
         }
-      });
+      );
       const data = await response.json();
+      if (Array.isArray(data.data.comments)) {
+        setReviewCriticData(data.data.comments);
+      } else {
+        setReviewCriticData([]);
+      }
+    } catch (error) {
+      throw new Error("Error fetching comments");
+    }
+  }
+
+  async function fetchSendComment(
+    publication: string,
+    content: string,
+    score: number
+  ) {
+    try {
+      const response = await fetch(
+        `${backendUrl}/api/review/${_id}/${id}
+`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            publication: publication,
+            content: content,
+            score: score,
+          }),
+        }
+      );
+      const data = await response.json();
+      console.log("este es mi con", data);
+    } catch (error) {
+      throw new Error("Error fetching comments");
+    }
+  }
+
+  async function fetchDeleteComment() {
+    try {
+      const response = await fetch(
+        `${backendUrl}/api/review/${_id}/${id}
+`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const data = await response.json();
+
       if (Array.isArray(data)) {
         setReviewCriticData(data);
       } else {
@@ -138,7 +200,7 @@ const GameScreen = () => {
           fetchUserComments(id as string),
           fetchCriticComments(id as string),
         ]);
-        console.log(`GameData: ${gameData}`)
+        console.log(`GameData: ${gameData}`);
       } catch (error) {
         setToast("Error fetching game data", true, 3000);
         router.replace("/HomeScreen");
@@ -165,23 +227,67 @@ const GameScreen = () => {
   };
 
   const onViewAllComments = () => {
-    router.push("/CommentScreen");
+    router.push({
+      pathname: `/CommentScreen`,
+      params: { id },
+    });
   };
 
   const handleFavoritePress = () => {
-    setIsFavorite(true);
+    setIsFavorite((prev) => !prev);
     if (isFavorite) {
+      fetchDeleteFavorite();
       return;
     }
+    fetchAddFavorite();
     setToast("Game added to favorites", true, 3000, "rgb(59, 130, 246)");
   };
+
+  async function fetchAddFavorite() {
+    try {
+      const response = await fetch(
+        `${backendUrl}/api/user/${_id}/add-favorite`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ game_api_id:  Number(id) }),
+        }
+      );
+      const data = await response.json();
+      console.log("este es mi datafav", data.error);
+    } catch (error) {
+      throw new Error("Error fetching comments");
+    }
+  }
+  async function fetchDeleteFavorite() {
+    try {
+      const response = await fetch(
+        `${backendUrl}/api/user/${_id}/remove-favorite`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ game_api_id: Number(id) }),
+        }
+      );
+      const data = await response.json();
+      console.log("este es mi dataNOfav", data);
+    } catch (error) {
+      throw new Error("Error fetching comments");
+    }
+  }
 
   const handleAddComment = ({ content, publication, score }: newComment) => {
     console.log("Adding comment", content, publication, score);
     const newReview: Review = {
       publication,
       id: Date.now().toString(),
-      username: "You",
+      username: username as string,
       score, // You might want to add a score input in the real app
       content,
       date: new Date().toLocaleDateString(),
@@ -194,6 +300,7 @@ const GameScreen = () => {
     }
 
     setReviewUserData([...reviewUserData, newReview]);
+    fetchSendComment(publication, content, score);
   };
 
   const handleDeleteReview = (reviewId: string) => {
@@ -204,13 +311,14 @@ const GameScreen = () => {
     setReviewUserData([
       ...reviewUserData.filter((review) => review.id !== reviewId),
     ]);
+    fetchDeleteComment();
   };
 
   const [renderViewAllButtonBoolean, setRenderViewAllButtonBoolean] =
     useState(false);
 
   useEffect(() => {
-    if (reviewUserData.length > -1 || reviewCriticData.length > 3) {
+    if (reviewUserData.length > 0 || reviewCriticData.length > 3) {
       console.log("review true");
       setRenderViewAllButtonBoolean(true);
     } else {
@@ -218,6 +326,12 @@ const GameScreen = () => {
       setRenderViewAllButtonBoolean(false);
     }
   }, [reviewUserData, reviewCriticData]);
+
+  const stripHtmlTags = (html: string) => {
+    return html.replace(/<\/?[^>]+(>|$)/g, "");
+  };
+
+  const hasOwnReview = reviewUserData.some((review) => review.isOwnReview);
 
   return (
     <>
@@ -245,13 +359,13 @@ const GameScreen = () => {
         <View style={styles.titleSection}>
           <Text style={styles.title}>{gameData.title}</Text>
           <View style={styles.genreContainer}>
-            {gameData.genres && gameData.genres.length > 0 && 
+            {gameData.genres &&
+              gameData.genres.length > 0 &&
               gameData.genres.map((genre, index) => (
                 <View key={index} style={styles.genreChip}>
                   <Text style={styles.genreText}>{genre}</Text>
                 </View>
-              ))
-            }
+              ))}
           </View>
         </View>
 
@@ -275,7 +389,9 @@ const GameScreen = () => {
 
         {/* Description and Ratings */}
         <View style={styles.contentSection}>
-          <Text style={styles.description}>{gameData.description}</Text>
+          <Text style={styles.description}>
+            {stripHtmlTags(gameData.description)}
+          </Text>
 
           <View style={styles.ratingsContainer}>
             <View style={styles.ratingBox}>
@@ -305,11 +421,11 @@ const GameScreen = () => {
             />
             <GameDetail
               label="Developer"
-              value={gameData.developer ? gameData.developer.join(", ") : ""}
+              value={gameData.developers ? gameData.developers.join(", ") : ""}
             />
             <GameDetail
               label="Publisher"
-              value={gameData.publisher ? gameData.publisher.join(", ") : ""}
+              value={gameData.publishers ? gameData.publishers.join(", ") : ""}
             />
             <GameDetail label="Release Date" value={gameData.releaseDate} />
             <GameDetail label="Age Rating" value={gameData.ageRating} />
@@ -340,7 +456,7 @@ const GameScreen = () => {
           </View>
         </View>
       </ScrollView>
-      <CommentInputFooter onSubmit={handleAddComment} />
+      {!hasOwnReview && <CommentInputFooter onSubmit={handleAddComment} />}
     </>
   );
 };

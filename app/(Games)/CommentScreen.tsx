@@ -10,16 +10,19 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { ReviewSection } from "@/components/GameComponents/ReviewSection";
 import { Review } from "@/types/main";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import Pagination from "@/components/mainInterfaceComponents/SearchScreenComponents/Pagination";
-import { useToast } from "../_layout";
+import { useToast, useUserData } from "../_layout";
+import { number } from "zod";
 
 const backendUrl = process.env.EXPO_PUBLIC_API_URL as string;
 
 const ITEMS_PER_PAGE = 10;
 
 const CommentsScreen = () => {
-  const [comments, setComments] = useState<Review[]>([]);
+  const { _id,token } = useUserData();
+  const { id } = useLocalSearchParams();
+
   const [activeTab, setActiveTab] = useState<"critic" | "user">("critic");
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -28,6 +31,8 @@ const CommentsScreen = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [resultCount, setResultCount] = useState(0);
   const { setToast } = useToast();
+  const [renderedShow, setRenderedShow] = useState(false);
+  const [renderedNo, setRenderedNo] = useState(false);
 
   const onClose = () => {
     console.log("onClose");
@@ -42,14 +47,26 @@ const CommentsScreen = () => {
     console.log("fetching data");
     setLoading(true);
     try {
-      const url = `${backendUrl}/commentspages/${activeTab}/pag_${currentPage}.json`;
-      const response = await fetch(url);
+      const url = `${backendUrl}/api/review/${_id}/${id}/${
+        activeTab === "user" ? "critic" : "player"
+      }/${currentPage}`;
+      const response = await fetch(url,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          }
+        }
+      );
       console.log("response", response);
       const data = await response.json();
-      console.log("data", data);
-      setReviews(data.comments);
-      setTotalPages(data.total_pages);
-      setResultCount(data.result_count);
+
+      setReviews(data.data.comments);
+      setTotalPages(data.data.total_pages);
+      setResultCount(data.data.result_count); 
+
+
     } catch (error) {
       setToast("Error fetching data", true, 3000);
     } finally {
@@ -66,6 +83,26 @@ const CommentsScreen = () => {
     isSearchingRef.current = true;
     getReviews();
   }, []);
+
+  useEffect(() => {
+    return () => {
+      isSearchingRef.current = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    try {
+      if (isSearchingRef.current && reviews.length > 0) {
+        setRenderedShow(true);
+        setRenderedNo(false);
+      } else if (isSearchingRef.current && reviews.length === 0) {
+        setRenderedShow(false);
+        setRenderedNo(true);
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  }, [reviews]);
 
   return (
     <View style={styles.container}>
@@ -129,11 +166,15 @@ const CommentsScreen = () => {
           </View>
         )}
 
-        {!loading && isSearchingRef.current && reviews.length > 0 && (
-          <ReviewSection reviews={reviews} type={activeTab}  maxNumberOfReviews={10}/>
+        {!loading && renderedShow && (
+          <ReviewSection
+            reviews={reviews}
+            type={activeTab}
+            maxNumberOfReviews={10}
+          />
         )}
 
-        {!loading && isSearchingRef.current && reviews.length === 0 && (
+        {!loading && renderedNo && (
           <View style={styles.emptyState}>
             <Image
               source={{
