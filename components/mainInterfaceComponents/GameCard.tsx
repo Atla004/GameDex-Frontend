@@ -44,6 +44,18 @@ export const GameCard: React.FC<GameCardProps> = ({
     }, 600);
   };
 
+  const stripHtmlTags = (html: string) => {
+    try {
+      
+      return html.replace(/<\/?[^>]+(>|$)/g, "");
+    } catch (e) {
+      console.log(e);
+    }
+
+    
+    return 
+  };
+
   return (
     <Pressable
       onPress={handlePress}
@@ -78,7 +90,7 @@ export const GameCard: React.FC<GameCardProps> = ({
                 <Text style={styles.title}>{title}</Text>
               </View>
               <Text style={styles.description} numberOfLines={3}>
-                {description}
+              {stripHtmlTags(description)}
               </Text>
             </View>
           </>

@@ -47,6 +47,18 @@ export const RatingGameCard = ({
     }, 600);
   };
 
+  const stripHtmlTags = (html: string) => {
+    try {
+      
+      return html.replace(/<\/?[^>]+(>|$)/g, "");
+    } catch (e) {
+      console.log(e);
+    }
+
+    
+    return 
+  };
+
   return (
     <Pressable
       onPress={handlePress}
@@ -88,7 +100,7 @@ export const RatingGameCard = ({
                     {title}
                   </Text>
                   <Text style={styles.description} numberOfLines={2}>
-                    {description}
+                  {stripHtmlTags(description)}
                   </Text>
                 </View>
               </View>

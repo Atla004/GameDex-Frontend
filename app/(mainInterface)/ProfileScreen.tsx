@@ -20,7 +20,11 @@ import DeleteAccountModal from "@/components/mainInterfaceComponents/ProfileScre
 import { router } from "expo-router";
 import { ProfileImageSelectorModal } from "@/components/mainInterfaceComponents/ProfileScreenComponents/ProfileImageSelectorModal";
 import { useToast, useUserData } from "../_layout";
-import { validateEmail, validatePassword, validateUsername } from "@/utils/validation";
+import {
+  validateEmail,
+  validatePassword,
+  validateUsername,
+} from "@/utils/validation";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const backendUrl = process.env.EXPO_PUBLIC_API_URL as string;
@@ -33,8 +37,6 @@ interface ProfileData {
   favorites: number;
   email: string;
 }
-
-
 
 const ProfileScreen = () => {
   const { setToast } = useToast();
@@ -50,7 +52,7 @@ const ProfileScreen = () => {
   const [newEmail, setNewEmail] = useState("");
   const [newUsername, setNewUsername] = useState("");
   const [deleteConfirmation, setDeleteConfirmation] = useState("");
-  const {token, _id} = useUserData()
+  const { token, _id ,email} = useUserData();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -59,14 +61,13 @@ const ProfileScreen = () => {
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
-          }
-        }  
-        );
+          },
+        });
         const data = await response.json();
-        console.log({data})
+        console.log({ data });
         setMockData(data.data);
       } catch (error) {
-        console.error(error)
+        console.error(error);
         setToast("Error getting profile data", true, 3000);
       }
     };
@@ -75,7 +76,6 @@ const ProfileScreen = () => {
   }, []);
 
   const handlePasswordChange = () => {
-
     const validation = validatePassword(newPassword);
 
     if (!validation.valid) {
@@ -86,6 +86,21 @@ const ProfileScreen = () => {
       Alert.alert("Error", "New passwords do not match!");
       return;
     }
+    fetch(`${backendUrl}/api/auth/instant-password-change`, {
+      method: "PUT",
+      body: JSON.stringify({ 
+        email: email,
+        newPassword: newPassword,
+     }),
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    }).then(() => {
+
+      setToast("Password changed successfully", true, 3000);
+    });
+
     setShowPasswordModal(false);
     resetPasswordFields();
   };
@@ -96,13 +111,17 @@ const ProfileScreen = () => {
       Alert.alert("Error", validation.errors?.[0]);
       return;
     }
-    fetch(`${backendUrl}/api/user/${_id}/change-email`, { method: "PUT", body: JSON.stringify({email: newEmail}), headers: {
-      "Authorization": `Bearer ${token}`,
-      "Content-Type": "application/json",
-    } }).then(() => {
+    fetch(`${backendUrl}/api/user/${_id}/change-email`, {
+      method: "PUT",
+      body: JSON.stringify({ email: newEmail }),
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    }).then(() => {
       setNewEmail(newEmail);
       setShowEmailModal(false);
-    })
+    });
   };
 
   const handleUsernameChange = () => {
@@ -116,14 +135,17 @@ const ProfileScreen = () => {
   };
 
   const handleLogout = () => {
-    AsyncStorage.removeItem('user').then(() => {
+    AsyncStorage.removeItem("user").then(() => {
       Alert.alert("Goodbye, Trainer!", "You have been logged out.", [
-        { text: "OK", onPress: () => {
-          router.dismissAll();
-          router.replace("/LoginScreen");
-        } },
+        {
+          text: "OK",
+          onPress: () => {
+            router.dismissAll();
+            router.replace("/LoginScreen");
+          },
+        },
       ]);
-    })
+    });
   };
 
   const handleDeleteAccount = () => {
@@ -131,9 +153,12 @@ const ProfileScreen = () => {
       Alert.alert("Error", 'Please type "delete" to confirm account deletion');
       return;
     }
-    fetch(`${backendUrl}/user/${_id}`, { method: "DELETE", headers: {
-      Authorization: `Bearer ${token}`
-    } }).then(() => {
+    fetch(`${backendUrl}/user/${_id}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }).then(() => {
       Alert.alert(
         "Goodbye, Trainer!",
         "Your account has been deleted. We hope to see you again in the future!",
@@ -141,7 +166,7 @@ const ProfileScreen = () => {
       );
       router.dismissAll();
       router.replace("/LoginScreen");
-    })
+    });
   };
 
   const resetPasswordFields = () => {
@@ -155,12 +180,17 @@ const ProfileScreen = () => {
   };
 
   const handleSelectProfileImage = (imageUri: string) => {
-    fetch(`${backendUrl}/api/user/${_id}/profile-pic`, { method: "POST", headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${token}`
-    }, body: JSON.stringify({ url: imageUri })})
-    setMockData(prev => prev ? { ...prev, profileImageUri: imageUri } : prev);
-
+    fetch(`${backendUrl}/api/user/${_id}/profile-pic`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ url: imageUri }),
+    });
+    setMockData((prev) =>
+      prev ? { ...prev, profileImageUri: imageUri } : prev
+    );
   };
 
   return (
@@ -173,7 +203,7 @@ const ProfileScreen = () => {
               source={{ uri: mockData?.profileImageUri }}
               style={styles.profileImage}
             />
-            <TouchableOpacity 
+            <TouchableOpacity
               onPress={handleChangeProfileImage}
               style={styles.editImageButton}
             >
@@ -181,7 +211,9 @@ const ProfileScreen = () => {
             </TouchableOpacity>
           </View>
           <Text style={styles.username}>{mockData?.username}</Text>
-          <Text style={styles.userLevel}>Level {mockData?.userLevel} Trainer</Text>
+          <Text style={styles.userLevel}>
+            Level {mockData?.userLevel} Trainer
+          </Text>
 
           {/* Stats */}
           <View style={styles.statsContainer}>
@@ -219,29 +251,9 @@ const ProfileScreen = () => {
           />
         </View>
 
-        {/* Help & Information */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Help & Information</Text>
-          <SettingOption
-            icon="luxury-ball"
-            title="About Us"
-            subtitle="Learn about our mission"
-            onPress={() => {}}
-          />
-          <SettingOption
-            icon="premier-ball"
-            title="FAQ"
-            subtitle="Common questions and answers"
-            onPress={() => {}}
-          />
-        </View>
-
         {/* Account Management */}
         <View style={styles.accountManagement}>
-          <TouchableOpacity 
-            style={styles.logoutButton}
-            onPress={handleLogout}   
-          >
+          <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
             <Text style={styles.logoutText}>Log Out</Text>
           </TouchableOpacity>
 

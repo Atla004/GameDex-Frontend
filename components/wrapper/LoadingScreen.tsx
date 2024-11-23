@@ -20,7 +20,6 @@ interface LoadingScreenProps {
 }
 
 export const LoadingScreen: React.FC<LoadingScreenProps> = ({ isLoading, children }) => {
-  console.log('LoadingScreen render', isLoading);
 
   const opacity = useSharedValue(0);
   const rotation = useSharedValue(0);

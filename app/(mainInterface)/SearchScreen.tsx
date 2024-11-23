@@ -17,7 +17,7 @@ import { useLocalSearchParams } from "expo-router";
 import FilterModal from "@/components/mainInterfaceComponents/SearchScreenComponents/FilterModal";
 import { useToast, useUserData } from "../_layout";
 import { OrderingDropdown } from "@/components/mainInterfaceComponents/SearchScreenComponents/Dropdown";
-
+import { set } from "zod";
 
 const backendUrl = process.env.EXPO_PUBLIC_API_URL as string;
 
@@ -81,7 +81,7 @@ const filterOptions = {
     "1971",
     "1970",
   ],
-  platform: ["Nintendo Switch", "Nintendo 3DS", "Mobile", "PC"],
+  platform: ["Nintendo Switch"],
   genre: ["RPG", "Action RPG", "Strategy", "Puzzle", "Adventure"],
   developer: ["Game Freak", "Niantic", "ILCA"],
   publisher: ["Nintendo", "The Pokémon Company"],
@@ -91,6 +91,12 @@ interface response {
   page: number;
   total_pages: number;
   result_count: number;
+}
+interface backArrays {
+  name: string;
+  slug: string;
+  id: number;
+  api_id?: number;
 }
 
 const SearchScreen = () => {
@@ -102,7 +108,8 @@ const SearchScreen = () => {
   const [loading, setLoading] = useState(false);
   const [genresArray, setGenresArray] = useState<string[]>([]);
   const [platformsArray, setPlatformsArray] = useState<string[]>([]);
-  const firstRender = useRef(true);
+  const [genresDic, setGenresDic] = useState<backArrays[]>([]);
+  const [platformsDic, setPlatformsDic] = useState<backArrays[]>([]);
 
   const isSearchingRef = useRef(false);
 
@@ -128,23 +135,41 @@ const SearchScreen = () => {
 
   const handleSearch = () => {
     isSearchingRef.current = true;
-    console.log("handleSearch to currentpage 1");
     setCurrentPage(1);
-    if (currentPage === 1) { 
+    if (currentPage === 1) {
       getSearchedGames();
     }
   };
 
   const getSearchedGames = () => {
     if (!isSearchingRef.current) {
-      console.log("not searching isSearching:", isSearchingRef.current);
       return;
     }
-    console.log("fetching data");
     setLoading(true);
-    const params = {
-      search: searchQuery,
+    console.log("fetching data to searchchhhchchch");
+    console.log("activeFilters", activeFilters);
+
+    const getFirstAndLast = (arr: string[]): string[] => {
+      return arr.length === 1 ? [arr[0], arr[0]] : [arr[arr.length - 1], arr[0]];
     };
+
+
+    const params: { search: string} = {
+      search: searchQuery,
+      ...(activeFilters.genre.length > 0 && {
+        genres: activeFilters.genre.map((genre) => genre.toLowerCase()),
+      }),
+      ...(activeFilters.platform.length > 0 && {
+        platforms: activeFilters.platform.map(
+          (plat) => platformsDic.find((num) => num.name === plat)?.api_id
+        ),
+      }),
+      ...(activeFilters.releaseDate.length > 0 && {
+        releaseYears: getFirstAndLast(activeFilters.releaseDate).join(","),
+      }),
+    };
+
+    console.log(getFirstAndLast(activeFilters.releaseDate))
 
     const formattedParams = new URLSearchParams({
       ...Object.fromEntries(
@@ -154,7 +179,6 @@ const SearchScreen = () => {
 
     const url = `${backendUrl}/api/game/search/${currentPage}?${formattedParams}`;
 
-    console.log(url);
     fetch(url, {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -164,8 +188,17 @@ const SearchScreen = () => {
     })
       .then((response) => response.json())
       .then((res) => {
-        console.log("derpertandop",res);
+        const getDepthLevel1 = (obj: Record<string, any>): Record<string, any> => {
+          const result: Record<string, any> = {};
+          for (const key in obj) {
+            if (obj.hasOwnProperty(key)) {
+              result[key] = typeof obj[key] === 'object' && obj[key] !== null ? '[Object]' : obj[key];
+            }
+          }
+          return result;
+        };
 
+        console.log("te odio rafael de la mata", getDepthLevel1(res.data));
 
         const toResults = res.data.results.map((game: any) => {
           return {
@@ -177,14 +210,17 @@ const SearchScreen = () => {
             criticScore: 0,
             ranking: 0,
           };
-        });
+        }); 
+        
 
-        if (Array.isArray(res.data.results)) setSearchResults(toResults as Game[]);
+
+        if (Array.isArray(res.data.results))
+          setSearchResults(toResults as Game[]);
 
         setResponse({
           page: res.data.page,
           total_pages: res.data.total_pages,
-          result_count: res.data.result_count
+          result_count: res.data.result_count,
         });
         setLoading(false);
       })
@@ -195,10 +231,7 @@ const SearchScreen = () => {
   };
 
   useEffect(() => {
-    console.log("useEffect currentPage", currentPage);
-
     getSearchedGames();
-
   }, [currentPage]);
 
   useEffect(() => {
@@ -208,7 +241,6 @@ const SearchScreen = () => {
   }, [data]);
 
   const handleClearFilters = () => {
-    console.log("handleClearFilters to curentPage 1");
     setCurrentPage(1);
     setActiveFilters({
       releaseDate: [],
@@ -218,7 +250,6 @@ const SearchScreen = () => {
       genre: [],
     });
   };
-  const [selected, setSelected] = useState("Release Date");
 
   async function fetchGenres() {
     try {
@@ -230,7 +261,11 @@ const SearchScreen = () => {
         method: "GET",
       });
       const data = await response.json();
-      console.log(data);
+
+      const namesArray = data.data.map((item: { name: string }) => item.name);
+      setGenresDic(data.data);
+
+      setGenresArray(namesArray);
     } catch (error) {
       setToast("Error fetching Genres", true, 3000);
     }
@@ -247,7 +282,13 @@ const SearchScreen = () => {
       });
 
       const data = await response.json();
-      console.log(data);
+
+      setPlatformsDic(data.data);
+      console.log("data plata", data.data[0]);
+
+      const namesArray = data.data.map((item: { name: string }) => item.name);
+
+      setPlatformsArray(namesArray);
     } catch (error) {
       setToast("Error fetching Platform", true, 3000);
     }
@@ -256,17 +297,13 @@ const SearchScreen = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        console.log("fetching data");
         await Promise.all([fetchGenres(), fetchPlatform()]);
-        console.log("Data fetched");
       } catch (error) {
         setToast("Error fetching data", true, 3000);
       }
     };
     fetchData();
   }, []);
-
-
 
   return (
     <>
@@ -299,11 +336,11 @@ const SearchScreen = () => {
         </View>
 
         <View style={styles.orderingDropdown}>
-          <OrderingDropdown
+          {/*           <OrderingDropdown
             options={["Release Date", "Name", "Rating"]}
             selected={selected}
             setSelected={setSelected}
-          />
+          /> */}
         </View>
         {/*pantalla de juegos*/}
         {loading && (

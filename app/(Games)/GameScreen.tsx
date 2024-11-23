@@ -85,10 +85,11 @@ const GameScreen = () => {
         console.log("not ok");
         throw new Error("Game not found");
       }
-      console.log(JSON.stringify(data, null, 4));
+      console.log("data lllegassssss", data.data.description);
+      console.log(JSON.stringify(data.data, null, 2));
       setGameData(data.data);
     } catch (error) {
-      console.log(error);
+      console.log('dafadsfadsdfsfdsfds',error);
       throw new Error("Error fetching game data");
     }
   }
@@ -161,7 +162,6 @@ const GameScreen = () => {
         }
       );
       const data = await response.json();
-      console.log("este es mi con", data);
     } catch (error) {
       throw new Error("Error fetching comments");
     }
@@ -200,23 +200,27 @@ const GameScreen = () => {
           fetchUserComments(id as string),
           fetchCriticComments(id as string),
         ]);
-        console.log(`GameData: ${gameData}`);
       } catch (error) {
         setToast("Error fetching game data", true, 3000);
         router.replace("/HomeScreen");
       }
     }
-    console.log("fetching all games", id);
 
     fetchAllGames();
   }, []);
 
   useEffect(() => {
-    if (!(gameData.id === "")) {
-      setLoading(false);
+    console.log("gameData11", !(gameData.description === ""));
+    console.log("gameData22", gameData.description);
+    if (!(gameData.description === ""  || gameData.description === undefined) ) {
+      setTimeout(() => {
+        
+        setLoading(false);
+      }, 100);
       return;
     }
-    console.log("Loading game data", gameData);
+
+
   }, [gameData]);
 
   const onClose = () => {
@@ -245,19 +249,23 @@ const GameScreen = () => {
 
   async function fetchAddFavorite() {
     try {
+
+      const body = JSON.stringify({ game_api_id: Number(id) });
+      const header = {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      };
       const response = await fetch(
         `${backendUrl}/api/user/${_id}/add-favorite`,
         {
           method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ game_api_id:  Number(id) }),
+          headers: header,
+          body: body,
         }
       );
+
+
       const data = await response.json();
-      console.log("este es mi datafav", data.error);
     } catch (error) {
       throw new Error("Error fetching comments");
     }
@@ -276,14 +284,12 @@ const GameScreen = () => {
         }
       );
       const data = await response.json();
-      console.log("este es mi dataNOfav", data);
     } catch (error) {
       throw new Error("Error fetching comments");
     }
   }
 
   const handleAddComment = ({ content, publication, score }: newComment) => {
-    console.log("Adding comment", content, publication, score);
     const newReview: Review = {
       publication,
       id: Date.now().toString(),
@@ -328,7 +334,17 @@ const GameScreen = () => {
   }, [reviewUserData, reviewCriticData]);
 
   const stripHtmlTags = (html: string) => {
-    return html.replace(/<\/?[^>]+(>|$)/g, "");
+    if (!html) {
+      return "";
+    }
+    try {
+      
+      return html.replace(/<\/?[^>]+(>|$)/g, "");
+    } catch (e) {
+      console.log('este sera el type error dasdf',e)
+      console.log(html);
+      return html;
+    }
   };
 
   const hasOwnReview = reviewUserData.some((review) => review.isOwnReview);
@@ -343,16 +359,7 @@ const GameScreen = () => {
           <TouchableOpacity onPress={onClose} style={styles.backButton}>
             <Ionicons name="chevron-back" size={28} color="#fff" />
           </TouchableOpacity>
-          <TouchableOpacity
-            onPress={handleFavoritePress}
-            style={styles.favoriteButton}
-          >
-            <Ionicons
-              name={isFavorite ? "heart" : "heart-outline"}
-              size={28}
-              color="#fff"
-            />
-          </TouchableOpacity>
+
         </View>
 
         {/* Title Section */}
@@ -415,10 +422,7 @@ const GameScreen = () => {
           {/* Game Details */}
           <View style={styles.detailsContainer}>
             <Text style={styles.sectionTitle}>Game Details</Text>
-            <GameDetail
-              label="Platforms"
-              value={gameData.platform ? gameData.platform.join(", ") : ""}
-            />
+
             <GameDetail
               label="Developer"
               value={gameData.developers ? gameData.developers.join(", ") : ""}
@@ -428,7 +432,7 @@ const GameScreen = () => {
               value={gameData.publishers ? gameData.publishers.join(", ") : ""}
             />
             <GameDetail label="Release Date" value={gameData.releaseDate} />
-            <GameDetail label="Age Rating" value={gameData.ageRating} />
+
           </View>
 
           {/* Reviews */}

@@ -84,7 +84,7 @@ const HomeScreen = () => {
               />
             </>
           ) : (
-            topRatedGames.map((game) => (
+            topRatedGames.slice(0,10).map((game) => (
               <RatingGameCard key={game.ranking} {...game} />
             ))
           )}

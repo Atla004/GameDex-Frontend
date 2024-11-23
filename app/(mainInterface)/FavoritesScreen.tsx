@@ -1,7 +1,7 @@
-import { RatingGameCard } from "@/components/mainInterfaceComponents/RatingGameCard";
+/* import { RatingGameCard } from "@/components/mainInterfaceComponents/RatingGameCard";
  
 import { Game } from "@/types/main";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { ScrollView, StyleSheet, View, Text, Image } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import { useToast, useUserData } from "../_layout";
@@ -23,8 +23,8 @@ const FavoritesScreen = () => {
             "Content-Type": "application/json",
           }});
           const data = await response.json();
-          console.log({favorites: data})
-          setFavoriteGames(data);
+          console.log(data.data)
+          setFavoriteGames(data.data);
         } catch (error) {
           setToast("Error getting user favorites", true, 3000);
         } 
@@ -33,6 +33,12 @@ const FavoritesScreen = () => {
       fetchFavoriteGames();
     }, [])
   );
+
+  useEffect(() => {
+    if (favoriteGames.length >= 0) {
+      setLoading(false);
+    }
+  }, [favoriteGames]);
 
   return (
     <>
@@ -135,3 +141,4 @@ const styles = StyleSheet.create({
     color: "#4b5563",
   },
 });
+ */

@@ -40,18 +40,6 @@ export default function Layout() {
           }}
         />
         <Tabs.Screen
-          name="FavoritesScreen"
-          options={{
-            title: "Favorites",
-            tabBarIcon: ({ focused }) => (
-              <Image
-                source={require('@/assets/tabsIcon/favorites.png')}
-                style={{ width: 24, height: 24}}
-              />
-            ),
-          }}
-        />
-        <Tabs.Screen
           name="ProfileScreen"
           options={{
             title: "Profile",
