@@ -33,6 +33,7 @@ export const GameSection = ({ title, games }:GameSectionProps) => {
             <Poster 
               imageUrl=""
               title=""
+              id={0}
               />
             </>
           ) : (
@@ -41,6 +42,7 @@ export const GameSection = ({ title, games }:GameSectionProps) => {
                 key={game.id}
                 imageUrl={game.imageUrl}
                 title={game.title}
+                id={game.id}
               />
             ))
           )}

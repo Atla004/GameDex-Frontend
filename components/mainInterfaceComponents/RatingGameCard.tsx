@@ -11,9 +11,9 @@ import { PokeBallRating } from "@/components/GameComponents/PokeballRating";
 import { router } from "expo-router";
 import { Game } from "@/types/main";
 import { useLoadingScreen } from "@/app/_layout";
-import { set } from "zod";
 
 export const RatingGameCard = ({
+  id,
   imageUrl,
   title,
   description,
@@ -22,7 +22,7 @@ export const RatingGameCard = ({
   ranking,
 }: Game) => {
   const [isLoading, setIsLoading] = useState(true);
-  const {setLoading} = useLoadingScreen();
+  const { setLoading } = useLoadingScreen();
 
   useEffect(() => {
     if (imageUrl && title) {
@@ -34,7 +34,10 @@ export const RatingGameCard = ({
     if (isLoading) return;
     setLoading(true);
     setTimeout(() => {
-    router.push("/GameScreen");
+      router.push({
+        pathname: `/GameScreen`,
+        params: { id },
+      });
     }, 600);
   };
 

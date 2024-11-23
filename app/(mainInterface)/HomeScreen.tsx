@@ -55,6 +55,7 @@ const HomeScreen = () => {
           imageUrl={cardGames.imageUrl}
           title={cardGames.title}
           description={cardGames.description}
+          id={cardGames.id}
         />
 
         <GameSection title="Featured Games" games={featuredGames} />

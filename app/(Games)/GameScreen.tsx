@@ -13,10 +13,11 @@ import { Ionicons } from "@expo/vector-icons";
 import { GameDetail } from "@/components/GameComponents/GameDetail";
 import { ReviewSection } from "@/components/GameComponents/ReviewSection";
 import { PokeBallRating } from "@/components/GameComponents/PokeballRating";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { CommentInputFooter } from "@/components/GameComponents/CommentsInputFooter";
 import { Review } from "@/types/main";
 import { useLoadingScreen, useToast } from "../_layout";
+import { LocalRouteParamsContext } from "expo-router/build/Route";
 const backendUrl = process.env.EXPO_PUBLIC_API_URL as string;
 
 interface GameScreenData {
@@ -58,7 +59,10 @@ const GameScreen = () => {
     favorite: false,
   });
 
-  const {setLoading} = useLoadingScreen();
+  
+
+  const { setLoading } = useLoadingScreen();
+  const { id, } = useLocalSearchParams();
 
   const [reviewUserData, setReviewUserData] = useState<Review[]>([]);
   const [reviewCriticData, setReviewCriticData] = useState<Review[]>([]);
@@ -69,8 +73,12 @@ const GameScreen = () => {
 
   async function fetchGame(gameId: string) {
     try {
+      console.log("fetching game data", gameId);
       const response = await fetch(`${backendUrl}/getGame/${gameId}.json`);
       const data = await response.json();
+      if (!response.ok) {
+        throw new Error("Game not found");
+      }
       setGameData(data);
     } catch (error) {
       throw new Error("Error fetching game data");
@@ -86,7 +94,6 @@ const GameScreen = () => {
       } else {
         setReviewUserData([]);
       }
-
     } catch (error) {
       throw new Error("Error fetching comments");
     }
@@ -109,16 +116,17 @@ const GameScreen = () => {
   useEffect(() => {
     async function fetchAllGames() {
       try {
-        const gameId = "1";
         await Promise.all([
-          fetchGame(gameId),
-          fetchUserComments(gameId),
-          fetchCriticComments(gameId),
+          fetchGame(id as string),
+          //fetchUserComments(gameId),
+          //fetchCriticComments(gameId),
         ]);
       } catch (error) {
         setToast("Error fetching game data", true, 3000);
+        router.replace("/HomeScreen");
       }
     }
+    console.log("fetching all games", id);
 
     fetchAllGames();
   }, []);
@@ -144,7 +152,6 @@ const GameScreen = () => {
   const handleFavoritePress = () => {
     setIsFavorite(true);
     if (isFavorite) {
-
       return;
     }
     setToast("Game added to favorites", true, 3000, "rgb(59, 130, 246)");
@@ -161,8 +168,6 @@ const GameScreen = () => {
       date: new Date().toLocaleDateString(),
       isOwnReview: true,
     };
-
-
 
     if (!reviewUserData) {
       setReviewUserData([newReview]);
@@ -193,7 +198,7 @@ const GameScreen = () => {
       console.log("review false");
       setRenderViewAllButtonBoolean(false);
     }
-  }, [reviewUserData,reviewCriticData]);
+  }, [reviewUserData, reviewCriticData]);
 
   return (
     <>
@@ -205,8 +210,15 @@ const GameScreen = () => {
           <TouchableOpacity onPress={onClose} style={styles.backButton}>
             <Ionicons name="chevron-back" size={28} color="#fff" />
           </TouchableOpacity>
-          <TouchableOpacity onPress={handleFavoritePress} style={styles.favoriteButton}>
-            <Ionicons name={isFavorite ? "heart" : "heart-outline"} size={28} color="#fff" />
+          <TouchableOpacity
+            onPress={handleFavoritePress}
+            style={styles.favoriteButton}
+          >
+            <Ionicons
+              name={isFavorite ? "heart" : "heart-outline"}
+              size={28}
+              color="#fff"
+            />
           </TouchableOpacity>
         </View>
 
@@ -285,10 +297,7 @@ const GameScreen = () => {
           {/* Reviews */}
           <View style={styles.reviewsContainer}>
             <Text style={styles.sectionTitle}>Critic Reviews</Text>
-            <ReviewSection
-              reviews={reviewCriticData}
-              type="critic"
-            />
+            <ReviewSection reviews={reviewCriticData} type="critic" />
 
             <Text style={[styles.sectionTitle, styles.userReviewsTitle]}>
               User Reviews

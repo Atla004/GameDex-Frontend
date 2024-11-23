@@ -9,14 +9,15 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { useLoadingScreen } from "@/app/_layout";
-import { set } from "zod";
+
 
 interface PosterProps {
   imageUrl: string;
   title: string;
+  id: number;
 }
 
-export const Poster: React.FC<PosterProps> = ({ imageUrl, title }) => {
+export const Poster: React.FC<PosterProps> = ({ imageUrl, title,id }) => {
   const [isLoading, setIsLoading] = useState(true);
   const { setLoading } = useLoadingScreen();
 
@@ -30,7 +31,11 @@ export const Poster: React.FC<PosterProps> = ({ imageUrl, title }) => {
     if (isLoading) return;
     setLoading(true);
     setTimeout(() => {
-      router.push("/GameScreen");
+
+      router.push({
+        pathname: `/GameScreen`,
+        params: { id },
+      });
     }, 600);
   };
 
