@@ -1,0 +1,13 @@
+{
+  "build": {
+    "ATS": {
+      "android": {
+        "buildType": "apk"
+      },
+
+      "env": {
+        "EXPO_PUBLIC_API_URL" : "https://gamedex-backend-production.up.railway.app" 
+      }
+    }
+  }
+}

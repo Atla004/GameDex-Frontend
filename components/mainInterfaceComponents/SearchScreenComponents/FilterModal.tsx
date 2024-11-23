@@ -65,20 +65,6 @@ const FilterModal: React.FC<FilterModalProps> = ({
               setActiveFilters={setActiveFilters}
             />
             <FilterSection
-              title="Developer"
-              options={filterOptions.developer}
-              category="developer"
-              activeFilters={activeFilters}
-              setActiveFilters={setActiveFilters}
-            />
-            <FilterSection
-              title="Publisher"
-              options={filterOptions.publisher}
-              category="publisher"
-              activeFilters={activeFilters}
-              setActiveFilters={setActiveFilters}
-            />
-            <FilterSection
               title="Genre"
               options={filterOptions.genre}
               category="genre"
