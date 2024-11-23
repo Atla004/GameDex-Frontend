@@ -73,7 +73,6 @@ const GameScreen = () => {
 
   async function fetchGame(gameId: string) {
     try {
-      console.log("fetching game data",gameId, token);
       const response = await fetch(`${backendUrl}/api/game/details/${gameId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -82,12 +81,11 @@ const GameScreen = () => {
       });
 
       const data = await response.json();
-      console.log("esta es la data",data)
       if (!response.ok) {
         console.log('not ok')
         throw new Error("Game not found");
       }
-      setGameData(data);
+      setGameData(data.data);
     } catch (error) {
       console.log(error)
       throw new Error("Error fetching game data");
@@ -156,6 +154,7 @@ const GameScreen = () => {
       setLoading(false);
       return;
     }
+    console.log("Loading game data", gameData);
   }, [gameData]);
 
   const onClose = () => {
