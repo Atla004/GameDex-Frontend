@@ -27,7 +27,7 @@ const backendUrl = process.env.EXPO_PUBLIC_API_URL as string;
 interface ProfileData {
   profileImageUri: string;
   username: string;
-  userLevel: string;
+  userLevel: number;
   reviews: number;
   favorites: number;
   email: string;
@@ -156,7 +156,7 @@ const ProfileScreen = () => {
             </TouchableOpacity>
           </View>
           <Text style={styles.username}>{mockData?.username}</Text>
-          <Text style={styles.userLevel}>{mockData?.userLevel}</Text>
+          <Text style={styles.userLevel}>Level {mockData?.userLevel} Trainer</Text>
 
           {/* Stats */}
           <View style={styles.statsContainer}>

@@ -1,7 +1,7 @@
 import { RatingGameCard } from "@/components/mainInterfaceComponents/RatingGameCard";
  
 import { Game } from "@/types/main";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { ScrollView, StyleSheet, View, Text, Image } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import { useToast } from "../_layout";
