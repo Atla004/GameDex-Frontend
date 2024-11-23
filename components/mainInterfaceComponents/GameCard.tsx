@@ -33,6 +33,7 @@ export const GameCard: React.FC<GameCardProps> = ({
   }, [imageUrl, title, description]);
 
   const handlePress = () => {
+    console.log("GameCard going", id);
     if (isLoading) return;
     setLoading(true);
     setTimeout(() => {

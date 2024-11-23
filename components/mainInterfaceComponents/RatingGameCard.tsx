@@ -24,6 +24,7 @@ export const RatingGameCard = ({
   const [isLoading, setIsLoading] = useState(true);
   const { setLoading } = useLoadingScreen();
 
+
   useEffect(() => {
     if (imageUrl && title) {
       setIsLoading(false);
@@ -31,9 +32,14 @@ export const RatingGameCard = ({
   }, [imageUrl, title]);
 
   const handlePress = () => {
+    console.log("RatingGameCard going", id);
     if (isLoading) return;
     setLoading(true);
     setTimeout(() => {
+      console.log(
+        "RatingGahhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhmeCard going",
+        id
+      );
       router.push({
         pathname: `/GameScreen`,
         params: { id },

@@ -28,6 +28,7 @@ export const Poster: React.FC<PosterProps> = ({ imageUrl, title,id }) => {
   }, [imageUrl, title]);
 
   const handlePress = () => {
+    console.log("Poster going", id);
     if (isLoading) return;
     setLoading(true);
     setTimeout(() => {

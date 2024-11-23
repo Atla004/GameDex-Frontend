@@ -16,7 +16,7 @@ const HomeScreen = () => {
   const [featuredGames, setFeaturedGames] = useState<Game[]>([]);
   const [topRatedGames, setTopRatedGames] = useState<Game[]>([]);
   const [cardGames, setCardGames] = useState<Game>({
-    id: 12,
+    id: 1,
     imageUrl: "",
     title: "",
     description: "",
@@ -125,7 +125,6 @@ const HomeScreen = () => {
 
       const data = await response.json();
 
-      console.log(data.data.cardGames[0]);
 
       setCardGames(data.data.cardGames[0]);
       setFeaturedGames(data.data.featured);

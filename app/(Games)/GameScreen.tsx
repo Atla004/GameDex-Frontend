@@ -59,7 +59,7 @@ const GameScreen = () => {
     favorite: false,
   });
 
-  const { _id } = useUserData()
+  const { _id,token } = useUserData()
 
   const { setLoading } = useLoadingScreen();
   const { id, } = useLocalSearchParams();
@@ -68,20 +68,21 @@ const GameScreen = () => {
   const [reviewCriticData, setReviewCriticData] = useState<Review[]>([]);
 
   const { setToast } = useToast();
-  const { token } = useUserData();
 
   const [isFavorite, setIsFavorite] = useState(false);
 
   async function fetchGame(gameId: string) {
     try {
-      console.log("fetching game data", token);
+      console.log("fetching game data",gameId, token);
       const response = await fetch(`${backendUrl}/api/game/details/${gameId}`, {
         headers: {
+          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
-          "Authentication": `Bearer ${token}`
         }
       });
+
       const data = await response.json();
+      console.log("esta es la data",data)
       if (!response.ok) {
         console.log('not ok')
         throw new Error("Game not found");
@@ -97,8 +98,8 @@ const GameScreen = () => {
     try {
       const response = await fetch(`${backendUrl}/review/${_id}/${gameId}/player/1`, {
         headers: {
+          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
-          "Authentication": `Bearer ${token}`
         }
       });
       const data = await response.json();
@@ -116,8 +117,8 @@ const GameScreen = () => {
     try {
       const response = await fetch(`${backendUrl}/review/${_id}/${gameId}/critic/1`, {
         headers: {
+          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
-          "Authentication": `Bearer ${token}`
         }
       });
       const data = await response.json();
@@ -136,8 +137,8 @@ const GameScreen = () => {
       try {
         await Promise.all([
           fetchGame(id as string),
-          // fetchUserComments(id as string),
-          // fetchCriticComments(id as string),
+          fetchUserComments(id as string),
+          fetchCriticComments(id as string),
         ]);
         console.log(`GameData: ${gameData}`)
       } catch (error) {
@@ -245,11 +246,13 @@ const GameScreen = () => {
         <View style={styles.titleSection}>
           <Text style={styles.title}>{gameData.title}</Text>
           <View style={styles.genreContainer}>
-            {gameData.genres.map((genre, index) => (
-              <View key={index} style={styles.genreChip}>
-                <Text style={styles.genreText}>{genre}</Text>
-              </View>
-            ))}
+            {gameData.genres && gameData.genres.length > 0 && 
+              gameData.genres.map((genre, index) => (
+                <View key={index} style={styles.genreChip}>
+                  <Text style={styles.genreText}>{genre}</Text>
+                </View>
+              ))
+            }
           </View>
         </View>
 
