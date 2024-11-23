@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -29,7 +29,7 @@ interface toggleFilterProps {
   value: string;
 }
 
-export const FilterSection = ({
+export const FilterSectionDate = ({
   title,
   options,
   category,
@@ -38,23 +38,41 @@ export const FilterSection = ({
 }: FilterSectionProps) => {
   const [filterText, setFilterText] = useState("");
 
+  useEffect(() => {
+    console.log(activeFilters);
+  }
+  , [activeFilters]);
+  
+  const [selectedRange, setSelectedRange] = useState<string[]>([]);
+
   const toggleFilter = ({ category, value }: toggleFilterProps) => {
-    setActiveFilters((prev) => ({
-      ...prev,
-      [category]: prev[category].includes(value)
-        ? prev[category].filter((item) => item !== value)
-        : [...prev[category], value],
-    }));
+    setActiveFilters((prev) => {
+      let newFilters = { ...prev };
+      if (selectedRange.length === 0) {
+        newFilters[category] = [value];
+        setSelectedRange([value]);
+      } else if (selectedRange.length === 1) {
+        if (selectedRange[0] === value) {
+          newFilters[category] = [];
+          setSelectedRange([]);
+        } else {
+          const start = Math.min(options.indexOf(selectedRange[0]), options.indexOf(value));
+          const end = Math.max(options.indexOf(selectedRange[0]), options.indexOf(value));
+          const range = options.slice(start, end + 1);
+          newFilters[category] = range;
+          setSelectedRange(range);
+        }
+      } else {
+        newFilters[category] = [value];
+        setSelectedRange([value]);
+      }
+      return newFilters;
+    });
   };
 
-  const filteredOptions = [
-    ...options.filter((option) => activeFilters[category].includes(option)),
-    ...options.filter(
-      (option) =>
-        !activeFilters[category].includes(option) &&
-        option.toLowerCase().includes(filterText.toLowerCase())
-    ),
-  ];
+  const filteredOptions = options.filter((option) =>
+    option.toLowerCase().includes(filterText.toLowerCase())
+  );
 
   return (
     <View style={styles.filterSection}>
@@ -67,18 +85,20 @@ export const FilterSection = ({
           onChangeText={setFilterText}
         />
       </View>
-      <ScrollView
-        horizontal
-        style={styles.filterOptions}
-        showsHorizontalScrollIndicator={false}
-      >
+      <ScrollView horizontal style={styles.filterOptions} showsHorizontalScrollIndicator={false}>
+
+        
         {filteredOptions.map((option, index) => (
           <TouchableOpacity
             key={index}
             style={[
               styles.filterChip,
               activeFilters[category].includes(option) &&
-                styles.filterChipActive,
+              selectedRange.length === 1 && selectedRange.includes(option)
+                ? styles.filterChipSingle
+                : activeFilters[category].includes(option)
+                ? styles.filterChipRange
+                : {},
             ]}
             onPress={() => toggleFilter({ category, value: option })}
           >
@@ -86,27 +106,35 @@ export const FilterSection = ({
               style={[
                 styles.filterChipText,
                 activeFilters[category].includes(option) &&
-                  styles.filterChipTextActive,
+                selectedRange.length === 1 && selectedRange.includes(option)
+                  ? styles.filterChipTextSingle
+                  : activeFilters[category].includes(option)
+                  ? styles.filterChipTextRange
+                  : {},
               ]}
             >
               {option}
             </Text>
           </TouchableOpacity>
         ))}
+
       </ScrollView>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
+  scrollStyle: {
+    backgroundColor: "white",
+  },
   filterSection: {
     marginBottom: 24,
   },
 
   filterOptions: {
     flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 8,
+    flexWrap: "nowrap",
+
   },
   filterChip: {
     paddingHorizontal: 12,
@@ -149,5 +177,19 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#374151",
     marginLeft: 8,
+  },
+  filterChipRange: {
+    backgroundColor: "#60a5fa",
+    borderColor: "#3b82f6",
+  },
+  filterChipTextRange: {
+    color: "#fff",
+  },
+  filterChipSingle: {
+    backgroundColor: "#f87171",
+    borderColor: "#ef4444",
+  },
+  filterChipTextSingle: {
+    color: "#fff",
   },
 });

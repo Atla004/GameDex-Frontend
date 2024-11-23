@@ -8,6 +8,8 @@ import {
   Pressable,
   ActivityIndicator,
 } from "react-native";
+import { useLoadingScreen } from "@/app/_layout";
+import { set } from "zod";
 
 interface PosterProps {
   imageUrl: string;
@@ -16,6 +18,7 @@ interface PosterProps {
 
 export const Poster: React.FC<PosterProps> = ({ imageUrl, title }) => {
   const [isLoading, setIsLoading] = useState(true);
+  const { setLoading } = useLoadingScreen();
 
   useEffect(() => {
     if (imageUrl && title) {
@@ -25,7 +28,10 @@ export const Poster: React.FC<PosterProps> = ({ imageUrl, title }) => {
 
   const handlePress = () => {
     if (isLoading) return;
-    router.push("/GameScreen");
+    setLoading(true);
+    setTimeout(() => {
+      router.push("/GameScreen");
+    }, 600);
   };
 
   return (

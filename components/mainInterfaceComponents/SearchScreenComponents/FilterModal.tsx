@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { activeFilters, FilterSection } from "@/components/mainInterfaceComponents/SearchScreenComponents/FilterSection";
+import { FilterSectionDate } from "./FilterSectionDate";
 
 interface FilterModalProps {
   visible: boolean;
@@ -49,7 +50,7 @@ const FilterModal: React.FC<FilterModalProps> = ({
           </View>
 
           <ScrollView style={styles.filtersContainer}>
-            <FilterSection
+            <FilterSectionDate
               title="Release Date"
               options={filterOptions.releaseDate}
               category="releaseDate"

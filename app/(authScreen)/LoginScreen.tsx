@@ -11,12 +11,8 @@ import {
 import { Checkbox, SecureInput } from "@/components/basic/MyComponents";
 import { useRouter } from "expo-router";
 import { usePokedex } from "./_layout";
-import { z } from "zod";
+import { validatePassword, validateUsername } from "@/utils/validation";
 
-const loginSchema = z.object({
-  username: z.string().nonempty("Username is required"),
-  password: z.string().min(6, "Password must be at least 6 characters long"),
-});
 
 export const LoginScreen = () => {
   const { isTransitioning, closePokedex, openPokedex } = usePokedex();
@@ -28,15 +24,15 @@ export const LoginScreen = () => {
   const router = useRouter();
 
   const handleLogin = () => {
-    const result = loginSchema.safeParse({ username, password });
-    if (!result.success) {
-      const formattedErrors = result.error.format();
+    const result2 = {username:validateUsername(username), password:validatePassword(password)};
+    if (!result2.username.valid || !result2.password.valid) {
       setErrors({
-        username: formattedErrors.username?._errors[0] || "",
-        password: formattedErrors.password?._errors[0] || "",
+        username: result2.username.errors?.[0] || "",
+        password: result2.password.errors?.[0] || "",
       });
       return;
     }
+    
     
     // go to home screen
     closePokedex();

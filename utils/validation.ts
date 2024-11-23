@@ -15,34 +15,42 @@ const passwordSchema = z.string()
 const emailSchema = z.string()
   .email({ message: "Invalid email address" });
 
-export const validateUsername = (username: string) => {
-  try {
-    usernameSchema.parse(username);
-  } catch (e) {
-    if (e instanceof z.ZodError) {
-      console.error("Validation errors:", e.errors);
+  export const validateUsername = (username: string): { valid: boolean, errors?: string[] } => {
+    try {
+      usernameSchema.parse(username);
+      return { valid: true };
+    } catch (e) {
+      if (e instanceof z.ZodError) {
+        console.error("Validation errors:", e.errors);
+        return { valid: false, errors: e.errors.map(error => error.message) };
+      }
+      return { valid: false, errors: ["Unknown error"] };
     }
-  }
-};
+  };
 
-export const validatePassword = (password: string) => {
-  try {
-    passwordSchema.parse(password);
-  } catch (e) {
-    if (e instanceof z.ZodError) {
-      console.error("Validation errors:", e.errors);
+  export const validatePassword = (password: string): { valid: boolean, errors?: string[] } => {
+    try {
+      passwordSchema.parse(password);
+      return { valid: true };
+    } catch (e) {
+      if (e instanceof z.ZodError) {
+        console.error("Validation errors:", e.errors);
+        return { valid: false, errors: e.errors.map(error => error.message) };
+      }
+      return { valid: false, errors: ["Unknown error"] };
     }
-  }
-};
-
-export const validateEmail = (email: string) => {
-  try {
-    emailSchema.parse(email);
-  } catch (e) {
-    if (e instanceof z.ZodError) {
-      console.error("Validation errors:", e.errors);
+  };
+  
+  export const validateEmail = (email: string): { valid: boolean, errors?: string[] } => {
+    try {
+      emailSchema.parse(email);
+      return { valid: true };
+    } catch (e) {
+      if (e instanceof z.ZodError) {
+        console.error("Validation errors:", e.errors);
+        return { valid: false, errors: e.errors.map(error => error.message) };
+      }
+      return { valid: false, errors: ["Unknown error"] };
     }
-  }
-};
-
+  };
 

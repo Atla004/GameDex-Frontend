@@ -10,26 +10,18 @@ import {
   Platform,
   ScrollView,
 } from "react-native";
-import { StatusBar } from "expo-status-bar";
 import { router } from "expo-router";
-import {SecureInput} from "@/components/basic/MyComponents";
+import { SecureInput } from "@/components/basic/MyComponents";
 import { usePokedex } from "./_layout";
-import { z } from "zod";
 import { useToast } from "../_layout";
+import { validateUsername } from "@/utils/validation";
 
-// Define validation schema using Zod
-const schema = z.object({
-  username: z.string().min(1, "Trainer Name is required"),
-  email: z.string().email("Invalid email address"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
-  confirmPassword: z.string().min(6, "Confirm Password must be at least 6 characters"),
-});
 
 interface Errors {
-  username?: { _errors: string[] };
-  email?: { _errors: string[] };
-  password?: { _errors: string[] };
-  confirmPassword?: { _errors: string[] };
+  username?: string ;
+  email?: string ;
+  password?: string;
+  confirmPassword?: string;
 }
 
 const RegisterScreen = () => {
@@ -40,18 +32,41 @@ const RegisterScreen = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errors, setErrors] = useState<Errors>({});
-  
+
   const handleRegister = () => {
-    const result = schema.safeParse({ username, email, password, confirmPassword });
-    if (!result.success) {
-      const formattedErrors = result.error.format();
-      setErrors(formattedErrors);
+
+
+    const samePassword =
+      password === confirmPassword
+        ? { valid: true }
+        : { valid: false, errors: ["Passwords do not match"] };
+
+    const result2 = {
+      username: validateUsername(username),
+      password: validateUsername(password),
+      confirmPassword: samePassword,
+      email: validateUsername(email),
+    };
+
+    if (
+      !result2.username.valid ||
+      !result2.password.valid ||
+      !result2.confirmPassword.valid ||
+      !result2.email.valid
+    ) {
+      setErrors({
+        username: result2.username.errors?.[0] || "",
+        password: result2.password.errors?.[0] || "",
+        confirmPassword: result2.confirmPassword.errors?.[0] || "",
+        email: result2.email.errors?.[0] || "",
+      });
       return;
     }
+    
     closePokedex();
     setTimeout(() => {
       router.push("LoginScreen");
-      setToast("Registration successful!", true,3000, "green");
+      setToast("Registration successful!", true, 3000, "green");
     }, 600);
   };
 
@@ -94,7 +109,9 @@ const RegisterScreen = () => {
               onChangeText={setUsername}
               autoCapitalize="none"
             />
-            {errors.username && <Text style={styles.errorText}>{errors.username._errors[0]}</Text>}
+            {errors.username && (
+              <Text style={styles.errorText}>{errors.username}</Text>
+            )}
 
             <TextInput
               style={styles.input}
@@ -104,13 +121,14 @@ const RegisterScreen = () => {
               keyboardType="email-address"
               autoCapitalize="none"
             />
-            {errors.email && <Text style={styles.errorText}>{errors.email._errors[0]}</Text>}
+            {errors.email && (
+              <Text style={styles.errorText}>{errors.email}</Text>
+            )}
 
-            <SecureInput
-              value={password}
-              onChangeText={setPassword}
-            />
-            {errors.password && <Text style={styles.errorText}>{errors.password._errors[0]}</Text>}
+            <SecureInput value={password} onChangeText={setPassword} />
+            {errors.password && (
+              <Text style={styles.errorText}>{errors.password}</Text>
+            )}
 
             <TextInput
               style={styles.input}
@@ -119,7 +137,11 @@ const RegisterScreen = () => {
               onChangeText={setConfirmPassword}
               secureTextEntry
             />
-            {errors.confirmPassword && <Text style={styles.errorText}>{errors.confirmPassword._errors[0]}</Text>}
+            {errors.confirmPassword && (
+              <Text style={styles.errorText}>
+                {errors.confirmPassword}
+              </Text>
+            )}
 
             <TouchableOpacity
               style={styles.registerButton}
@@ -210,6 +232,6 @@ const styles = StyleSheet.create({
   },
   errorText: {
     color: "red",
-    fontSize: 12
+    fontSize: 12,
   },
 });

@@ -5,12 +5,14 @@ import { GameCard } from "@/components/mainInterfaceComponents/GameCard";
 import { RatingGameCard } from "@/components/mainInterfaceComponents/RatingGameCard";
 import SearchBar from "@/components/basic/SearchBar";
 import { Game } from "@/types/main";
-import { useToast } from "../_layout";
+import { useLoadingScreen, useToast } from "../_layout";
+import { set } from "zod";
 
 const backendUrl = process.env.EXPO_PUBLIC_API_URL as string;
 
 const HomeScreen = () => {
   const { setToast } = useToast();
+  const { setLoading,isLoading } = useLoadingScreen();
   const [featuredGames, setFeaturedGames] = useState<Game[]>([]);
   const [topRatedGames, setTopRatedGames] = useState<Game[]>([]);
   const [cardGames, setCardGames] = useState<Game>({
@@ -24,6 +26,7 @@ const HomeScreen = () => {
   });
 
   useEffect(() => {
+
     const fetchData = async () => {
       try {
         console.log("fetching data");
@@ -33,6 +36,10 @@ const HomeScreen = () => {
           fetchCardGames(),
         ]);
         console.log("Data fetched");
+        if (isLoading) {
+          setLoading(false);
+          return;
+        }
       } catch (error) {
         setToast("Error fetching data", true, 3000);
       }

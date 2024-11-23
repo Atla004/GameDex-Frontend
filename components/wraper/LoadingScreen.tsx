@@ -28,9 +28,9 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({ isLoading, childre
 
   useEffect(() => {
     if (isLoading) {
-      opacity.value = withTiming(1, { duration: 100 });
+      opacity.value = withTiming(1, { duration: 300 });
       rotation.value = withRepeat(
-        withTiming(360, {
+        withTiming(100, {
           duration: 2000,
           easing: ReanimatedEasing.linear,
         }),

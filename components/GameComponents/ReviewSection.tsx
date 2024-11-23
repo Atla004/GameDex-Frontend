@@ -50,7 +50,6 @@ export const ReviewSection = ({
       ]
     );
   };
-  console.log("dfasdf",reviews);
 
   const reviewsToRender = reviews? reviews.slice(0, maxNumberOfReviews): [];
 

@@ -16,7 +16,7 @@ import { router } from "expo-router";
 import { CommentInputFooter } from "@/components/GameComponents/CommentsInputFooter";
 import { Review } from "@/types/main";
 import { LoadingScreen } from "@/components/wraper/LoadingScreen";
-import { useToast } from "../_layout";
+import { useLoadingScreen, useToast } from "../_layout";
 import { set } from "zod";
 
 const backendUrl = process.env.EXPO_PUBLIC_API_URL as string;
@@ -57,6 +57,8 @@ const GameScreen = () => {
     releaseDate: "",
     ageRating: "",
   });
+
+  const {setLoading} = useLoadingScreen();
 
   const [reviewUserData, setReviewUserData] = useState<Review[]>([]);
   const [reviewCriticData, setReviewCriticData] = useState<Review[]>([]);
@@ -119,13 +121,25 @@ const GameScreen = () => {
     fetchAllGames();
   }, []);
 
+  useEffect(() => {
+    if (!(gameData.id === "")) {
+      setLoading(false);
+      return;
+    }
+  }, [gameData]);
+
   const onClose = () => {
-    router.replace("/(mainInterface)/HomeScreen");
+    setLoading(true);
+    setTimeout(() => {
+      router.replace("/(mainInterface)/HomeScreen");
+    }, 600);
   };
 
   const onViewAllComments = () => {
-    router.replace("/(games)/CommentScreen");
+    router.push("/(games)/CommentScreen");
   };
+
+  
 
   const handleAddComment = ({ content, publication, score }: newComment) => {
     console.log("Adding comment", content, publication, score);
@@ -163,19 +177,17 @@ const GameScreen = () => {
     useState(false);
 
   useEffect(() => {
-    if (reviewUserData.length > 3 || reviewCriticData.length > 3) {
+    if (reviewUserData.length > -1 || reviewCriticData.length > 3) {
       console.log("review true");
       setRenderViewAllButtonBoolean(true);
     } else {
       console.log("review false");
       setRenderViewAllButtonBoolean(false);
     }
-  }, [gameData]);
+  }, [reviewUserData,reviewCriticData]);
 
-  console.log("gameData", gameData.id);
-  console.log("gameDatdddda", gameData.id === "null");
   return (
-    <LoadingScreen isLoading={gameData.id === ""}>
+    <>
       {/* Your app content */}
 
       <ScrollView style={styles.container}>
@@ -265,15 +277,6 @@ const GameScreen = () => {
               reviews={reviewCriticData}
               type="critic"
             />
-            {reviewCriticData.length > 1 && (
-              <TouchableOpacity
-                style={styles.viewAllButton}
-                onPress={onViewAllComments}
-              >
-                <Text style={styles.viewAllText}>View All Reviews</Text>
-                <Ionicons name="chevron-forward" size={20} color="#3b82f6" />
-              </TouchableOpacity>
-            )}
 
             <Text style={[styles.sectionTitle, styles.userReviewsTitle]}>
               User Reviews
@@ -296,7 +299,7 @@ const GameScreen = () => {
         </View>
       </ScrollView>
       <CommentInputFooter onSubmit={handleAddComment} />
-    </LoadingScreen>
+    </>
   );
 };
 

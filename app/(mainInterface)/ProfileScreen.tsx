@@ -9,7 +9,8 @@ import {
   Alert,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
- 
+import { z } from "zod";
+
 import { SettingOption } from "@/components/ProfileComponents/SettingOption";
 import PasswordChangeModal from "@/components/mainInterfaceComponents/ProfileScreenComponents/PasswordChangeModal";
 import EmailChangeModal from "@/components/mainInterfaceComponents/ProfileScreenComponents/EmailChangeModal";
@@ -19,6 +20,7 @@ import DeleteAccountModal from "@/components/mainInterfaceComponents/ProfileScre
 import { router } from "expo-router";
 import { ProfileImageSelectorModal } from "@/components/mainInterfaceComponents/ProfileScreenComponents/ProfileImageSelectorModal";
 import { useToast } from "../_layout";
+import { validateEmail, validatePassword, validateUsername } from "@/utils/validation";
 
 const backendUrl = process.env.EXPO_PUBLIC_API_URL as string;
 
@@ -30,6 +32,8 @@ interface ProfileData {
   favorites: number;
   email: string;
 }
+
+
 
 const ProfileScreen = () => {
   const { setToast } = useToast();
@@ -61,6 +65,13 @@ const ProfileScreen = () => {
   }, []);
 
   const handlePasswordChange = () => {
+
+    const validation = validatePassword(newPassword);
+
+    if (!validation.valid) {
+      Alert.alert("Error", validation.errors?.[0]);
+      return;
+    }
     if (newPassword !== confirmPassword) {
       Alert.alert("Error", "New passwords do not match!");
       return;
@@ -70,11 +81,21 @@ const ProfileScreen = () => {
   };
 
   const handleEmailChange = () => {
+    const validation = validateEmail(newEmail);
+    if (!validation.valid) {
+      Alert.alert("Error", validation.errors?.[0]);
+      return;
+    }
     setShowEmailModal(false);
     setNewEmail("");
   };
 
   const handleUsernameChange = () => {
+    const validation = validateUsername(newUsername);
+    if (!validation.valid) {
+      Alert.alert("Error", validation.errors?.[0]);
+      return;
+    }
     setShowUsernameModal(false);
     setNewUsername("");
   };
@@ -83,7 +104,7 @@ const ProfileScreen = () => {
     Alert.alert("Goodbye, Trainer!", "You have been logged out.", [
       { text: "OK", onPress: () => {
         router.dismissAll();
-        router.replace("/(authScreen)/LoginScreen");
+        router.replace("/LoginScreen");
       } },
     ]);
   };
@@ -98,6 +119,8 @@ const ProfileScreen = () => {
       "Your account has been deleted. We hope to see you again in the future!",
       [{ text: "OK", onPress: () => setShowDeleteAccountModal(false) }]
     );
+    router.dismissAll();
+    router.replace("/LoginScreen");
   };
 
   const resetPasswordFields = () => {
@@ -112,7 +135,7 @@ const ProfileScreen = () => {
 
   const handleSelectProfileImage = (imageUri: string) => {
     setMockData(prev => prev ? { ...prev, profileImageUri: imageUri } : prev);
-    // Here you would typically make an API call to update the profile image
+
   };
 
   return (

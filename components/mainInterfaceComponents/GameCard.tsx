@@ -1,6 +1,8 @@
+import { useLoadingScreen } from '@/app/_layout';
 import { router } from 'expo-router';
 import React, { useState, useEffect } from 'react';
 import { View, Image, Text, StyleSheet, Pressable, ActivityIndicator } from 'react-native';
+import { set } from 'zod';
 
 interface GameCardProps {
   imageUrl: string;
@@ -9,6 +11,7 @@ interface GameCardProps {
 }
 
 export const GameCard: React.FC<GameCardProps> = ({ imageUrl, title, description }) => {
+  const {setLoading} = useLoadingScreen();
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -19,7 +22,10 @@ export const GameCard: React.FC<GameCardProps> = ({ imageUrl, title, description
 
   const handlePress = () => {
     if (isLoading) return;
-    router.push("/GameScreen");
+    setLoading(true);
+    setTimeout(() => {
+      router.push("/GameScreen");
+    }, 600);
   };
 
   return (
