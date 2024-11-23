@@ -29,7 +29,7 @@ export default function Index() {
   const handlePress = () => {
     setIsOpen(false);
     setTimeout(() => {
-      router.push('/HomeScreen');
+      router.push('/LoginScreen');
     }, 600);
   };
 

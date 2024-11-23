@@ -12,13 +12,15 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.atlas004.GameDexFrontend"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.atlas004.GameDexFrontend"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -29,6 +31,14 @@
     "scheme": "your-app-scheme",
     "assets": [
       "./assets/fonts/"
-    ]
+    ],
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "befdd70c-469b-4c5c-8dd1-d27086d996b0"
+      }
+    }
   }
 }
