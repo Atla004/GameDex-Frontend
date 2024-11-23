@@ -15,6 +15,7 @@ import { useRouter } from "expo-router";
 import {SecureInput} from "@/components/basic/MyComponents";
 import { usePokedex } from "./_layout";
 import { z } from "zod";
+import { useUserData } from "../_layout";
 
 const backendUrl = process.env.EXPO_PUBLIC_API_URL as string;
 
@@ -29,6 +30,7 @@ const RestartPasswordScreen = () => {
 
   const fetchData = async (email: string) => {
     try {
+      const { token } = useUserData()
       const response = await fetch(`${backendUrl}/api/user/reset-password`, {
         method: "POST",
         headers: {

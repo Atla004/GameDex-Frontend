@@ -16,7 +16,7 @@ import { PokeBallRating } from "@/components/GameComponents/PokeballRating";
 import { router, useLocalSearchParams } from "expo-router";
 import { CommentInputFooter } from "@/components/GameComponents/CommentsInputFooter";
 import { Review } from "@/types/main";
-import { useLoadingScreen, useToast } from "../_layout";
+import { useLoadingScreen, useToast, useUserData } from "../_layout";
 import { LocalRouteParamsContext } from "expo-router/build/Route";
 const backendUrl = process.env.EXPO_PUBLIC_API_URL as string;
 
@@ -59,7 +59,7 @@ const GameScreen = () => {
     favorite: false,
   });
 
-  
+  const { _id } = useUserData()
 
   const { setLoading } = useLoadingScreen();
   const { id, } = useLocalSearchParams();
@@ -68,26 +68,39 @@ const GameScreen = () => {
   const [reviewCriticData, setReviewCriticData] = useState<Review[]>([]);
 
   const { setToast } = useToast();
+  const { token } = useUserData();
 
   const [isFavorite, setIsFavorite] = useState(false);
 
   async function fetchGame(gameId: string) {
     try {
-      console.log("fetching game data", gameId);
-      const response = await fetch(`${backendUrl}/getGame/${gameId}.json`);
+      console.log("fetching game data", token);
+      const response = await fetch(`${backendUrl}/api/game/details/${gameId}`, {
+        headers: {
+          "Content-Type": "application/json",
+          "Authentication": `Bearer ${token}`
+        }
+      });
       const data = await response.json();
       if (!response.ok) {
+        console.log('not ok')
         throw new Error("Game not found");
       }
       setGameData(data);
     } catch (error) {
+      console.log(error)
       throw new Error("Error fetching game data");
     }
   }
 
   async function fetchUserComments(gameId: string) {
     try {
-      const response = await fetch(`${backendUrl}/Comments/${gameId}.json`);
+      const response = await fetch(`${backendUrl}/review/${_id}/${gameId}/player/1`, {
+        headers: {
+          "Content-Type": "application/json",
+          "Authentication": `Bearer ${token}`
+        }
+      });
       const data = await response.json();
       if (Array.isArray(data)) {
         setReviewUserData(data);
@@ -101,7 +114,12 @@ const GameScreen = () => {
 
   async function fetchCriticComments(gameId: string) {
     try {
-      const response = await fetch(`${backendUrl}/Comments/${gameId}.json`);
+      const response = await fetch(`${backendUrl}/review/${_id}/${gameId}/critic/1`, {
+        headers: {
+          "Content-Type": "application/json",
+          "Authentication": `Bearer ${token}`
+        }
+      });
       const data = await response.json();
       if (Array.isArray(data)) {
         setReviewCriticData(data);
@@ -118,9 +136,10 @@ const GameScreen = () => {
       try {
         await Promise.all([
           fetchGame(id as string),
-          //fetchUserComments(gameId),
-          //fetchCriticComments(gameId),
+          // fetchUserComments(id as string),
+          // fetchCriticComments(id as string),
         ]);
+        console.log(`GameData: ${gameData}`)
       } catch (error) {
         setToast("Error fetching game data", true, 3000);
         router.replace("/HomeScreen");
