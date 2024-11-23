@@ -12,9 +12,18 @@ import { Checkbox, SecureInput } from "@/components/basic/MyComponents";
 import { useRouter } from "expo-router";
 import { usePokedex } from "./_layout";
 import { validatePassword, validateUsername } from "@/utils/validation";
+import { useUserData } from "../_layout";
 
+const backendUrl = process.env.EXPO_PUBLIC_API_URL as string;
 
 export const LoginScreen = () => {
+  const {
+    setUser,
+    username: us,
+    email: em,
+    _id: ide,
+    token: tok,
+  } = useUserData();
   const { isTransitioning, closePokedex, openPokedex } = usePokedex();
 
   const [username, setUsername] = useState("");
@@ -24,7 +33,10 @@ export const LoginScreen = () => {
   const router = useRouter();
 
   const handleLogin = () => {
-    const result2 = {username:validateUsername(username), password:validatePassword(password)};
+    const result2 = {
+      username: validateUsername(username),
+      password: validatePassword(password),
+    };
     if (!result2.username.valid || !result2.password.valid) {
       setErrors({
         username: result2.username.errors?.[0] || "",
@@ -32,13 +44,41 @@ export const LoginScreen = () => {
       });
       return;
     }
-    
-    
-    // go to home screen
-    closePokedex();
-    setTimeout(() => {
-      router.push("../../(mainInterface)/HomeScreen");
-    }, 600);
+
+    fetch(`${backendUrl}/api/auth/login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ username, password }),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          console.log(JSON.stringify(response, null, 4));
+
+          setErrors({ username: "Invalid username or password", password: "" });
+          return;
+        }
+        return response.json();
+      })
+      .then((response) => {
+        console.log("Logged in successfully");
+        console.log(JSON.stringify(response, null, 4));
+        setUser({
+          username: response.data.user.username,
+          _id: response.data.user._id,
+          email: response.data.user.email,
+          token: response.data.token,
+        });
+        closePokedex();
+        setTimeout(() => {
+          router.push("/HomeScreen");
+        }, 600);
+      })
+      .catch((error) => {
+        console.log(error);
+        setErrors({ username: "", password: "Invalid username or password" });
+      });
   };
 
   const handleRegister = () => {
@@ -83,10 +123,14 @@ export const LoginScreen = () => {
           onChangeText={setUsername}
           autoCapitalize="none"
         />
-        {errors.username && <Text style={styles.errorText}>{errors.username}</Text>}
+        {errors.username && (
+          <Text style={styles.errorText}>{errors.username}</Text>
+        )}
 
         <SecureInput value={password} onChangeText={setPassword} />
-        {errors.password && <Text style={styles.errorText}>{errors.password}</Text>}
+        {errors.password && (
+          <Text style={styles.errorText}>{errors.password}</Text>
+        )}
 
         <View style={styles.checkboxContainer}>
           <Checkbox value={staySignedIn} setValue={setStaySignedIn} />

@@ -1,7 +1,7 @@
 import { GameCard } from "@/components/mainInterfaceComponents/GameCard";
 
 export interface Game {
-  id: string;
+  id: number;
   imageUrl: string;
   title: string;
   ranking: number;

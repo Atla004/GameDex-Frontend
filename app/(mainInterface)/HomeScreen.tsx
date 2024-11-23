@@ -6,7 +6,6 @@ import { RatingGameCard } from "@/components/mainInterfaceComponents/RatingGameC
 import SearchBar from "@/components/basic/SearchBar";
 import { Game } from "@/types/main";
 import { useLoadingScreen, useToast } from "../_layout";
-import { set } from "zod";
 
 const backendUrl = process.env.EXPO_PUBLIC_API_URL as string;
 
@@ -16,7 +15,7 @@ const HomeScreen = () => {
   const [featuredGames, setFeaturedGames] = useState<Game[]>([]);
   const [topRatedGames, setTopRatedGames] = useState<Game[]>([]);
   const [cardGames, setCardGames] = useState<Game>({
-    id: "12",
+    id: 12,
     imageUrl: "",
     title: "",
     description: "",
@@ -31,9 +30,9 @@ const HomeScreen = () => {
       try {
         console.log("fetching data");
         await Promise.all([
-          fetchFeaturedGames(),
-          fetchTopRatedGames(),
-          fetchCardGames(),
+          //fetchFeaturedGames(),
+          //fetchTopRatedGames(),
+          //fetchCardGames(),
         ]);
         console.log("Data fetched");
         if (isLoading) {
@@ -74,7 +73,7 @@ const HomeScreen = () => {
           {topRatedGames.length === 0 ? (
             <>
               <RatingGameCard
-                id=""
+                id={1}
                 imageUrl=""
                 title=""
                 description=""

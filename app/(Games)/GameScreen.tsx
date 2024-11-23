@@ -142,7 +142,7 @@ const GameScreen = () => {
   };
 
   const handleFavoritePress = () => {
-    setIsFavorite(prev => !prev);
+    setIsFavorite(true);
     if (isFavorite) {
 
       return;

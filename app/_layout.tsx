@@ -1,7 +1,7 @@
 import HolographicScreen from "@/components/Anuevos/HolographicScreen";
 import Toast from "@/components/basic/Toast";
 import { Slot } from "expo-router";
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { useFontsLoad } from "@/utils/fontsload";
 import { StyleSheet, View } from "react-native";
 import { red } from "react-native-reanimated/lib/typescript/Colors";
@@ -26,18 +26,30 @@ const LoadingScreenContext = createContext({
   setLoading: (isLoading: boolean) => {},
 });
 
-const userDataContext = createContext<{ 
-  user: string | null,
-  setUser: (user: string) => void,
+interface User {
+  username: string | null;
+  _id: string | null;
+  email: string | null;
+  token: string | null;
+}
+
+const userDataContext = createContext<{
+  username: string | null;
+  _id: string | null;
+  email: string | null;
+  token: string | null;
+  setUser: (user: User) => void;
 }>({
-  user: null,
+  username: null,
+  _id: null,
+  email: null,
+  token: null,
   setUser: () => {},
 });
 
 export const useLoadingScreen = () => useContext(LoadingScreenContext);
 export const useUserData = () => useContext(userDataContext);
 export const useToast = () => useContext(ToastContext);
-
 
 export default function Layout() {
   const [toast, setToastState] = useState({
@@ -49,15 +61,17 @@ export default function Layout() {
 
   const [LoadingScreenBool, setLoadingScreen] = useState(false);
 
-  const [userData, setUserData] = useState<string |null>(null);
+  const [userData, setUserData] = useState<User>({
+    username: null,
+    _id: null,
+    email: null,
+    token: null,
+  });
 
-  const setUser = (user: string) => {
-    setUserData(user);
-  }
+  const setUser = ({ username, _id, email, token }: User) => {
+    setUserData({ username, _id, email, token });
+  };
 
-
-  
-  
   const setToast = (
     message: string,
     visible: boolean,
@@ -67,9 +81,13 @@ export default function Layout() {
     setToastState({ message, visible, duration, color });
   };
 
-  const setLoading= (isLoading: boolean) => {
+  const setLoading = (isLoading: boolean) => {
     setLoadingScreen(isLoading);
-  }
+  };
+
+  useEffect(() => {
+    console.log("userData se cambio", userData);
+  }, [userData]);
 
 
   const loading = useFontsLoad();
@@ -80,26 +98,25 @@ export default function Layout() {
   return (
     <HolographicScreen>
       <ToastContext.Provider value={{ ...toast, setToast }}>
-      <LoadingScreenContext.Provider value={{ isLoading: LoadingScreenBool, setLoading }}>
-      <userDataContext.Provider value={{ user: userData, setUser }}>  
-
-
-        <LoadingScreen isLoading={LoadingScreenBool}>
-        <Slot
-          screenOptions={{
-            headerShown: false,
-          }}
-        />
-        <Toast
-          message={toast.message}
-          visible={toast.visible}
-          duration={toast.duration}
-          color={toast.color}
-          setToast={() => setToast("", false)}
-        />
-        
-        </LoadingScreen>
-      </userDataContext.Provider>
+        <LoadingScreenContext.Provider
+          value={{ isLoading: LoadingScreenBool, setLoading }}
+        >
+          <userDataContext.Provider value={{ ...userData, setUser }}>
+            <LoadingScreen isLoading={LoadingScreenBool}>
+              <Slot
+                screenOptions={{
+                  headerShown: false,
+                }}
+              />
+              <Toast
+                message={toast.message}
+                visible={toast.visible}
+                duration={toast.duration}
+                color={toast.color}
+                setToast={() => setToast("", false)}
+              />
+            </LoadingScreen>
+          </userDataContext.Provider>
         </LoadingScreenContext.Provider>
       </ToastContext.Provider>
     </HolographicScreen>

@@ -14,8 +14,9 @@ import { router } from "expo-router";
 import { SecureInput } from "@/components/basic/MyComponents";
 import { usePokedex } from "./_layout";
 import { useToast } from "../_layout";
-import { validateUsername } from "@/utils/validation";
+import { validateEmail, validateUsername } from "@/utils/validation";
 
+const backendUrl = process.env.EXPO_PUBLIC_API_URL as string;
 
 interface Errors {
   username?: string ;
@@ -45,7 +46,7 @@ const RegisterScreen = () => {
       username: validateUsername(username),
       password: validateUsername(password),
       confirmPassword: samePassword,
-      email: validateUsername(email),
+      email: validateEmail(email),
     };
 
     if (
@@ -62,12 +63,28 @@ const RegisterScreen = () => {
       });
       return;
     }
-    
-    closePokedex();
-    setTimeout(() => {
-      router.push("LoginScreen");
-      setToast("Registration successful!", true, 3000, "green");
-    }, 600);
+
+    fetch(`${backendUrl}/api/auth/register`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ username, email, password,user_type: "player"}),
+    }).then((response) => {
+      if (!response.ok) {
+        setToast("Registration failed", true, 3000);
+        return;
+      }
+      console.log("Registration successful");
+
+      closePokedex();
+      setTimeout(() => {
+        router.push("LoginScreen");
+        setToast("Registration successful!", true, 3000, "green");
+      }, 600);
+    });
+  
+  
   };
 
   const goBackToLogin = () => {
@@ -130,12 +147,10 @@ const RegisterScreen = () => {
               <Text style={styles.errorText}>{errors.password}</Text>
             )}
 
-            <TextInput
-              style={styles.input}
+            <SecureInput
               placeholder="Confirm Password"
               value={confirmPassword}
               onChangeText={setConfirmPassword}
-              secureTextEntry
             />
             {errors.confirmPassword && (
               <Text style={styles.errorText}>

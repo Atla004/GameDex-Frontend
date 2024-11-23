@@ -22,9 +22,7 @@ const FavoritesScreen = () => {
           setFavoriteGames(data);
         } catch (error) {
           setToast("Error getting user favorites", true, 3000);
-        } finally {
-          setLoading(false);
-        }
+        } 
       };
 
       fetchFavoriteGames();

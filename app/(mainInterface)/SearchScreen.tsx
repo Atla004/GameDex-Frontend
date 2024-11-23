@@ -15,9 +15,10 @@ import Pagination from "@/components/mainInterfaceComponents/SearchScreenCompone
 import { Game } from "@/types/main";
 import { useLocalSearchParams } from "expo-router";
 import FilterModal from "@/components/mainInterfaceComponents/SearchScreenComponents/FilterModal";
-import { useToast } from "../_layout";
-import {OrderingDropdown} from "@/components/mainInterfaceComponents/SearchScreenComponents/Dropdown";
-
+import { useToast, useUserData } from "../_layout";
+import { OrderingDropdown } from "@/components/mainInterfaceComponents/SearchScreenComponents/Dropdown";
+import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
+import { set, z } from "zod";
 
 const backendUrl = process.env.EXPO_PUBLIC_API_URL as string;
 
@@ -25,17 +26,66 @@ const ITEMS_PER_PAGE = 10;
 
 const filterOptions = {
   releaseDate: [
-    "2024", "2023", "2022", "2021", "2020", "2019", "2018", "2017", "2016", "2015",
-    "2014", "2013", "2012", "2011", "2010", "2009", "2008", "2007", "2006", "2005",
-    "2004", "2003", "2002", "2001", "2000", "1999", "1998", "1997", "1996", "1995",
-    "1994", "1993", "1992", "1991", "1990", "1989", "1988", "1987", "1986", "1985",
-    "1984", "1983", "1982", "1981", "1980", "1979", "1978", "1977", "1976", "1975",
-    "1974", "1973", "1972", "1971", "1970"
+    "2024",
+    "2023",
+    "2022",
+    "2021",
+    "2020",
+    "2019",
+    "2018",
+    "2017",
+    "2016",
+    "2015",
+    "2014",
+    "2013",
+    "2012",
+    "2011",
+    "2010",
+    "2009",
+    "2008",
+    "2007",
+    "2006",
+    "2005",
+    "2004",
+    "2003",
+    "2002",
+    "2001",
+    "2000",
+    "1999",
+    "1998",
+    "1997",
+    "1996",
+    "1995",
+    "1994",
+    "1993",
+    "1992",
+    "1991",
+    "1990",
+    "1989",
+    "1988",
+    "1987",
+    "1986",
+    "1985",
+    "1984",
+    "1983",
+    "1982",
+    "1981",
+    "1980",
+    "1979",
+    "1978",
+    "1977",
+    "1976",
+    "1975",
+    "1974",
+    "1973",
+    "1972",
+    "1971",
+    "1970",
   ],
   platform: ["Nintendo Switch", "Nintendo 3DS", "Mobile", "PC"],
+  genre: ["RPG", "Action RPG", "Strategy", "Puzzle", "Adventure"],
   developer: ["Game Freak", "Niantic", "ILCA"],
   publisher: ["Nintendo", "The Pokémon Company"],
-  genre: ["RPG", "Action RPG", "Strategy", "Puzzle", "Adventure"],
 };
 
 interface response {
@@ -46,10 +96,14 @@ interface response {
 
 const SearchScreen = () => {
   const { setToast } = useToast();
+  const { token } = useUserData();
   const [searchQuery, setSearchQuery] = useState("");
   const [showFilters, setShowFilters] = useState(false);
-  const [currentPage, setCurrentPage] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [genresArray, setGenresArray] = useState<string[]>([]);
+  const [platformsArray, setPlatformsArray] = useState<string[]>([]);
+
   const isSearchingRef = useRef(false);
 
   const [response, setResponse] = useState<response>({
@@ -74,39 +128,74 @@ const SearchScreen = () => {
 
   const handleSearch = () => {
     isSearchingRef.current = true;
+    console.log("handleSearch to currentpage 1");
     setCurrentPage(1);
-    console.log("handleSearch to currentpage 1"); // no es
+    getSearchedGames();
   };
 
-  const getSearchedGames = useCallback(() => {
+  const getSearchedGames = () => {
     if (!isSearchingRef.current) {
       console.log("not searching isSearching:", isSearchingRef.current);
       return;
     }
     console.log("fetching data");
     setLoading(true);
-    const url = `${backendUrl}/pagination/pag_${currentPage}.json`;
+    const params = {
+      search: searchQuery,
+    };
+
+    const formattedParams = new URLSearchParams({
+      ...Object.fromEntries(
+        Object.entries(params).map(([key, value]) => [key, value.toString()])
+      ),
+    });
+
+    const url = `${backendUrl}/api/game/search/${currentPage}?${formattedParams}`;
+
     console.log(url);
-    fetch(url)
+    fetch(url, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      method: "GET",
+    })
       .then((response) => response.json())
-      .then((data) => {
-        setSearchResults(data.results);
-        setResponse(data);
+      .then((res) => {
+
+
+        const toResults = res.data.results.map((game: any) => {
+          return {
+            id: game.api_id,
+            title: game.title,
+            description: game.description,
+            imageUrl: game.imageUrl,
+            userScore: game.userScore,
+            criticScore: 0,
+            ranking: 0,
+          };
+        });
+
+        if (Array.isArray(res.data.results)) setSearchResults(toResults as Game[]);
+
+        setResponse({
+          page: res.data.page,
+          total_pages: res.data.total_pages,
+          result_count: res.data.result_count
+        });
         setLoading(false);
       })
       .catch((error) => {
         setToast("Error searching games", true, 3000);
         setLoading(false);
       });
-  }, [currentPage]);
+  };
 
   useEffect(() => {
     console.log("useEffect currentPage", currentPage);
-    getSearchedGames();
-  }, [currentPage]);
-
-  useEffect(() => {
-    console.log("currentPage se esta cambiando", currentPage);
+    if (currentPage > 1) {
+      getSearchedGames();
+    }
   }, [currentPage]);
 
   useEffect(() => {
@@ -127,6 +216,54 @@ const SearchScreen = () => {
     });
   };
   const [selected, setSelected] = useState("Release Date");
+
+  async function fetchGenres() {
+    try {
+      const response = await fetch(`${backendUrl}/api/misc/genres`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        method: "GET",
+      });
+
+      const data = await response.json();
+      console.log(data);
+    } catch (error) {
+      setToast("Error fetching Genres", true, 3000);
+    }
+  }
+
+  async function fetchPlatform() {
+    try {
+      const response = await fetch(`${backendUrl}/api/misc/platforms`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        method: "GET",
+      });
+
+      const data = await response.json();
+      console.log(data);
+    } catch (error) {
+      setToast("Error fetching Platform", true, 3000);
+    }
+  }
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        console.log("fetching data");
+        await Promise.all([fetchGenres(), fetchPlatform()]);
+        console.log("Data fetched");
+      } catch (error) {
+        setToast("Error fetching data", true, 3000);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   return (
     <>
@@ -158,7 +295,7 @@ const SearchScreen = () => {
           </View>
         </View>
 
-<View style={styles.orderingDropdown}>
+        <View style={styles.orderingDropdown}>
           <OrderingDropdown
             options={["Release Date", "Name", "Rating"]}
             selected={selected}
@@ -207,7 +344,11 @@ const SearchScreen = () => {
       <FilterModal
         visible={showFilters}
         onRequestClose={() => setShowFilters(false)}
-        filterOptions={filterOptions}
+        filterOptions={{
+          ...filterOptions,
+          genre: genresArray,
+          platform: platformsArray,
+        }}
         activeFilters={activeFilters}
         setActiveFilters={setActiveFilters}
         handleClearFilters={handleClearFilters}
@@ -245,9 +386,7 @@ const styles = StyleSheet.create({
     marginLeft: 8,
     padding: 4,
   },
-  orderingDropdown: {
-
-  },
+  orderingDropdown: {},
   emptyState: {
     alignItems: "center",
     justifyContent: "center",
