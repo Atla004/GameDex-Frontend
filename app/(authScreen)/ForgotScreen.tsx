@@ -15,11 +15,29 @@ import { useRouter } from "expo-router";
 import { usePokedex } from "./_layout";
 import { z } from "zod";
 
+const backendUrl = process.env.EXPO_PUBLIC_API_URL as string;
+
 const ForgotScreen = () => {
   const { isTransitioning, closePokedex, openPokedex } = usePokedex();
   const [email_or_username, setUsernameOrEmail] = useState("");
   const [error, setError] = useState("");
   const router = useRouter();
+
+  const fetchData = async (email: string) => {
+    try {
+      const response = await fetch(`${backendUrl}/api/user/send-reset-token`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }) 
+      });
+      const data = await response.json();
+      // setMockData(data);
+    } catch (error) {
+      // setToast("Error getting profile data", true, 3000);
+    }
+  };
 
   const handleResetPassword = () => {
     const emailSchema = z.string().email("Invalid email format");
@@ -35,11 +53,12 @@ const ForgotScreen = () => {
 
     setError("");
     console.log("Reset password");
-
-    closePokedex();
-    setTimeout(() => {
-      router.push("EnterCodeScreen");
-    }, 600);
+    fetchData(email_or_username).then(() => {
+      closePokedex();
+      setTimeout(() => {
+        router.push("EnterCodeScreen");
+      }, 600)
+    })
   };
 
   const goBackToLogin = () => {

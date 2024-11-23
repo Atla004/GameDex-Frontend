@@ -14,6 +14,7 @@ import { StatusBar } from 'expo-status-bar';
 import { router } from 'expo-router';
 import { usePokedex } from './_layout';
 
+const backendUrl = process.env.EXPO_PUBLIC_API_URL as string;
 
 const EnterCodeScreen = () => {
   const { isTransitioning, closePokedex, openPokedex } = usePokedex();
@@ -44,15 +45,30 @@ const EnterCodeScreen = () => {
     }
   };
 
+  const fetchData = async (token: string) => {
+    try {
+      const response = await fetch(`${backendUrl}/api/user/check-reset-token`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ token }) 
+      });
+      const data = await response.json();
+    } catch (error) {
+      // setToast("Error getting profile data", true, 3000);
+    }
+  };
+
   const handleSubmit = () => {
     const fullCode = code.join('');
     if (fullCode.length === 6) {
-
-
-      closePokedex();
-      setTimeout(() => {
-      router.push('/RestartPasswordScreen');
-    }, 600);
+      fetchData(fullCode).then(() => {
+        closePokedex();
+        setTimeout(() => {
+          router.push('/RestartPasswordScreen');
+        }, 600);
+      })
     }
   };
 
