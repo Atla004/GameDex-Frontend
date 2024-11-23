@@ -27,7 +27,7 @@ export const GameCard: React.FC<GameCardProps> = ({
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (imageUrl && title) {
+    if (title) {
       setIsLoading(false);
     }
   }, [imageUrl, title, description]);
