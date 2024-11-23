@@ -16,6 +16,8 @@ import {SecureInput} from "@/components/basic/MyComponents";
 import { usePokedex } from "./_layout";
 import { z } from "zod";
 
+const backendUrl = process.env.EXPO_PUBLIC_API_URL as string;
+
 const passwordSchema = z.string().min(8, "Password must be at least 8 characters long");
 
 const RestartPasswordScreen = () => {
@@ -24,6 +26,22 @@ const RestartPasswordScreen = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errors, setErrors] = useState({ newPassword: "", confirmPassword: "" });
   const router = useRouter();
+
+  const fetchData = async (email: string) => {
+    try {
+      const response = await fetch(`${backendUrl}/api/user/reset-password`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }) 
+      });
+      const data = await response.json();
+      // setMockData(data);
+    } catch (error) {
+      // setToast("Error getting profile data", true, 3000);
+    }
+  };
 
   const handleRestartPassword = () => {
     const newPasswordValidation = passwordSchema.safeParse(newPassword);
