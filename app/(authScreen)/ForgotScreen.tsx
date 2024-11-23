@@ -56,7 +56,7 @@ const ForgotScreen = () => {
     fetchData(email_or_username).then(() => {
       closePokedex();
       setTimeout(() => {
-        router.push("EnterCodeScreen");
+        router.push({pathname: "/EnterCodeScreen", params: { email: email_or_username }});
       }, 600)
     })
   };

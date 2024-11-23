@@ -11,7 +11,7 @@ import {
   ScrollView,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { usePokedex } from './_layout';
 
 const backendUrl = process.env.EXPO_PUBLIC_API_URL as string;
@@ -20,6 +20,7 @@ const EnterCodeScreen = () => {
   const { isTransitioning, closePokedex, openPokedex } = usePokedex();
   const [code, setCode] = useState(['', '', '', '', '', '']);
   const inputRefs = useRef<Array<TextInput | null>>([]);
+  const {email} = useLocalSearchParams();
 
   const handleCodeChange = (text: string, index: number) => {
     if (text.length > 1) {
@@ -66,7 +67,7 @@ const EnterCodeScreen = () => {
       fetchData(fullCode).then(() => {
         closePokedex();
         setTimeout(() => {
-          router.push('/RestartPasswordScreen');
+          router.push({pathname: '/RestartPasswordScreen', params: { email, token: code }});
         }, 600);
       })
     }

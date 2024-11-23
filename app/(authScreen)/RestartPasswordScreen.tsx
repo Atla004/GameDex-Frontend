@@ -11,7 +11,7 @@ import {
   Platform,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import {SecureInput} from "@/components/basic/MyComponents";
 import { usePokedex } from "./_layout";
 import { z } from "zod";
@@ -27,16 +27,17 @@ const RestartPasswordScreen = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errors, setErrors] = useState({ newPassword: "", confirmPassword: "" });
   const router = useRouter();
+  const {email, token} = useLocalSearchParams();
 
-  const fetchData = async (email: string) => {
+  const fetchData = async (newPassword: string) => {
     try {
-      const { token } = useUserData()
+      // const { token } = useUserData()
       const response = await fetch(`${backendUrl}/api/user/reset-password`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email }) 
+        body: JSON.stringify({ email, token, newPassword }) 
       });
       const data = await response.json();
       // setMockData(data);
@@ -66,10 +67,12 @@ const RestartPasswordScreen = () => {
     }
 
     if (newPasswordValidation.success && confirmPasswordValidation.success && newPassword === confirmPassword) {
-      closePokedex();
-      setTimeout(() => {
-        router.push("/LoginScreen");
-      }, 600);
+      fetchData(newPassword).then(() => {
+        closePokedex();
+        setTimeout(() => {
+          router.push("/LoginScreen");
+        }, 600);
+      });
     }
   };
 
