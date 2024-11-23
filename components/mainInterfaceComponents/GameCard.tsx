@@ -26,6 +26,7 @@ export const GameCard: React.FC<GameCardProps> = ({ imageUrl, title, description
     setTimeout(() => {
       router.push("/GameScreen");
     }, 600);
+    
   };
 
   return (

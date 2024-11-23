@@ -7,6 +7,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   Dimensions,
+  Alert,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { GameDetail } from "@/components/GameComponents/GameDetail";
@@ -31,6 +32,7 @@ interface GameScreenData {
   publisher: string[];
   releaseDate: string;
   ageRating: string;
+  favorite: boolean;
 }
 
 interface newComment {
@@ -53,6 +55,7 @@ const GameScreen = () => {
     publisher: [],
     releaseDate: "",
     ageRating: "",
+    favorite: false,
   });
 
   const {setLoading} = useLoadingScreen();
@@ -61,6 +64,8 @@ const GameScreen = () => {
   const [reviewCriticData, setReviewCriticData] = useState<Review[]>([]);
 
   const { setToast } = useToast();
+
+  const [isFavorite, setIsFavorite] = useState(false);
 
   async function fetchGame(gameId: string) {
     try {
@@ -136,7 +141,14 @@ const GameScreen = () => {
     router.push("/(games)/CommentScreen");
   };
 
-  
+  const handleFavoritePress = () => {
+    setIsFavorite(prev => !prev);
+    if (isFavorite) {
+
+      return;
+    }
+    setToast("Game added to favorites", true, 3000, "rgb(59, 130, 246)");
+  };
 
   const handleAddComment = ({ content, publication, score }: newComment) => {
     console.log("Adding comment", content, publication, score);
@@ -192,6 +204,9 @@ const GameScreen = () => {
         <View style={styles.header}>
           <TouchableOpacity onPress={onClose} style={styles.backButton}>
             <Ionicons name="chevron-back" size={28} color="#fff" />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={handleFavoritePress} style={styles.favoriteButton}>
+            <Ionicons name={isFavorite ? "heart" : "heart-outline"} size={28} color="#fff" />
           </TouchableOpacity>
         </View>
 
@@ -309,10 +324,16 @@ const styles = StyleSheet.create({
   header: {
     height: 60,
     backgroundColor: "#ef4444",
-    justifyContent: "center",
+    justifyContent: "space-between",
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 16,
   },
   backButton: {
     paddingLeft: 16,
+  },
+  favoriteButton: {
+    paddingRight: 16,
   },
   titleSection: {
     padding: 16,

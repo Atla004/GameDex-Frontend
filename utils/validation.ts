@@ -21,7 +21,6 @@ const emailSchema = z.string()
       return { valid: true };
     } catch (e) {
       if (e instanceof z.ZodError) {
-        console.error("Validation errors:", e.errors);
         return { valid: false, errors: e.errors.map(error => error.message) };
       }
       return { valid: false, errors: ["Unknown error"] };
@@ -34,7 +33,6 @@ const emailSchema = z.string()
       return { valid: true };
     } catch (e) {
       if (e instanceof z.ZodError) {
-        console.error("Validation errors:", e.errors);
         return { valid: false, errors: e.errors.map(error => error.message) };
       }
       return { valid: false, errors: ["Unknown error"] };
@@ -47,7 +45,6 @@ const emailSchema = z.string()
       return { valid: true };
     } catch (e) {
       if (e instanceof z.ZodError) {
-        console.error("Validation errors:", e.errors);
         return { valid: false, errors: e.errors.map(error => error.message) };
       }
       return { valid: false, errors: ["Unknown error"] };
