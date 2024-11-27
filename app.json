@@ -4,7 +4,7 @@
     "slug": "GameDex-Frontend",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/gamedexpng",
+    "icon": "./assets/gamedex.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
