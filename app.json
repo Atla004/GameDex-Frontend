@@ -15,7 +15,8 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.atlas004.GameDexFrontend"
     },
     "android": {
       "adaptiveIcon": {
@@ -32,6 +33,9 @@
       "expo-build-properties"
     ],
     "scheme": "your-app-scheme",
+    "assets": [
+      "./assets/fonts/"
+    ],
     "extra": {
       "router": {
         "origin": false

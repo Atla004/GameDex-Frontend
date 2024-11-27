@@ -199,6 +199,8 @@ const SearchScreen = () => {
         };
 
         console.log("te odio rafael de la mata", getDepthLevel1(res.data));
+        console.log("te odio rafael de la mata", getDepthLevel1(res.data.results[0]));
+        
 
         const toResults = res.data.results.map((game: any) => {
           return {

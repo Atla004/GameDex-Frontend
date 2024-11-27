@@ -1,6 +1,5 @@
 import { useEffect, useRef } from "react";
 import { View, StyleSheet, Animated, Dimensions, Text } from "react-native";
-import { usePokedex } from "../../app/(authScreen)/_layout";
 
 interface PokedexFrameProps {
   children: React.ReactNode;
@@ -46,10 +45,11 @@ const BottomBorder = () => {
 };
 
 const PokedexFrame = ({ children, isTransitioning }: PokedexFrameProps) => {
-  const topHeight = useRef(new Animated.Value(80)).current;
-  const bottomHeight = useRef(new Animated.Value(80)).current;
+  const topHeight = useRef(new Animated.Value(Dimensions.get("window").height / 2 + 15)).current;
+  const bottomHeight = useRef(new Animated.Value(Dimensions.get("window").height / 2 + 15)).current;
 
   useEffect(() => {
+    console.log("isTransitioning", isTransitioning);
     if (isTransitioning) {
       // Close animation
       Animated.parallel([
@@ -65,6 +65,7 @@ const PokedexFrame = ({ children, isTransitioning }: PokedexFrameProps) => {
         }),
       ]).start();
     } else {
+      console.log("opessssn");
       // Open animation
       Animated.parallel([
         Animated.timing(topHeight, {

@@ -14,6 +14,7 @@ import { usePokedex } from "./_layout";
 import { validatePassword, validateUsername } from "@/utils/validation";
 import { useUserData } from "../_layout";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { set } from "zod";
 // import { AsyncStorage } from 'react-native'
 
 const backendUrl = process.env.EXPO_PUBLIC_API_URL as string;
@@ -107,10 +108,13 @@ export const LoginScreen = () => {
   };
 
   useEffect(() => {
+    console.log("LoginScreen mounted");
     validateAutoLogin();
+
     if (isTransitioning) {
-      // Close animation
-      openPokedex();
+      setTimeout(() => {
+        openPokedex();
+      }, 100);
     }
   }, []);
 

@@ -18,6 +18,8 @@ import { CommentInputFooter } from "@/components/GameComponents/CommentsInputFoo
 import { Review } from "@/types/main";
 import { useLoadingScreen, useToast, useUserData } from "../_layout";
 import { LocalRouteParamsContext } from "expo-router/build/Route";
+import { GameCard } from "@/components/mainInterfaceComponents/GameCard";
+import { GameCardRating } from "@/components/GameComponents/GameCardRating";
 const backendUrl = process.env.EXPO_PUBLIC_API_URL as string;
 
 interface GameScreenData {
@@ -87,7 +89,11 @@ const GameScreen = () => {
       }
       console.log("data lllegassssss", data.data.description);
       console.log(JSON.stringify(data.data, null, 2));
-      setGameData(data.data);
+      const gameData = data.data;
+      if (gameData.releaseDate) {
+        gameData.releaseDate = gameData.releaseDate.split("T")[0];
+      }
+      setGameData(gameData);
     } catch (error) {
       console.log('dafadsfadsdfsfdsfds',error);
       throw new Error("Error fetching game data");
@@ -181,30 +187,34 @@ const GameScreen = () => {
         }
       );
       const data = await response.json();
+      fetchAllGames();
 
       if (Array.isArray(data)) {
         setReviewCriticData(data);
       } else {
         setReviewCriticData([]);
       }
+      
     } catch (error) {
       throw new Error("Error fetching comments");
     }
   }
 
-  useEffect(() => {
-    async function fetchAllGames() {
-      try {
-        await Promise.all([
-          fetchGame(id as string),
-          fetchUserComments(id as string),
-          fetchCriticComments(id as string),
-        ]);
-      } catch (error) {
-        setToast("Error fetching game data", true, 3000);
-        router.replace("/HomeScreen");
-      }
+  async function fetchAllGames() {
+    try {
+      await Promise.all([
+        fetchGame(id as string),
+        fetchUserComments(id as string),
+        fetchCriticComments(id as string),
+      ]);
+    } catch (error) {
+      setToast("Error fetching game data", true, 3000);
+      router.replace("/HomeScreen");
     }
+  }
+
+  useEffect(() => {
+
 
     fetchAllGames();
   }, []);
@@ -307,6 +317,8 @@ const GameScreen = () => {
 
     setReviewUserData([...reviewUserData, newReview]);
     fetchSendComment(publication, content, score);
+    fetchAllGames();
+
   };
 
   const handleDeleteReview = (reviewId: string) => {
@@ -318,6 +330,7 @@ const GameScreen = () => {
       ...reviewUserData.filter((review) => review.id !== reviewId),
     ]);
     fetchDeleteComment();
+
   };
 
   const [renderViewAllButtonBoolean, setRenderViewAllButtonBoolean] =
@@ -403,18 +416,16 @@ const GameScreen = () => {
           <View style={styles.ratingsContainer}>
             <View style={styles.ratingBox}>
               <Text style={styles.ratingLabel}>Critic Score</Text>
-              <PokeBallRating
+              <GameCardRating
                 score={gameData.criticScore}
                 type="critic"
-                size="large"
               />
             </View>
             <View style={styles.ratingBox}>
               <Text style={styles.ratingLabel}>User Score</Text>
-              <PokeBallRating
+              <GameCardRating
                 score={gameData.userScore}
                 type="user"
-                size="large"
               />
             </View>
           </View>

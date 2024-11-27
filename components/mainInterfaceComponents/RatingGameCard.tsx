@@ -36,10 +36,6 @@ export const RatingGameCard = ({
     if (isLoading) return;
     setLoading(true);
     setTimeout(() => {
-      console.log(
-        "RatingGahhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhmeCard going",
-        id
-      );
       router.push({
         pathname: `/GameScreen`,
         params: { id },

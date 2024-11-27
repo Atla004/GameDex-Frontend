@@ -9,22 +9,28 @@ import {
   Pressable,
   ActivityIndicator,
 } from "react-native";
+import { GameCardRating } from "../GameComponents/GameCardRating";
 
 interface GameCardProps {
   imageUrl: string;
   title: string;
   description: string;
   id: number;
+  criticScore: number;
+  userScore: number;
 }
 
 export const GameCard: React.FC<GameCardProps> = ({
   imageUrl,
   title,
   description,
+  criticScore,
+  userScore,
   id,
 }) => {
   const { setLoading } = useLoadingScreen();
   const [isLoading, setIsLoading] = useState(true);
+  console.log("GameCard", imageUrl, title,criticScore,userScore);
 
   useEffect(() => {
     if (title) {
@@ -42,18 +48,6 @@ export const GameCard: React.FC<GameCardProps> = ({
         params: { id },
       });
     }, 600);
-  };
-
-  const stripHtmlTags = (html: string) => {
-    try {
-      
-      return html.replace(/<\/?[^>]+(>|$)/g, "");
-    } catch (e) {
-      console.log(e);
-    }
-
-    
-    return 
   };
 
   return (
@@ -87,11 +81,14 @@ export const GameCard: React.FC<GameCardProps> = ({
                   }}
                   style={styles.pokeball}
                 />
-                <Text style={styles.title}>{title}</Text>
+                <Text style={styles.title} numberOfLines={2}>{title}</Text>
               </View>
-              <Text style={styles.description} numberOfLines={3}>
-              {stripHtmlTags(description)}
-              </Text>
+              <View style={styles.RatingContainer}>  
+
+                <GameCardRating score={criticScore} type="critic" size="large"/>
+                <GameCardRating score={userScore} type="user" size="large" />
+              </View>
+
             </View>
           </>
         )}
@@ -115,6 +112,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     position: "relative",
+    height: 160,
   },
   loader: {
     flex: 1,
@@ -129,8 +127,7 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    padding: 12,
-    width: "70%",
+    width: "100%",
   },
   titleContainer: {
     flexDirection: "row",
@@ -139,6 +136,7 @@ const styles = StyleSheet.create({
     padding: 8,
     borderRadius: 10,
     marginBottom: 8,
+    margin: 8,
   },
   pokeball: {
     width: 20,
@@ -155,5 +153,12 @@ const styles = StyleSheet.create({
     color: "#4b5563",
     fontSize: 14,
     lineHeight: 20,
+  },
+  RatingContainer: {
+    top: 8,
+    
+    flexDirection: "row",
+    height: 90,
+    justifyContent: "space-around",
   },
 });
