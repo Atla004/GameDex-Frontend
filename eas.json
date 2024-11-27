@@ -1,8 +1,12 @@
 {
+  "cli": {
+    "appVersionSource": "remote"
+  },
   "build": {
     "ATS": {
       "android": {
         "buildType": "apk"
+        
       },
 
       "env": {

@@ -115,7 +115,7 @@ const ProfileScreen = () => {
       method: "PUT",
       body: JSON.stringify({ email: newEmail }),
       headers: {
-        Authorization: `Bearer ${token}`,
+        "Authorization": `Bearer ${token}`,
         "Content-Type": "application/json",
       },
     }).then(() => {
