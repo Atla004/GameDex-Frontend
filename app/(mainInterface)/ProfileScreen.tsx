@@ -53,7 +53,7 @@ const ProfileScreen = () => {
   const [newUsername, setNewUsername] = useState("");
   const [deleteConfirmation, setDeleteConfirmation] = useState("");
   const { token, _id ,email} = useUserData();
-
+  console.log(mockData);
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -212,7 +212,7 @@ const ProfileScreen = () => {
           </View>
           <Text style={styles.username}>{mockData?.username}</Text>
           <Text style={styles.userLevel}>
-            Level {mockData?.userLevel} Trainer
+            Level {mockData?.userLevel? Math.floor(mockData?.userLevel): 0} Trainer
           </Text>
 
           {/* Stats */}

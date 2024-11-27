@@ -3,7 +3,7 @@ import { Slot } from 'expo-router';
 import PokedexFrame from '../../components/wrapper/PokedexFrame';
 
 const PokedexContext = createContext({
-  isTransitioning: false,
+  isTransitioning: true,
   openPokedex: () => {},
   closePokedex: () => {}
 });
@@ -15,6 +15,7 @@ const Layout = () => {
 
   const openPokedex = () =>{
     console.log("openPokedex");
+    console.log("isTransitioningggg", isTransitioning);
     setIsTransitioning(false);
 
   } 

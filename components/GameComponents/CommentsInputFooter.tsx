@@ -91,7 +91,7 @@ export const CommentInputFooter: React.FC<CommentInputFooterProps> = ({ onSubmit
                 placeholder="Enter comment title"
                 value={commentData.publication}
                 onChangeText={(text) => setCommentData(prev => ({ ...prev, publication: text }))}
-                maxLength={100}
+                maxLength={50}
               />
             </View>
 
@@ -103,7 +103,7 @@ export const CommentInputFooter: React.FC<CommentInputFooterProps> = ({ onSubmit
                 value={commentData.content}
                 onChangeText={(text) => setCommentData(prev => ({ ...prev, content: text }))}
                 multiline
-                maxLength={500}
+                maxLength={200}
               />
             </View>
 

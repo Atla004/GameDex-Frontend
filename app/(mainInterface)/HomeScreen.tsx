@@ -56,6 +56,8 @@ const HomeScreen = () => {
           title={cardGames.title}
           description={cardGames.description}
           id={cardGames.id}
+          criticScore={cardGames.criticScore}
+          userScore={cardGames.userScore}
         />
 
         <GameSection title="Featured Games" games={featuredGames} />
