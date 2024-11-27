@@ -1,7 +1,8 @@
 import HolographicScreen from "@/components/Anuevos/HolographicScreen";
 import Toast from "@/components/basic/Toast";
 import { Slot } from "expo-router";
-import { createContext, useContext, useEffect, useState } from "react";
+import * as SplashScreen from 'expo-splash-screen';
+import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { useFontsLoad } from "@/utils/fontsload";
 import { StyleSheet, View } from "react-native";
 import { red } from "react-native-reanimated/lib/typescript/Colors";
@@ -51,6 +52,13 @@ export const useLoadingScreen = () => useContext(LoadingScreenContext);
 export const useUserData = () => useContext(userDataContext);
 export const useToast = () => useContext(ToastContext);
 
+// SplashScreen.preventAutoHideAsync()
+
+SplashScreen.setOptions({
+  duration: 1000,
+  fade: true
+})
+
 export default function Layout() {
   const [toast, setToastState] = useState({
     message: "",
@@ -89,7 +97,13 @@ export default function Layout() {
     console.log("userData se cambio", userData);
   }, [userData]);
 
-  const loading = useFontsLoad();
+  const loading = true // useFontsLoad();
+
+  const onLayoutRootView = useCallback(() => {
+    // console.log('hidden splash screen')
+    // SplashScreen.hide();
+  }, [loading])
+
   if (!loading) {
     return <View style={styles.loadingContainer}></View>;
   }
