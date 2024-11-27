@@ -13,7 +13,6 @@ import { Review } from "@/types/main";
 import { router, useLocalSearchParams } from "expo-router";
 import Pagination from "@/components/mainInterfaceComponents/SearchScreenComponents/Pagination";
 import { useToast, useUserData } from "../_layout";
-import { number } from "zod";
 
 const backendUrl = process.env.EXPO_PUBLIC_API_URL as string;
 

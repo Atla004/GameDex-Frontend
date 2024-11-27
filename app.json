@@ -18,9 +18,6 @@
       },
       "package": "com.atlas004.GameDexFrontend"
     },
-    "web": {
-      "favicon": "./assets/favicon.png"
-    },
     "plugins": [
       [
         "expo-build-properties", {
@@ -47,5 +44,4 @@
     }
   }
 }
-
 
