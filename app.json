@@ -1,52 +1,24 @@
 {
   "expo": {
-    "name": "GameDex",
-    "slug": "GameDex-Frontend",
+    "name": "FriendApp-Frontend",
+    "slug": "FriendApp-Frontend",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/gamedex.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
-    "splash": {
-      "image": "./assets/gamedex.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
     "ios": {
-      "supportsTablet": true,
-      "bundleIdentifier": "com.atlas004.GameDexFrontend"
+      "supportsTablet": true
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "5e861310-12d1-422e-a308-a287046b01fe"
+      }
     },
     "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      },
-      "package": "com.atlas004.GameDexFrontend"
-    },
-    "plugins": [
-      [
-        "expo-build-properties", {
-          "android": {
-            "compileSdkVersion": 35,
-            "targetSdkVersion": 35
-          },
-          "ios": {
-            "deploymentTarget": "15.1"
-          }
-        }
-      ],
-
-      "expo-router"
-    ],
-    "scheme": "your-app-scheme",
-    "extra": {
-      "router": {
-        "origin": false
-      },
-      "eas": {
-        "projectId": "befdd70c-469b-4c5c-8dd1-d27086d996b0"
-      }
+      "package": "com.atlas004.FriendAppFrontend"
     }
   }
 }
-

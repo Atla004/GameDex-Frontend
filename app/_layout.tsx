@@ -1,123 +1,43 @@
-import HolographicScreen from "@/components/Anuevos/HolographicScreen";
-import Toast from "@/components/basic/Toast";
 import { Slot } from "expo-router";
-import { createContext, useCallback, useContext, useEffect, useState } from "react";
-import { useFontsLoad } from "@/utils/fontsload";
 import { StyleSheet, View } from "react-native";
-import { LoadingScreen } from "@/components/wrapper/LoadingScreen";
+import { useFontsLoad } from "../utils/fontsload";
 
-const ToastContext = createContext({
-  message: "",
-  visible: false,
-  duration: 3000,
-  color: "red",
-  setToast: (
-    message: string,
-    visible: boolean,
-    duration?: number,
-    color?: string
-  ) => {},
-});
-
-const LoadingScreenContext = createContext({
-  isLoading: true,
-  setLoading: (isLoading: boolean) => {},
-});
-
-interface User {
-  username: string | null;
-  _id: string | null;
-  email: string | null;
-  token: string | null;
-}
-
-const userDataContext = createContext<{
-  username: string | null;
-  _id: string | null;
-  email: string | null;
-  token: string | null;
-  setUser: (user: User) => void;
-}>({
-  username: null,
-  _id: null,
-  email: null,
-  token: null,
-  setUser: () => {},
-});
-
-export const useLoadingScreen = () => useContext(LoadingScreenContext);
-export const useUserData = () => useContext(userDataContext);
-export const useToast = () => useContext(ToastContext);
+import { LoadingScreen } from "../components/wrapper/LoadingScreen";
+import { ProfileProvider } from '../context/ProfileContext';
+import { ToastProvider } from '../context/ToastContext';
+import { LoadingScreenProvider, useLoadingScreen } from '../context/LoadingScreenContext';
+import { UserDataProvider } from '../context/UserDataContext';
+import { useState } from "react";
 
 export default function Layout() {
-  const [toast, setToastState] = useState({
-    message: "",
-    visible: false,
-    duration: 3000,
-    color: "red",
-  });
-
-  const [LoadingScreenBool, setLoadingScreen] = useState(false);
-
-  const [userData, setUserData] = useState<User>({
-    username: "",
-    _id: "",
-    email: "",
-    token: "",
-  });
-
-  const setUser = ({ username, _id, email, token }: User) => {
-    setUserData({ username, _id, email, token });
-  };
-
-  const setToast = (
-    message: string,
-    visible: boolean,
-    duration: number = 3000,
-    color: string = "red"
-  ) => {
-    setToastState({ message, visible, duration, color });
-  };
-
-  const setLoading = (isLoading: boolean) => {
-    setLoadingScreen(isLoading);
-  };
-
-  useEffect(() => {
-    console.log("userData se cambio", userData);
-  }, [userData]);
-
   const loading = useFontsLoad();
+  const [toast, setToast] = useState({ message: "", visible: false, duration: undefined, color: undefined });
+  const { isLoading  } = useLoadingScreen();
+  console.log("valo de isLoading",isLoading);
 
   if (!loading) {
     return <View style={styles.loadingContainer}></View>;
   }
 
   return (
-    <HolographicScreen>
-      <ToastContext.Provider value={{ ...toast, setToast }}>
-        <LoadingScreenContext.Provider
-          value={{ isLoading: LoadingScreenBool, setLoading }}
-        >
-          <userDataContext.Provider value={{ ...userData, setUser }}>
-            <LoadingScreen isLoading={LoadingScreenBool}>
+    
+    <ProfileProvider>
+      <ToastProvider>
+        <LoadingScreenProvider>
+          <UserDataProvider>
+            <LoadingScreen isLoading={isLoading}>
+
               <Slot
                 screenOptions={{
                   headerShown: false,
                 }}
               />
-              <Toast
-                message={toast.message}
-                visible={toast.visible}
-                duration={toast.duration}
-                color={toast.color}
-                setToast={() => setToast("", false)}
-              />
+
             </LoadingScreen>
-          </userDataContext.Provider>
-        </LoadingScreenContext.Provider>
-      </ToastContext.Provider>
-    </HolographicScreen>
+          </UserDataProvider>
+        </LoadingScreenProvider>
+      </ToastProvider>
+    </ProfileProvider>
   );
 }
 

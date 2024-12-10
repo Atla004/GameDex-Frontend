@@ -1,7 +1,7 @@
 import React from "react";
 import { Modal, View, Text, TextInput, TouchableOpacity, StyleSheet } from "react-native";
 
-interface EmailChangeModalProps {
+export interface EmailChangeModalProps {
   visible: boolean;
   onClose: () => void;
   newEmail: string;

@@ -1,429 +1,341 @@
-import React, { useState, useEffect } from "react";
 import {
-  ScrollView,
   View,
-  Text,
   StyleSheet,
-  Image,
+  Text,
+  TextInput,
+  ScrollView,
   TouchableOpacity,
-  Alert,
+  Modal,
+  Image,
+  Appearance,
 } from "react-native";
+import { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
-import { z } from "zod";
-
-import { SettingOption } from "@/components/ProfileComponents/SettingOption";
-import PasswordChangeModal from "@/components/mainInterfaceComponents/ProfileScreenComponents/PasswordChangeModal";
-import EmailChangeModal from "@/components/mainInterfaceComponents/ProfileScreenComponents/EmailChangeModal";
-import UsernameChangeModal from "@/components/mainInterfaceComponents/ProfileScreenComponents/UsernameChangeModal";
-import DeleteAccountModal from "@/components/mainInterfaceComponents/ProfileScreenComponents/DeleteAccountModal";
-
-import { router } from "expo-router";
-import { ProfileImageSelectorModal } from "@/components/mainInterfaceComponents/ProfileScreenComponents/ProfileImageSelectorModal";
-import { useToast, useUserData } from "../_layout";
+import * as ImagePicker from "expo-image-picker";
+import DateTimePicker from "@react-native-community/datetimepicker";
+import { useProfileContext } from "@/context/ProfileContext";
 import {
-  validateEmail,
-  validatePassword,
-  validateUsername,
-} from "@/utils/validation";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+  PasswordChangeModal,
+  EmailChangeModal,
+  DeleteAccountModal,
+} from "@/components/mainInterfaceComponents/ProfileScreenComponents/ProfileScreenComponents";
+import { PasswordChangeModalProps } from "@/components/mainInterfaceComponents/ProfileScreenComponents/PasswordChangeModal";
+import { EmailChangeModalProps } from "@/components/mainInterfaceComponents/ProfileScreenComponents/EmailChangeModal";
+import { DeleteAccountModalProps } from "@/components/mainInterfaceComponents/ProfileScreenComponents/DeleteAccountModal";
+import SnackbarSaveChanges from "@/components/mainInterfaceComponents/ProfileScreenComponents/SnackbarSaveChanges";
 
-const backendUrl = process.env.EXPO_PUBLIC_API_URL as string;
+export default function ProfileScreen() {
+  const { profile, updateProfile } = useProfileContext();
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [hasChanges, setHasChanges] = useState(false);
 
-interface ProfileData {
-  profileImageUri: string;
-  username: string;
-  userLevel: number;
-  reviews: number;
-  favorites: number;
-  email: string;
-}
+  const [passwordModalProps, setPasswordModalProps] =
+    useState<PasswordChangeModalProps>({
+      visible: false,
+      onClose: () => {
+        setPasswordModalProps({ ...passwordModalProps, visible: false });
+      },
+      currentPassword: "",
+      newPassword: "",
+      confirmPassword: "",
+      setCurrentPassword: (text: string) => {
+        setPasswordModalProps({ ...passwordModalProps, currentPassword: text });
+      },
+      setNewPassword: (text: string) => {
+        setPasswordModalProps({ ...passwordModalProps, newPassword: text });
+      },
+      setConfirmPassword: (text: string) => {
+        setPasswordModalProps({ ...passwordModalProps, confirmPassword: text });
+      },
+      onChange: () => handleOnChangePassword(),
+    });
 
-const ProfileScreen = () => {
-  const { setToast } = useToast();
-  const [mockData, setMockData] = useState<ProfileData>();
-  const [showPasswordModal, setShowPasswordModal] = useState(false);
-  const [showEmailModal, setShowEmailModal] = useState(false);
-  const [showUsernameModal, setShowUsernameModal] = useState(false);
-  const [showDeleteAccountModal, setShowDeleteAccountModal] = useState(false);
-  const [showImageSelectorModal, setShowImageSelectorModal] = useState(false);
-  const [currentPassword, setCurrentPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [newEmail, setNewEmail] = useState("");
-  const [newUsername, setNewUsername] = useState("");
-  const [deleteConfirmation, setDeleteConfirmation] = useState("");
-  const { token, _id ,email} = useUserData();
-  console.log(mockData);
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch(`${backendUrl}/api/user/${_id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
+  console.log(
+    "ProfileScreen password modal visible",
+    passwordModalProps.visible
+  );
+  const [emailModalProps, setEmailModalProps] = useState<EmailChangeModalProps>(
+    {
+      visible: false,
+      onClose: () => {
+        setEmailModalProps({ ...emailModalProps, visible: false });
+      },
+      newEmail: "",
+      setNewEmail: (text: string) => {
+        setEmailModalProps({ ...emailModalProps, newEmail: text });
+      },
+      onChange: () => handleOnChangeEmail(),
+    }
+  );
+
+  const [deleteAccountModalProps, setDeleteAccountModalProps] =
+    useState<DeleteAccountModalProps>({
+      visible: false,
+      onClose: () => {
+        setDeleteAccountModalProps({
+          ...deleteAccountModalProps,
+          visible: false,
         });
-        const data = await response.json();
-        console.log({ data });
-        setMockData(data.data);
-      } catch (error) {
-        console.error(error);
-        setToast("Error getting profile data", true, 3000);
-      }
+      },
+      deleteConfirmation: "",
+      setDeleteConfirmation: (text: string) => {
+        setDeleteAccountModalProps({
+          ...deleteAccountModalProps,
+          deleteConfirmation: text,
+        });
+      },
+      onDelete: () => handleOnDelete(),
+    });
+
+  const handleOnDelete = () => {
+    // Implement onDelete functionality here
+  };
+
+  const handleOnChangeEmail = () => {
+    // Implement onChange email functionality here
+  };
+
+  const handleOnChangePassword = () => {
+    // Implement onChange password functionality here
+  };
+  
+    const handleLogout = () => {
+      // Implement logout functionality here
     };
 
-    fetchData();
-  }, []);
+  const colorScheme = Appearance.getColorScheme();
 
-  const handlePasswordChange = () => {
-    const validation = validatePassword(newPassword);
-
-    if (!validation.valid) {
-      Alert.alert("Error", validation.errors?.[0]);
-      return;
-    }
-    if (newPassword !== confirmPassword) {
-      Alert.alert("Error", "New passwords do not match!");
-      return;
-    }
-    fetch(`${backendUrl}/api/auth/instant-password-change`, {
-      method: "PUT",
-      body: JSON.stringify({ 
-        email: email,
-        newPassword: newPassword,
-     }),
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-    }).then(() => {
-
-      setToast("Password changed successfully", true, 3000);
+  const pickImage = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
     });
 
-    setShowPasswordModal(false);
-    resetPasswordFields();
-  };
-
-  const handleEmailChange = () => {
-    const validation = validateEmail(newEmail);
-    if (!validation.valid) {
-      Alert.alert("Error", validation.errors?.[0]);
-      return;
+    if (!result.canceled) {
+      updateProfile({ photo: result.assets[0].uri });
+      setHasChanges(true);
     }
-    fetch(`${backendUrl}/api/user/${_id}/change-email`, {
-      method: "PUT",
-      body: JSON.stringify({ email: newEmail }),
-      headers: {
-        "Authorization": `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-    }).then(() => {
-      setNewEmail(newEmail);
-      setShowEmailModal(false);
-    });
-  };
-
-  const handleUsernameChange = () => {
-    const validation = validateUsername(newUsername);
-    if (!validation.valid) {
-      Alert.alert("Error", validation.errors?.[0]);
-      return;
-    }
-    setShowUsernameModal(false);
-    setNewUsername("");
-  };
-
-  const handleLogout = () => {
-    AsyncStorage.removeItem("user").then(() => {
-      Alert.alert("Goodbye, Trainer!", "You have been logged out.", [
-        {
-          text: "OK",
-          onPress: () => {
-            router.dismissAll();
-            router.replace("/LoginScreen");
-          },
-        },
-      ]);
-    });
-  };
-
-  const handleDeleteAccount = () => {
-    if (deleteConfirmation.toLowerCase() !== "delete") {
-      Alert.alert("Error", 'Please type "delete" to confirm account deletion');
-      return;
-    }
-    fetch(`${backendUrl}/user/${_id}`, {
-      method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }).then(() => {
-      Alert.alert(
-        "Goodbye, Trainer!",
-        "Your account has been deleted. We hope to see you again in the future!",
-        [{ text: "OK", onPress: () => setShowDeleteAccountModal(false) }]
-      );
-      router.dismissAll();
-      router.replace("/LoginScreen");
-    });
-  };
-
-  const resetPasswordFields = () => {
-    setCurrentPassword("");
-    setNewPassword("");
-    setConfirmPassword("");
-  };
-
-  const handleChangeProfileImage = () => {
-    setShowImageSelectorModal(true);
-  };
-
-  const handleSelectProfileImage = (imageUri: string) => {
-    fetch(`${backendUrl}/api/user/${_id}/profile-pic`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ url: imageUri }),
-    });
-    setMockData((prev) =>
-      prev ? { ...prev, profileImageUri: imageUri } : prev
-    );
   };
 
   return (
     <>
       <ScrollView style={styles.container}>
-        {/* Profile Header */}
-        <View style={styles.header}>
-          <View style={styles.profileImageContainer}>
-            <Image
-              source={{ uri: mockData?.profileImageUri }}
-              style={styles.profileImage}
-            />
-            <TouchableOpacity
-              onPress={handleChangeProfileImage}
-              style={styles.editImageButton}
-            >
-              <Ionicons name="camera" size={20} color="#fff" />
-            </TouchableOpacity>
-          </View>
-          <Text style={styles.username}>{mockData?.username}</Text>
-          <Text style={styles.userLevel}>
-            Level {mockData?.userLevel? Math.floor(mockData?.userLevel): 0} Trainer
-          </Text>
-
-          {/* Stats */}
-          <View style={styles.statsContainer}>
-            <View style={styles.statItem}>
-              <Text style={styles.statValue}>{mockData?.reviews}</Text>
-              <Text style={styles.statLabel}>Reviews</Text>
+        <TouchableOpacity style={styles.photoContainer} onPress={pickImage}>
+          {profile.photo ? (
+            <Image source={{ uri: profile.photo }} style={styles.photo} />
+          ) : (
+            <View style={styles.photoPlaceholder}>
+              <Ionicons name="camera" size={40} color="#666" />
             </View>
-            <View style={styles.statItem}>
-              <Text style={styles.statValue}>{mockData?.favorites}</Text>
-              <Text style={styles.statLabel}>Favorites</Text>
-            </View>
-          </View>
-        </View>
+          )}
+        </TouchableOpacity>
 
-        {/* Account Settings */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Account Settings</Text>
-          {/* <SettingOption
-            icon="master-ball"
-            title="Change Username"
-            subtitle={mockData?.username}
-            onPress={() => setShowUsernameModal(true)}
-          /> */}
-          <SettingOption
-            icon="quick-ball"
-            title="Change Email"
-            subtitle={mockData?.email}
-            onPress={() => setShowEmailModal(true)}
-          />
-          <SettingOption
-            icon="ultra-ball"
-            title="Change Password"
-            subtitle="********"
-            onPress={() => setShowPasswordModal(true)}
+          <Text style={styles.label}>Biography</Text>
+          <TextInput
+            style={styles.input}
+            multiline
+            numberOfLines={4}
+            value={profile.bio || ""}
+            onChangeText={(text) => {
+              updateProfile({ bio: text });
+              setHasChanges(true);
+            }}
+            placeholder="Tell us about yourself..."
+            maxLength={200}
           />
         </View>
 
-        {/* Account Management */}
-        <View style={styles.accountManagement}>
-          <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-            <Text style={styles.logoutText}>Log Out</Text>
-          </TouchableOpacity>
+        <View style={styles.section}>
+          <Text style={styles.label}>Gender</Text>
+          <View style={styles.genderButtons}>
+            {["Male", "Female"].map((gender) => (
+              <TouchableOpacity
+                key={gender}
+                style={[
+                  styles.genderButton,
+                  profile.gender === gender && styles.genderButtonActive,
+                ]}
+                onPress={() => {
+                  updateProfile({ gender });
+                  setHasChanges(true);
+                }}
+              >
+                <Text
+                  style={[
+                    styles.genderButtonText,
+                    profile.gender === gender && styles.genderButtonTextActive,
+                  ]}
+                >
+                  {gender}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
 
-          <TouchableOpacity
-            style={styles.deleteAccountButton}
-            onPress={() => setShowDeleteAccountModal(true)}
+        <TouchableOpacity
+          style={styles.section}
+          onPress={() => setShowDatePicker(true)}
+        >
+          <Text style={styles.label}>Birth Date</Text>
+          <Text style={styles.value}>
+            {profile.birthDate
+              ? profile.birthDate.toLocaleDateString()
+              : "Select date"}
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.section}
+          onPress={() => {
+            setPasswordModalProps({ ...passwordModalProps, visible: true });
+          }}
+        >
+          <Text style={styles.label}>Change Password</Text>
+          <Ionicons name="chevron-forward" size={20} color="#666" />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.section}
+          onPress={() => {
+            setEmailModalProps({ ...emailModalProps, visible: true });
+          }}
+        >
+          <Text style={styles.label}>Change Email</Text>
+          <Ionicons name="chevron-forward" size={20} color="#666" />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.section}
+          onPress={() => {
+            setDeleteAccountModalProps({
+              ...deleteAccountModalProps,
+              visible: true,
+            });
+          }}
+        >
+          <Text style={styles.label}>Delete Account</Text>
+          <Ionicons name="chevron-forward" size={20} color="#666" />
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.section} onPress={handleLogout}>
+          <Text style={styles.label}>Log Out</Text>
+          <Ionicons name="chevron-forward" size={20} color="#666" />
+        </TouchableOpacity>
+
+        {showDatePicker && (
+          <View
+            style={[
+              styles.datePickerContainer,
+              colorScheme === "dark" ? styles.darkMode : styles.lightMode,
+            ]}
           >
-            <Text style={styles.deleteAccountText}>Delete Account</Text>
-          </TouchableOpacity>
-        </View>
+            <DateTimePicker
+              value={profile.birthDate || new Date()}
+              mode="date"
+              display="spinner"
+              onChange={(event: any, date: Date | undefined) => {
+                setShowDatePicker(false);
+                if (date) {
+                  updateProfile({ birthDate: date });
+                  setHasChanges(true);
+                }
+              }}
+            />
+          </View>
+        )}
 
-        {/* Modals */}
-        <PasswordChangeModal
-          visible={showPasswordModal}
-          onClose={() => {
-            setShowPasswordModal(false);
-            resetPasswordFields();
-          }}
-          currentPassword={currentPassword}
-          newPassword={newPassword}
-          confirmPassword={confirmPassword}
-          setCurrentPassword={setCurrentPassword}
-          setNewPassword={setNewPassword}
-          setConfirmPassword={setConfirmPassword}
-          onChange={handlePasswordChange}
-        />
-        <EmailChangeModal
-          visible={showEmailModal}
-          onClose={() => {
-            setShowEmailModal(false);
-            setNewEmail("");
-          }}
-          newEmail={newEmail}
-          setNewEmail={setNewEmail}
-          onChange={handleEmailChange}
-        />
-        <UsernameChangeModal
-          visible={showUsernameModal}
-          onClose={() => {
-            setShowUsernameModal(false);
-            setNewUsername("");
-          }}
-          newUsername={newUsername}
-          setNewUsername={setNewUsername}
-          onChange={handleUsernameChange}
-        />
-        <DeleteAccountModal
-          visible={showDeleteAccountModal}
-          onClose={() => {
-            setShowDeleteAccountModal(false);
-            setDeleteConfirmation("");
-          }}
-          deleteConfirmation={deleteConfirmation}
-          setDeleteConfirmation={setDeleteConfirmation}
-          onDelete={handleDeleteAccount}
-        />
-        <ProfileImageSelectorModal
-          visible={showImageSelectorModal}
-          onClose={() => setShowImageSelectorModal(false)}
-          onSelectImage={handleSelectProfileImage}
-        />
+        <PasswordChangeModal {...passwordModalProps} />
+        <EmailChangeModal {...emailModalProps} />
+        <DeleteAccountModal {...deleteAccountModalProps} />
       </ScrollView>
+      {hasChanges && <SnackbarSaveChanges setHasChanges={setHasChanges} />}
     </>
   );
-};
-
-export default ProfileScreen;
+}
 
 const styles = StyleSheet.create({
-  container: {},
-  header: {
+  container: {
+    flex: 1,
+    backgroundColor: "#f5f5f5",
+  },
+  photoContainer: {
     alignItems: "center",
     padding: 20,
-    backgroundColor: "#ef4444",
   },
-  profileImageContainer: {
-    position: "relative",
-    width: 120,
-    height: 120,
-    marginBottom: 16,
+  photo: {
+    width: 150,
+    height: 150,
+    borderRadius: 75,
   },
-  profileImage: {
-    width: "100%",
-    height: "100%",
-    borderRadius: 60,
-    backgroundColor: "#fff",
-    borderWidth: 4,
-    borderColor: "#fff",
-  },
-  editImageButton: {
-    position: "absolute",
-    bottom: 0,
-    right: 0,
-    backgroundColor: "#3b82f6",
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+  photoPlaceholder: {
+    width: 150,
+    height: 150,
+    borderRadius: 75,
+    backgroundColor: "#ddd",
     justifyContent: "center",
     alignItems: "center",
-    borderWidth: 3,
-    borderColor: "#fff",
-  },
-  username: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#fff",
-    marginBottom: 4,
-  },
-  userLevel: {
-    fontSize: 16,
-    color: "#fff",
-    opacity: 0.9,
-    marginBottom: 16,
-  },
-  statsContainer: {
-    flexDirection: "row",
-    backgroundColor: "rgba(255, 255, 255, 0.1)",
-    borderRadius: 12,
-    padding: 16,
-    width: "100%",
-  },
-  statItem: {
-    flex: 1,
-    alignItems: "center",
-  },
-  statValue: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#fff",
-  },
-  statLabel: {
-    fontSize: 12,
-    color: "#fff",
-    opacity: 0.9,
   },
   section: {
-    padding: 16,
-    backgroundColor: "#fff",
+    backgroundColor: "white",
+    padding: 15,
+    marginBottom: 10,
+  },
+  label: {
+    fontSize: 16,
+    fontWeight: "500",
     marginBottom: 8,
   },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#1f2937",
-    marginBottom: 16,
+  input: {
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 8,
+    padding: 10,
+    minHeight: 100,
+    textAlignVertical: "top",
   },
-  accountManagement: {
-    padding: 16,
-    gap: 12,
+  genderButtons: {
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
-  logoutButton: {
-    padding: 16,
-    backgroundColor: "#dc2626",
-    borderRadius: 12,
+  genderButton: {
+    flex: 1,
+    padding: 10,
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 8,
+    marginHorizontal: 5,
     alignItems: "center",
   },
-  logoutText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold",
+  genderButtonActive: {
+    backgroundColor: "#007AFF",
+    borderColor: "#007AFF",
   },
-  deleteAccountButton: {
-    padding: 16,
-    backgroundColor: "#1f2937",
-    borderRadius: 12,
-    alignItems: "center",
+  genderButtonText: {
+    color: "#666",
   },
-  deleteAccountText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold",
+  genderButtonTextActive: {
+    color: "white",
+  },
+  value: {
+    color: "#666",
+  },
+
+  datePickerContainer: {
+    borderRadius: 10,
+    padding: 10,
+    backgroundColor: "red", // Fondo semitransparente
+  },
+  darkMode: {
+    backgroundColor: "red", // Fondo semitransparente para modo oscuro
+  },
+  lightMode: {
+    backgroundColor: "red", // Fondo semitransparente para modo claro
+  },
+  datePicker: {
+    backgroundColor: "transparent", // Asegura que el fondo del DateTimePicker sea transparente
   },
 });

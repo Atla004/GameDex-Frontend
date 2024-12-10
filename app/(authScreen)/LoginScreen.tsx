@@ -8,14 +8,12 @@ import {
   Image,
   ScrollView,
 } from "react-native";
-import { Checkbox, SecureInput } from "@/components/basic/MyComponents";
 import { useRouter } from "expo-router";
-import { usePokedex } from "./_layout";
-import { validatePassword, validateUsername } from "@/utils/validation";
-import { useUserData } from "../_layout";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { set } from "zod";
-// import { AsyncStorage } from 'react-native'
+import SecureInput from "../../components/basic/SecureInput";
+import Checkbox from "../../components/basic/Checkbox";
+import { validatePassword, validateUsername } from "../../utils/validation";
+import { useUserData } from "@/context/UserDataContext";
 
 const backendUrl = process.env.EXPO_PUBLIC_API_URL as string;
 
@@ -27,7 +25,6 @@ export const LoginScreen = () => {
     _id: ide,
     token: tok,
   } = useUserData();
-  const { isTransitioning, closePokedex, openPokedex } = usePokedex();
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -35,7 +32,8 @@ export const LoginScreen = () => {
   const [errors, setErrors] = useState({ username: "", password: "" });
   const router = useRouter();
 
-  const handleLogin = () => {
+
+  const handleLogin = async () => {
     const result2 = {
       username: validateUsername(username),
       password: validatePassword(password),
@@ -48,118 +46,104 @@ export const LoginScreen = () => {
       return;
     }
 
-    fetch(`${backendUrl}/api/auth/login`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ username, password }),
-    })
-      .then((response) => {
-        console.log(response.ok);
-        if (!response.ok) {
-          console.log(JSON.stringify(response, null, 4));
+    try {
+      router.push("/MatchScreen");
+      return 
 
-          setErrors({ username: "Invalid username or password", password: "" });
-        }
-        return response.json();
-      })
-      .then((response) => {
-        if (response.error) {
-          return;
-        }
-        console.log(JSON.stringify(response, null, 4));
-        setUser({
-          username: response.data.user.username,
-          _id: response.data.user._id,
-          email: response.data.user.email,
-          token: response.data.token,
-        });
-
-        if (staySignedIn) {
-          AsyncStorage.setItem("user", JSON.stringify(response.data))
-            .then(() => console.log("User data saved in localStorage"))
-            .catch((error) => console.log("Error saving user data", error));
-        }
-
-        closePokedex();
-        setTimeout(() => {
-          router.push("/HomeScreen");
-        }, 600);
-      })
-      .catch((error) => {
-        console.log(error);
-        setErrors({ username: "", password: "Invalid username or password" });
+      const response = await fetch(`${backendUrl}/api/auth/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username, password }),
       });
+
+      if (!response.ok) {
+        console.log(JSON.stringify(response, null, 4));
+        setErrors({ username: "Invalid username or password", password: "" });
+        return;
+      }
+
+      const responseData = await response.json();
+      if (responseData.error) {
+        return;
+      }
+
+      console.log(JSON.stringify(responseData, null, 4));
+      setUser({
+        username: responseData.data.user.username,
+        _id: responseData.data.user._id,
+        email: responseData.data.user.email,
+        token: responseData.data.token,
+      });
+
+      if (staySignedIn) {
+        await AsyncStorage.setItem("user", JSON.stringify(responseData.data));
+        console.log("User data saved in localStorage");
+      }
+
+
+    } catch (error) {
+      console.log(error);
+      setErrors({ username: "", password: "Invalid username or password" });
+    }
   };
 
   const handleRegister = () => {
-    closePokedex();
-    setTimeout(() => {
-      router.push("RegisterScreen");
-    }, 600);
+    router.push("RegisterScreen");
   };
 
   const handleForgot = () => {
-    closePokedex();
-    setTimeout(() => {
-      router.push("/ForgotScreen");
-    }, 600);
+    router.push("/ForgotScreen");
   };
 
   useEffect(() => {
     console.log("LoginScreen mounted");
     validateAutoLogin();
-
-    if (isTransitioning) {
-      setTimeout(() => {
-        openPokedex();
-      }, 100);
-    }
   }, []);
 
   const validateAutoLogin = async () => {
-    AsyncStorage.getItem("user").then(async(tok) => {
+    try {
+      const tok = await AsyncStorage.getItem("user");
       if (tok) {
         const parsedUser = JSON.parse(tok);
-        console.log("User data retrieved from localStorage", parsedUser.user._id);
+        console.log(
+          "User data retrieved from localStorage",
+          parsedUser.user._id
+        );
 
-        const response = await fetch(`${backendUrl}/api/user/${parsedUser.user._id}`, {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${parsedUser.token}`,
-          },
-        });
+        const response = await fetch(
+          `${backendUrl}/api/user/${parsedUser.user._id}`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${parsedUser.token}`,
+            },
+          }
+        );
+
         const data = await response.json();
         console.log("Refresh token response", data.data.username);
         if (data.error) {
           return;
         }
+
         setUser({
           username: data.data.username,
           _id: parsedUser.user._id,
           email: data.data.email,
           token: parsedUser.token,
         });
-        closePokedex();
-        setTimeout(() => {
-          router.push("/HomeScreen");
-        }, 600);
-
+        router.push("/HomeScreen");
       }
-    });
+    } catch (error) {
+      console.log("Error during auto login", error);
+    }
   };
 
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
       <View style={styles.card}>
-        <Image
-          source={{
-            uri: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png",
-          }}
-          style={styles.logo}
-          resizeMode="contain"
-        />
 
         <Text style={styles.title}>Log in</Text>
 

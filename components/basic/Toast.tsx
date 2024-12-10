@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { View, Text, StyleSheet, Animated } from 'react-native';
 
 interface ToastProps {
@@ -12,7 +12,9 @@ interface ToastProps {
 const Toast: React.FC<ToastProps> = ({ message, visible, duration = 3000, setToast , color="red"}) => {
   const opacity = new Animated.Value(0);
 
+  console.log("Toast mounted", visible, message, duration, color);
   useEffect(() => {
+
     if (visible) {
       Animated.timing(opacity, {
         toValue: 1,
@@ -21,7 +23,7 @@ const Toast: React.FC<ToastProps> = ({ message, visible, duration = 3000, setToa
       }).start(() => {
         setTimeout(() => {
           Animated.timing(opacity, {
-            toValue: 0,
+            toValue: 0.8,
             duration: 500,
             useNativeDriver: true,
           }).start(() => setToast(false));
@@ -30,7 +32,7 @@ const Toast: React.FC<ToastProps> = ({ message, visible, duration = 3000, setToa
     }
   }, [visible]);
 
-  if (!visible) {
+  if ( !visible ) {
     return null;
   }
 
@@ -38,6 +40,7 @@ const Toast: React.FC<ToastProps> = ({ message, visible, duration = 3000, setToa
     <Animated.View style={[styles.toast, { opacity },{backgroundColor: color,}]}>
       <Text style={styles.message}>{message}</Text>
     </Animated.View>
+
   );
 };
 

@@ -12,9 +12,8 @@ import {
 } from "react-native";
 import { router } from "expo-router";
 import { SecureInput } from "@/components/basic/MyComponents";
-import { usePokedex } from "./_layout";
-import { useToast } from "../_layout";
 import { validateEmail, validateUsername } from "@/utils/validation";
+import { useToast } from "@/context/ToastContext";
 
 const backendUrl = process.env.EXPO_PUBLIC_API_URL as string;
 
@@ -27,14 +26,16 @@ interface Errors {
 
 const RegisterScreen = () => {
   const { setToast } = useToast();
-  const { isTransitioning, closePokedex, openPokedex } = usePokedex();
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errors, setErrors] = useState<Errors>({});
 
-  const handleRegister = () => {
+
+  const handleRegister = async () => {
+    //limpiar errores
+    setErrors({});
 
 
     const samePassword =
@@ -64,42 +65,38 @@ const RegisterScreen = () => {
       return;
     }
 
-    fetch(`${backendUrl}/api/auth/register`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ username, email, password,user_type: "player"}),
-    }).then((response) => {
+
+    router.push("LoginScreen");
+    setToast("Registration successful!", true, 3000, "green");
+    return;
+    try {
+      const response = await fetch(`${backendUrl}/api/auth/register`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username, email, password,user_type: "player"}),
+      });
+  
       if (!response.ok) {
         setToast("Registration failed", true, 3000);
         return;
       }
       console.log("Registration successful");
-
-      closePokedex();
-      setTimeout(() => {
+  
         router.push("LoginScreen");
         setToast("Registration successful!", true, 3000, "green");
-      }, 600);
-    });
+    } catch (error) {
+      setToast("Registration failed", true, 3000);
+    }
   
   
   };
 
   const goBackToLogin = () => {
-    closePokedex();
-    setTimeout(() => {
       router.push("LoginScreen");
-    }, 600);
   };
 
-  useEffect(() => {
-    if (isTransitioning) {
-      // Close animation
-      openPokedex();
-    }
-  }, []);
 
   return (
     <>
@@ -109,13 +106,6 @@ const RegisterScreen = () => {
       >
         <ScrollView contentContainerStyle={styles.scrollContent}>
           <View style={styles.card}>
-            <Image
-              source={{
-                uri: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/premier-ball.png",
-              }}
-              style={styles.logo}
-              resizeMode="contain"
-            />
 
             <Text style={styles.title}>New Trainer Registration</Text>
 

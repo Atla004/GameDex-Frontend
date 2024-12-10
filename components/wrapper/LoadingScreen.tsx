@@ -69,7 +69,7 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({ isLoading, childre
       <Reanimated.View style={[styles.overlay, overlayStyle]}>
         <View style={styles.content}>
           <Reanimated.View style={[styles.imageContainer, rotationStyle]}>
-            <Image source={require('@/assets/background/pokeballLoading.png')} style={styles.loadingImage} />
+
           </Reanimated.View>
           <Reanimated.Text style={[styles.loadingText, textStyle]}>
             Loading...

@@ -3,7 +3,6 @@ import {
   StyleSheet,
   View,
   Text,
-  TextInput,
   TouchableOpacity,
   Image,
   ScrollView,
@@ -13,16 +12,13 @@ import {
 import { StatusBar } from "expo-status-bar";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {SecureInput} from "@/components/basic/MyComponents";
-import { usePokedex } from "./_layout";
 import { z } from "zod";
-import { useUserData } from "../_layout";
 
 const backendUrl = process.env.EXPO_PUBLIC_API_URL as string;
 
 const passwordSchema = z.string().min(8, "Password must be at least 8 characters long");
 
 const RestartPasswordScreen = () => {
-  const { isTransitioning, closePokedex, openPokedex } = usePokedex();
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errors, setErrors] = useState({ newPassword: "", confirmPassword: "" });
@@ -68,27 +64,15 @@ const RestartPasswordScreen = () => {
 
     if (newPasswordValidation.success && confirmPasswordValidation.success && newPassword === confirmPassword) {
       fetchData(newPassword).then(() => {
-        closePokedex();
-        setTimeout(() => {
           router.push("/LoginScreen");
-        }, 600);
       });
     }
   };
 
   const goBackToLogin = () => {
-    closePokedex();
-    setTimeout(() => {
     router.push("/LoginScreen");
-  }, 600);
   };
 
-  useEffect(() => {
-    if (isTransitioning) {
-      // Close animation
-      openPokedex();
-    }
-  }, []);
 
   return (
     <>
@@ -99,13 +83,6 @@ const RestartPasswordScreen = () => {
       >
         <ScrollView contentContainerStyle={styles.scrollContent}>
           <View style={styles.card}>
-            <Image
-              source={{
-                uri: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png",
-              }}
-              style={styles.logo}
-              resizeMode="contain"
-            />
 
             <Text style={styles.title}>Restart Password</Text>
 

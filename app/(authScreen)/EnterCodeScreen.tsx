@@ -12,12 +12,10 @@ import {
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { router, useLocalSearchParams } from 'expo-router';
-import { usePokedex } from './_layout';
 
 const backendUrl = process.env.EXPO_PUBLIC_API_URL as string;
 
 const EnterCodeScreen = () => {
-  const { isTransitioning, closePokedex, openPokedex } = usePokedex();
   const [code, setCode] = useState(['', '', '', '', '', '']);
   const inputRefs = useRef<Array<TextInput | null>>([]);
   const {email} = useLocalSearchParams();
@@ -65,27 +63,15 @@ const EnterCodeScreen = () => {
     const fullCode = code.join('');
     if (fullCode.length === 6) {
       fetchData(fullCode).then(() => {
-        closePokedex();
-        setTimeout(() => {
           router.push({pathname: '/RestartPasswordScreen', params: { email, token: code }});
-        }, 600);
       })
     }
   };
 
   const handleBack = () => {
-    closePokedex();
-    setTimeout(() => {
     router.push('/LoginScreen');
-  }, 600);
   };
 
-  useEffect(() => {
-    if (isTransitioning) {
-      // Close animation
-      openPokedex();
-    }
-  }, []);
 
   return (
     <>
@@ -96,11 +82,6 @@ const EnterCodeScreen = () => {
       >
         <ScrollView contentContainerStyle={styles.scrollContent}>
           <View style={styles.card}>
-            <Image
-              source={{ uri: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/master-ball.png' }}
-              style={styles.logo}
-              resizeMode="contain"
-            />
             
             <Text style={styles.title}>Enter Verification Code</Text>
             <Text style={styles.subtitle}>

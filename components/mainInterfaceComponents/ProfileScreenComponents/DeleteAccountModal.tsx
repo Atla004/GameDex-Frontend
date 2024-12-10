@@ -1,7 +1,7 @@
 import React from "react";
 import { Modal, View, Text, TextInput, TouchableOpacity, StyleSheet } from "react-native";
 
-interface DeleteAccountModalProps {
+export interface DeleteAccountModalProps {
   visible: boolean;
   onClose: () => void;
   deleteConfirmation: string;
