@@ -1,7 +1,7 @@
 import React from "react";
 import { Modal, View, Text, TextInput, TouchableOpacity, StyleSheet } from "react-native";
 
-export interface PasswordChangeModalProps {
+interface PasswordChangeModalProps {
   visible: boolean;
   onClose: () => void;
   currentPassword: string;
@@ -24,7 +24,6 @@ const PasswordChangeModal = ({
   setConfirmPassword,
   onChange,
 }: PasswordChangeModalProps) => {
-  console.log("PasswordChangeModal",visible);
   return (
     <Modal
       visible={visible}

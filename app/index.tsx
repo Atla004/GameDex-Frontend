@@ -8,6 +8,7 @@ import {
   Pressable,
 } from "react-native";
 import { router } from "expo-router";
+import PokedexFrame from "@/components/wrapper/PokedexFrame";
 
 export default function Index() {
   const [isOpen, setIsOpen] = useState(true);
@@ -38,7 +39,7 @@ export default function Index() {
   };
 
   return (
-    <>
+    <PokedexFrame isTransitioning={isOpen}>
       {isOpen && (
         <Pressable
           style={styles.fullScreenContainer}
@@ -53,7 +54,7 @@ export default function Index() {
           </View>
         </Pressable>
       )}
-      </>
+    </PokedexFrame>
   );
 }
 

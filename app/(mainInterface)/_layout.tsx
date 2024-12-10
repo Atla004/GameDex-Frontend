@@ -1,9 +1,14 @@
+
 import { Tabs } from "expo-router";
-import { StyleSheet, View, Image } from "react-native";
+import { StyleSheet, Text, View, Image } from "react-native";
 
 export default function Layout() {
+
+
   return (
-    <View style={styles.tabsContainer}>
+    <View
+      style={styles.tabsContainer}
+    >
       <Tabs
         screenOptions={({ route }) => ({
           sceneStyle: { backgroundColor: "transparent" },
@@ -11,21 +16,39 @@ export default function Layout() {
         })}
       >
         <Tabs.Screen
-          name="MatchScreen"
+          name="HomeScreen"
           options={{
-            title: "Match",
+            title: "Home",
+            tabBarIcon: ({ focused }) => (
+              <Image
+                source={require('@/assets/tabsIcon/home.png')}
+                style={{ width: 24, height: 24}}
+              />
+            ),
           }}
         />
-                <Tabs.Screen
-          name="ChatScreen"
+        <Tabs.Screen
+          name="SearchScreen"
           options={{
-            title: "Chat",
+            title: "Search",
+            tabBarIcon: ({ focused }) => (
+              <Image
+                source={require('@/assets/tabsIcon/search.png')}
+                style={{ width: 24, height: 24}}
+              />
+            ),
           }}
         />
         <Tabs.Screen
           name="ProfileScreen"
           options={{
             title: "Profile",
+            tabBarIcon: ({ focused }) => (
+              <Image
+                source={require('@/assets/tabsIcon/profile.png')}
+                style={{ width: 24, height: 24}}
+              />
+            ),
           }}
         />
       </Tabs>
@@ -43,4 +66,5 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+
 });
